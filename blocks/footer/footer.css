@@ -1,57 +1,138 @@
 footer {
   a {
     text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
   }
 
   .footer-content {
-    max-width: var(--grid-container-width);
-    margin: 48px auto;
-    font-size: 14px;
-  }
-
-  .section-legal ul {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .section-copyright p {
-    margin: 0;
+    max-width: 1480px;
+    margin: 0 auto;
   }
 
   .section {
+    padding: 40px 48px;
+
     .default-content {
       max-width: initial;
       margin: initial;
     }
   }
-}
 
-@media (width >= 900px) {
-  footer {
-    margin: 0;
+  /* ----- First section — Brand + Social ----- */
+  .section:first-child {
+    picture {
+      display: inline-block;
 
-    .section-legal {
-      display: flex;
-      justify-content: end;
-      gap: var(--spacing-xl);
-      margin-bottom: 24px;
-
-      ul {
-        display: flex;
-        justify-content: end;
-        gap: var(--spacing-xl);
+      img {
+        width: 200px;
+        height: auto;
       }
+    }
+
+    p {
+      margin: 0;
+    }
+
+    ul {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 20px;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+
+      li {
+        margin: 0;
+      }
+
+      a {
+        display: flex;
+        align-items: center;
+      }
+
+      svg {
+        width: 24px;
+        height: 24px;
+        fill: currentColor;
+      }
+    }
+  }
+
+  /* ----- Last section — Legal + Copyright ----- */
+  .section:last-child {
+    padding: 20px 48px;
+    font-size: var(--body-font-size-xs);
+
+    ul {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      list-style: none;
+      padding: 0;
+      margin: 0;
 
       li {
         margin: 0;
       }
     }
 
-    .section-copyright {
-      display: flex;
-      justify-content: end;
-      gap: var(--spacing-xl);
+    p {
+      margin: 0;
+      white-space: nowrap;
+    }
+  }
+}
+
+/* ============================================
+   Mobile (< 900px)
+   ============================================ */
+@media (width < 900px) {
+  footer {
+    .section:first-child {
+      padding: 32px 20px;
+      text-align: center;
+
+      ul {
+        justify-content: center;
+        margin-top: 16px;
+      }
+    }
+
+    .section:last-child {
+      padding: 20px;
+      text-align: center;
+
+      ul {
+        justify-content: center;
+        margin-bottom: 12px;
+      }
+    }
+  }
+}
+
+/* ============================================
+   Desktop (≥ 900px)
+   ============================================ */
+@media (width >= 900px) {
+  footer {
+    .section:first-child {
+      .default-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+    }
+
+    .section:last-child {
+      .default-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
     }
   }
 }
