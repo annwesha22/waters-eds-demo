@@ -1,62 +1,21 @@
 import { getConfig, getMetadata } from '../../scripts/ak.js';
 import { loadFragment } from '../fragment/fragment.js';
+import { setColorScheme } from '../section-metadata/section-metadata.js';
 
 const { locale } = getConfig();
 
-const FALLBACK_LOCALE = 'en';
-
+const HEADER_PATH = '/fragments/nav/header';
 const HEADER_ACTIONS = [
+  '/tools/widgets/scheme',
   '/tools/widgets/language',
-  '/tools/widgets/search',
   '/tools/widgets/toggle',
 ];
 
-/**
- * Returns current locale from URL/config
- */
-function getCurrentLocale() {
-  return locale?.prefix?.replace('/', '') || FALLBACK_LOCALE;
-}
-
-/**
- * Build locale-specific header path
- */
-function getHeaderPath(localeCode) {
-  return `/fragments/nav/${localeCode}/header`;
-}
-
-/**
- * Fetch localization sheet
- */
-async function getLocales() {
-  try {
-    const resp = await fetch(
-      '/docs/library/metadata/localization.json',
-    );
-
-    if (!resp.ok) {
-      throw new Error('Localization sheet not found');
-    }
-
-    const json = await resp.json();
-
-    return json.data || [];
-  } catch (e) {
-    console.warn('Unable to load localization config', e);
-
-    return [
-      { locale: 'en', label: 'English' },
-    ];
-  }
-}
-
-/**
- * Close all open menus
- */
 function closeAllMenus() {
-  document
-    .querySelectorAll('header .is-open')
-    .forEach((menu) => menu.classList.remove('is-open'));
+  const openMenus = document.body.querySelectorAll('header .is-open');
+  for (const openMenu of openMenus) {
+    openMenu.classList.remove('is-open');
+  }
 }
 
 function docClose(e) {
@@ -66,278 +25,173 @@ function docClose(e) {
 
 function toggleMenu(menu) {
   const isOpen = menu.classList.contains('is-open');
-
   closeAllMenus();
-
   if (isOpen) {
     document.removeEventListener('click', docClose);
     return;
   }
 
+  // Setup the global close event
   document.addEventListener('click', docClose);
   menu.classList.add('is-open');
 }
 
-/**
- * Language Selector
- */
-async function decorateLanguage(btn) {
-  const locales = await getLocales();
-
-  btn.addEventListener('click', () => {
-    let menu = document.querySelector('.language-selector-menu');
-
-    if (menu) {
-      menu.remove();
-      return;
+function decorateLanguage(btn) {
+  const section = btn.closest('.section');
+  btn.addEventListener('click', async () => {
+    let menu = section.querySelector('.language.menu');
+    if (!menu) {
+      const content = document.createElement('div');
+      content.classList.add('block-content');
+      const fragment = await loadFragment(`${locale.prefix}${HEADER_PATH}/languages`);
+      menu = document.createElement('div');
+      menu.className = 'language menu';
+      menu.append(fragment);
+      content.append(menu);
+      section.append(content);
     }
-
-    const currentLocale = getCurrentLocale();
-
-    menu = document.createElement('div');
-    menu.className = 'language-selector-menu';
-
-    locales.forEach((lang) => {
-      const option = document.createElement('button');
-
-      option.className = 'language-option';
-      option.textContent = lang.label;
-
-      if (lang.locale === currentLocale) {
-        option.classList.add('active');
-      }
-
-      option.addEventListener('click', () => {
-        const path = window.location.pathname;
-
-        const newPath = path.replace(
-          /^\/(en|fr|de|es)/,
-          `/${lang.locale}`,
-        );
-
-        window.location.href = newPath;
-      });
-
-      menu.append(option);
-    });
-
-    btn.parentElement.append(menu);
+    toggleMenu(section);
   });
 }
 
-/**
- * Search Action
- */
-function decorateSearch(btn) {
-  btn.addEventListener('click', () => {
-    document.body.classList.toggle('search-open');
+function decorateScheme(btn) {
+  btn.addEventListener('click', async () => {
+    const { body } = document;
 
-    const searchInput = document.querySelector(
-      '.header-search input[type="search"]',
-    );
+    let currPref = localStorage.getItem('color-scheme');
+    if (!currPref) {
+      currPref = matchMedia('(prefers-color-scheme: dark)')
+        .matches ? 'dark-scheme' : 'light-scheme';
+    }
 
-    if (searchInput) {
-      setTimeout(() => searchInput.focus(), 100);
+    const theme = currPref === 'dark-scheme'
+      ? { add: 'light-scheme', remove: 'dark-scheme' }
+      : { add: 'dark-scheme', remove: 'light-scheme' };
+
+    body.classList.remove(theme.remove);
+    body.classList.add(theme.add);
+    localStorage.setItem('color-scheme', theme.add);
+    // Re-calculatie section schemes
+    const sections = document.querySelectorAll('.section');
+    for (const section of sections) {
+      setColorScheme(section);
     }
   });
 }
 
-/**
- * Mobile Toggle
- */
 function decorateNavToggle(btn) {
   btn.addEventListener('click', () => {
-    const header = document.querySelector('header');
-
-    if (header) {
-      header.classList.toggle('is-mobile-open');
-    }
+    const header = document.body.querySelector('header');
+    if (header) header.classList.toggle('is-mobile-open');
   });
 }
 
-/**
- * Action Decorator
- */
-function decorateAction(header, pattern) {
+async function decorateAction(header, pattern) {
   const link = header.querySelector(`[href*="${pattern}"]`);
-
   if (!link) return;
 
   const icon = link.querySelector('.icon');
-  const text = link.textContent.trim();
-
+  const text = link.textContent;
   const btn = document.createElement('button');
-  btn.type = 'button';
-
   if (icon) btn.append(icon);
-
   if (text) {
-    const span = document.createElement('span');
-    span.className = 'text';
-    span.textContent = text;
-    btn.append(span);
+    const textSpan = document.createElement('span');
+    textSpan.className = 'text';
+    textSpan.textContent = text;
+    btn.append(textSpan);
   }
-
   const wrapper = document.createElement('div');
-  wrapper.className = 'action-wrapper';
+  wrapper.className = `action-wrapper ${icon.classList[1].replace('icon-', '')}`;
   wrapper.append(btn);
+  link.parentElement.parentElement.replaceChild(wrapper, link.parentElement);
 
-  link.parentElement.parentElement.replaceChild(
-    wrapper,
-    link.parentElement,
-  );
-
-  if (pattern === '/tools/widgets/language') {
-    decorateLanguage(btn);
-  }
-
-  if (pattern === '/tools/widgets/search') {
-    decorateSearch(btn);
-  }
-
-  if (pattern === '/tools/widgets/toggle') {
-    decorateNavToggle(btn);
-  }
+  if (pattern === '/tools/widgets/language') decorateLanguage(btn);
+  if (pattern === '/tools/widgets/scheme') decorateScheme(btn);
+  if (pattern === '/tools/widgets/toggle') decorateNavToggle(btn);
 }
 
-/**
- * Mega Menu Support
- */
+function decorateMenu() {
+  // TODO: finish single menu support
+  return null;
+}
+
 function decorateMegaMenu(li) {
   const menu = li.querySelector('.fragment-content');
-
   if (!menu) return null;
-
   const wrapper = document.createElement('div');
   wrapper.className = 'mega-menu';
-
   wrapper.append(menu);
-
   li.append(wrapper);
-  li.classList.add('has-dropdown');
-
   return wrapper;
 }
 
 function decorateNavItem(li) {
   li.classList.add('main-nav-item');
-
   const link = li.querySelector(':scope > p > a');
-
-  if (link) {
-    link.classList.add('main-nav-link');
-  }
-
-  const menu = decorateMegaMenu(li);
-
-  if (menu && link) {
-    link.addEventListener('click', (e) => {
-      e.preventDefault();
-      toggleMenu(li);
-    });
-  }
+  if (link) link.classList.add('main-nav-link');
+  const menu = decorateMegaMenu(li) || decorateMenu(li);
+  if (!(menu || link)) return;
+  link.addEventListener('click', (e) => {
+    e.preventDefault();
+    toggleMenu(li);
+  });
 }
 
-/**
- * Brand Section
- */
 function decorateBrandSection(section) {
   section.classList.add('brand-section');
-
-  const link = section.querySelector('a');
-
-  if (!link) return;
-
-  link.classList.add('brand-link');
-
-  const img = link.querySelector('img');
-
-  if (img) {
-    img.classList.add('brand-logo');
-  }
+  const brandLink = section.querySelector('a');
+  const [, text] = brandLink.childNodes;
+  const span = document.createElement('span');
+  span.className = 'brand-text';
+  span.append(text);
+  brandLink.append(span);
 }
 
-/**
- * Navigation Section
- */
 function decorateNavSection(section) {
   section.classList.add('main-nav-section');
-
+  const navContent = section.querySelector('.default-content');
   const navList = section.querySelector('ul');
-
   if (!navList) return;
-
   navList.classList.add('main-nav-list');
 
   const nav = document.createElement('nav');
   nav.append(navList);
+  navContent.append(nav);
 
-  section.append(nav);
-
-  nav.querySelectorAll(':scope > ul > li')
-    .forEach((item) => decorateNavItem(item));
+  const mainNavItems = section.querySelectorAll('nav > ul > li');
+  for (const navItem of mainNavItems) {
+    decorateNavItem(navItem);
+  }
 }
 
-/**
- * Actions Section
- */
-function decorateActionSection(section) {
+async function decorateActionSection(section) {
   section.classList.add('actions-section');
 }
 
-/**
- * Header Decorator
- */
 async function decorateHeader(fragment) {
   const sections = fragment.querySelectorAll(':scope > .section');
-
   if (sections[0]) decorateBrandSection(sections[0]);
   if (sections[1]) decorateNavSection(sections[1]);
   if (sections[2]) decorateActionSection(sections[2]);
 
-  HEADER_ACTIONS.forEach((action) => {
-    decorateAction(fragment, action);
-  });
-}
-
-/**
- * Try loading header fragment
- */
-async function loadHeader(path) {
-  try {
-    return await loadFragment(path);
-  } catch {
-    return null;
+  for (const pattern of HEADER_ACTIONS) {
+    decorateAction(fragment, pattern);
   }
 }
 
 /**
- * Initialize Header
+ * loads and decorates the header
+ * @param {Element} el The header element
  */
 export default async function init(el) {
-  const currentLocale = getCurrentLocale();
-
   const headerMeta = getMetadata('header');
-
-  const localizedHeader =
-    headerMeta || getHeaderPath(currentLocale);
-
-  let fragment = await loadHeader(localizedHeader);
-
-  if (!fragment) {
-    fragment = await loadHeader(
-      getHeaderPath(FALLBACK_LOCALE),
-    );
+  const path = headerMeta || HEADER_PATH;
+  try {
+    const fragment = await loadFragment(`${locale.prefix}${path}`);
+    fragment.classList.add('header-content');
+    await decorateHeader(fragment);
+    el.append(fragment);
+  } catch (e) {
+    throw Error(e);
   }
-
-  if (!fragment) {
-    console.error('Header fragment not found');
-    return;
-  }
-
-  fragment.classList.add('header-content');
-
-  await decorateHeader(fragment);
-
-  el.append(fragment);
 }
