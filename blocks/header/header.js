@@ -4,11 +4,11 @@ import { setColorScheme } from '../section-metadata/section-metadata.js';
 
 const { locale } = getConfig();
 
-const HEADER_PATH = '/fragments/nav/en/header';
+const HEADER_PATH = '/fragments/nav/header';
 const HEADER_ACTIONS = [
+  '/tools/widgets/scheme',
   '/tools/widgets/language',
   '/tools/widgets/toggle',
-  '/tools/widgets/search',
 ];
 
 function closeAllMenus() {
@@ -43,7 +43,7 @@ function decorateLanguage(btn) {
     if (!menu) {
       const content = document.createElement('div');
       content.classList.add('block-content');
-      const fragment = await loadFragment(`${HEADER_PATH}/languages`);
+      const fragment = await loadFragment(`${locale.prefix}${HEADER_PATH}/languages`);
       menu = document.createElement('div');
       menu.className = 'language menu';
       menu.append(fragment);
