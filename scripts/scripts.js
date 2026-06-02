@@ -3,7 +3,7 @@ import { loadArea, setConfig } from './ak.js';
 const hostnames = ['authorkit.dev'];
 
 const locales = {
-  '/en': { lang: 'en' },
+  '': { lang: 'en' },
   '/de': { lang: 'de' },
   '/es': { lang: 'es' },
   '/fr': { lang: 'fr' },
