@@ -184,6 +184,7 @@ function decorateNavItem(li) {
 function decorateBrandSection(section) {
   section.classList.add('brand-section');
   const brandLink = section.querySelector('a');
+  console.log('Header brand link:', brandLink);
   const [, text] = brandLink.childNodes;
   const span = document.createElement('span');
   span.className = 'brand-text';
