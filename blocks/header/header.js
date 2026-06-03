@@ -111,22 +111,26 @@ async function decorateAction(header, pattern) {
 }
 
   // TODO: finish single menu support
-  function decorateMenu(li) {
+ function decorateMenu(li) {
   const submenu = li.querySelector(':scope > ul');
   if (!submenu) return null;
 
-  submenu.classList.add('single-menu-list');
-
-  // Decorate each submenu item
-  const items = submenu.querySelectorAll(':scope > li');
-  for (const item of items) {
-    item.classList.add('single-menu-item');
-    const itemLink = item.querySelector('a');
-    if (itemLink) itemLink.classList.add('single-menu-link');
-  }
+  li.classList.add('has-single-menu');
 
   const wrapper = document.createElement('div');
   wrapper.className = 'single-menu';
+
+  submenu.classList.add('single-menu-list');
+
+  [...submenu.children].forEach((item) => {
+    item.classList.add('single-menu-item');
+
+    const link = item.querySelector('a');
+    if (link) {
+      link.classList.add('single-menu-link');
+    }
+  });
+
   wrapper.append(submenu);
   li.append(wrapper);
 
@@ -147,37 +151,34 @@ function decorateMegaMenu(li) {
 function decorateNavItem(li) {
   li.classList.add('main-nav-item');
 
-  // Prefer <p><a> structure, but fall back to a plain <a> or <p> label
-  const link = li.querySelector(':scope > p > a') || li.querySelector(':scope > a');
-  if (link) link.classList.add('main-nav-link');
+  const link =
+    li.querySelector(':scope > p > a')
+    || li.querySelector(':scope > a');
 
-  const menu = decorateMegaMenu(li) || decorateMenu(li);
-  if (!(menu || link)) return;
-
-  // Determine what should receive the click to toggle the menu
-  let trigger = link;
-  if (!trigger) {
-    // No link — use the first <p> as the label, or create one from the li's text
-    trigger = li.querySelector(':scope > p');
-    if (!trigger) {
-      // Wrap any stray text nodes into a <p> so we have something clickable
-      const p = document.createElement('p');
-      // Move any non-menu children (text) into the p
-      [...li.childNodes].forEach((node) => {
-        if (node !== menu) p.append(node);
-      });
-      li.prepend(p);
-      trigger = p;
-    }
-    trigger.classList.add('main-nav-link');
+  if (link) {
+    link.classList.add('main-nav-link');
   }
 
-  if (!menu) return; // nothing to toggle
+  const menu = decorateMegaMenu(li) || decorateMenu(li);
 
-  trigger.style.cursor = 'pointer';
+  if (!menu) return;
+
+  const trigger =
+    link
+    || li.querySelector(':scope > p');
+
+  if (!trigger) return;
+
+  trigger.classList.add('menu-trigger');
+
+  const arrow = document.createElement('span');
+  arrow.className = 'menu-arrow';
+  arrow.innerHTML = '&#9662;';
+  trigger.append(arrow);
+
   trigger.addEventListener('click', (e) => {
     e.preventDefault();
-    e.stopPropagation(); // prevent docClose from immediately closing
+    e.stopPropagation();
     toggleMenu(li);
   });
 }
