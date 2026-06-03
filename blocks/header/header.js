@@ -159,7 +159,7 @@ function decorateNavItem(li) {
     link.classList.add('main-nav-link');
   }
 
-  const dropdown = decorateSingleMenu(li);
+  const dropdown = decorateMenu(li);
 
   // Regular navigation link
   if (!dropdown) {
