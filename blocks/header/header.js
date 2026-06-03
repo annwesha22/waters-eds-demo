@@ -9,7 +9,6 @@ const HEADER_ACTIONS = [
   '/tools/widgets/scheme',
   '/tools/widgets/language',
   '/tools/widgets/toggle',
-  '/tools/widgets/search',
 ];
 
 function closeAllMenus() {
@@ -55,29 +54,6 @@ function decorateLanguage(btn) {
   });
 }
 
-function decorateSearch(link) {
-  const li = link.closest('li');
-
-  const wrapper = document.createElement('div');
-  wrapper.className = 'search-wrapper';
-
-  const button = document.createElement('button');
-  button.className = 'search-button';
-  button.setAttribute('aria-label', 'Search');
-
-  const icon = document.createElement('span');
-  icon.className = 'search-icon';
-
-  const input = document.createElement('input');
-  input.type = 'search';
-  input.placeholder = 'Search';
-  input.className = 'search-input';
-
-  button.append(icon);
-  wrapper.append(button, input);
-
-  li.replaceChildren(wrapper);
-}
 
 function decorateScheme(btn) {
   btn.addEventListener('click', async () => {
@@ -133,7 +109,6 @@ async function decorateAction(header, pattern) {
   if (pattern === '/tools/widgets/language') decorateLanguage(btn);
   if (pattern === '/tools/widgets/scheme') decorateScheme(btn);
   if (pattern === '/tools/widgets/toggle') decorateNavToggle(btn);
-  if (pattern === '/tools/widgets/search') decorateSearch(link);
   
 }
 
@@ -241,6 +216,30 @@ function decorateNavSection(section) {
 
 async function decorateActionSection(section) {
   section.classList.add('actions-section');
+
+   const items = section.querySelectorAll('li');
+
+  items.forEach((item) => {
+    const text = item.textContent.trim().toLowerCase();
+
+    if (text === 'search') {
+      item.textContent = '';
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'search-wrapper';
+
+      const icon = document.createElement('span');
+      icon.className = 'search-icon';
+
+      const input = document.createElement('input');
+      input.type = 'search';
+      input.placeholder = 'Search';
+      input.className = 'search-input';
+
+      wrapper.append(icon, input);
+      item.append(wrapper);
+    }
+  });
 }
 
 async function decorateHeader(fragment) {
