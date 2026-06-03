@@ -364,3 +364,36 @@ header {
     }
   }
 }
+
+.main-nav-item .single-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: var(--background-color, #fff);
+  border: 1px solid #e5e5e5;
+  min-width: 220px;
+  padding: 8px 0;
+  z-index: 10;
+}
+
+.main-nav-item.is-open .single-menu {
+  display: block;
+}
+
+.single-menu-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.single-menu-item .single-menu-link {
+  display: block;
+  padding: 8px 16px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.single-menu-item .single-menu-link:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
