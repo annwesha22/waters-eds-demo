@@ -11,7 +11,14 @@ header {
   z-index: 1000;
   overflow: hidden;
   max-height: var(--header-height);
-  background-color: light-dark(var(--color-light), var(--color-dark));
+  /* background-color: light-dark(var(--color-light), var(--color-dark)); */
+  background-color: #71b3cf;
+
+  .single-menu,
+  .language-menu,
+  .mega-menu {
+    background-color: #c49595;
+  }
 
   ul {
     margin: 0;
