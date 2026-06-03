@@ -110,10 +110,29 @@ async function decorateAction(header, pattern) {
   if (pattern === '/tools/widgets/toggle') decorateNavToggle(btn);
 }
 
-function decorateMenu() {
   // TODO: finish single menu support
-  return null;
+  function decorateMenu(li) {
+  const submenu = li.querySelector(':scope > ul');
+  if (!submenu) return null;
+
+  submenu.classList.add('single-menu-list');
+
+  // Decorate each submenu item
+  const items = submenu.querySelectorAll(':scope > li');
+  for (const item of items) {
+    item.classList.add('single-menu-item');
+    const itemLink = item.querySelector('a');
+    if (itemLink) itemLink.classList.add('single-menu-link');
+  }
+
+  const wrapper = document.createElement('div');
+  wrapper.className = 'single-menu';
+  wrapper.append(submenu);
+  li.append(wrapper);
+
+  return wrapper;
 }
+
 
 function decorateMegaMenu(li) {
   const menu = li.querySelector('.fragment-content');
