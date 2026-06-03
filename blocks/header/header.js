@@ -175,8 +175,7 @@ function decorateNavItem(li) {
 
   const arrow = document.createElement('span');
   arrow.className = 'dropdown-arrow';
-  arrow.innerHTML = '⌄';
-
+  //arrow.innerHTML = '⌄';
   trigger.append(arrow);
 
   trigger.addEventListener('click', (e) => {

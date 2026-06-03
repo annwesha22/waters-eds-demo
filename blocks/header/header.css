@@ -399,6 +399,21 @@ header {
   font-size: 12px;
 }
 
+.dropdown-arrow::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg) translateY(-2px);
+  display: block;
+}
+
+.main-nav-item.is-open .dropdown-arrow::before {
+  transform: rotate(-135deg);
+}
+
+
 .single-menu {
   display: none;
   position: absolute;
