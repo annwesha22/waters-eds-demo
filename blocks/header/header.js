@@ -115,6 +115,50 @@ function decorateMenu() {
   return null;
 }
 
+/**
+ * Creates Categories dropdown menu
+ * @param {Array} categories - Array of category names
+ * @returns {HTMLElement}
+ */
+function createCategoriesDropdown(categories = []) {
+  const wrapper = document.createElement('div');
+  wrapper.classList.add('categories-dropdown');
+
+  const button = document.createElement('button');
+  button.classList.add('categories-toggle');
+  button.innerHTML = `
+    Categories
+    <span class="dropdown-icon">⌄</span>
+  `;
+
+  const menu = document.createElement('ul');
+  menu.classList.add('categories-menu');
+
+  categories.forEach((category) => {
+    const item = document.createElement('li');
+
+    const link = document.createElement('a');
+    link.href = '#';
+    link.textContent = category;
+
+    item.appendChild(link);
+    menu.appendChild(item);
+  });
+
+  button.addEventListener('click', (e) => {
+    e.stopPropagation();
+    menu.classList.toggle('open');
+  });
+
+  document.addEventListener('click', () => {
+    menu.classList.remove('open');
+  });
+
+  wrapper.append(button, menu);
+
+  return wrapper;
+}
+
 function decorateMegaMenu(li) {
   const menu = li.querySelector('.fragment-content');
   if (!menu) return null;
@@ -173,6 +217,17 @@ async function decorateHeader(fragment) {
   if (sections[0]) decorateBrandSection(sections[0]);
   if (sections[1]) decorateNavSection(sections[1]);
   if (sections[2]) decorateActionSection(sections[2]);
+  const categories = [
+  'Clinical',
+  'ESG',
+  'Food & Environmental',
+  'Materials Science',
+  'Pharmaceutical',
+  'Technology',
+    ];
+
+  const nav = document.querySelector('.nav-tools'); // your header container
+  nav.append(createCategoriesDropdown(categories));
 
   for (const pattern of HEADER_ACTIONS) {
     decorateAction(fragment, pattern);
