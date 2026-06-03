@@ -188,12 +188,29 @@ function decorateNavItem(li) {
 }
 
 function decorateBrandSection(section) {
+  // section.classList.add('brand-section');
+  // const brandLink = section.querySelector('a');
+  // const [, text] = brandLink.childNodes;
+  // const span = document.createElement('span');
+  // span.className = 'brand-text';
+  // span.append(text);
+  // brandLink.append(span);
   section.classList.add('brand-section');
+
   const brandLink = section.querySelector('a');
-  const [, text] = brandLink.childNodes;
+  if (!brandLink) return;
+
+  const textNode = [...brandLink.childNodes]
+    .find((node) => node.nodeType === Node.TEXT_NODE
+      && node.textContent.trim());
+
+  if (!textNode) return;
+
   const span = document.createElement('span');
   span.className = 'brand-text';
-  span.append(text);
+  span.textContent = textNode.textContent.trim();
+
+  textNode.remove();
   brandLink.append(span);
 }
 

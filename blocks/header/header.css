@@ -176,8 +176,19 @@ header {
 
     > .default-content {
       display: flex;
-      justify-content: end;
+      /* justify-content: end; */
+      gap: 20px;
       align-items: center;
+    }
+
+    .actions-section .default-content ul {
+      display: flex;
+      align-items: center;
+      margin: 0;
+    }
+
+    .actions-section .default-content li {
+      margin: 0;
     }
 
     > .block-content {
@@ -259,7 +270,9 @@ header {
     overflow: initial;
 
     .header-content {
-      max-width: var(--grid-container-width);
+      /* max-width: var(--grid-container-width); */
+      max-width: 100%;
+      padding-inline: 12px;
       margin: 0 auto;
       grid-template: "brand nav actions" auto / auto 1fr auto;
       gap: var(--spacing-l);
