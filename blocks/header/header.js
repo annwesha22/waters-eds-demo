@@ -111,11 +111,11 @@ async function decorateAction(header, pattern) {
 }
 
   // TODO: finish single menu support
- function decorateMenu(li) {
+function decorateMenu(li) {
   const submenu = li.querySelector(':scope > ul');
   if (!submenu) return null;
 
-  li.classList.add('has-single-menu');
+  li.classList.add('has-dropdown');
 
   const wrapper = document.createElement('div');
   wrapper.className = 'single-menu';
@@ -159,21 +159,24 @@ function decorateNavItem(li) {
     link.classList.add('main-nav-link');
   }
 
-  const menu = decorateMegaMenu(li) || decorateMenu(li);
+  const dropdown = decorateSingleMenu(li);
 
-  if (!menu) return;
+  // Regular navigation link
+  if (!dropdown) {
+    return;
+  }
 
+  // Dropdown trigger
   const trigger =
-    link
-    || li.querySelector(':scope > p');
+    li.querySelector(':scope > p')
+    || li.querySelector(':scope > a');
 
-  if (!trigger) return;
-
-  trigger.classList.add('menu-trigger');
+  trigger.classList.add('dropdown-trigger');
 
   const arrow = document.createElement('span');
-  arrow.className = 'menu-arrow';
-  arrow.innerHTML = '&#9662;';
+  arrow.className = 'dropdown-arrow';
+  arrow.innerHTML = '⌄';
+
   trigger.append(arrow);
 
   trigger.addEventListener('click', (e) => {
