@@ -120,7 +120,7 @@ function decorateMenu() {
  * @param {Array} categories - Array of category names
  * @returns {HTMLElement}
  */
-function createCategoriesDropdown(categories = []) {
+/*function createCategoriesDropdown(categories = []) {
   const wrapper = document.createElement('div');
   wrapper.classList.add('categories-dropdown');
 
@@ -157,7 +157,7 @@ function createCategoriesDropdown(categories = []) {
   wrapper.append(button, menu);
 
   return wrapper;
-}
+}*/
 
 function decorateMegaMenu(li) {
   const menu = li.querySelector('.fragment-content');
@@ -217,17 +217,17 @@ async function decorateHeader(fragment) {
   if (sections[0]) decorateBrandSection(sections[0]);
   if (sections[1]) decorateNavSection(sections[1]);
   if (sections[2]) decorateActionSection(sections[2]);
-  const categories = [
-  'Clinical',
-  'ESG',
-  'Food & Environmental',
-  'Materials Science',
-  'Pharmaceutical',
-  'Technology',
-    ];
+  // const categories = [
+  // 'Clinical',
+  // 'ESG',
+  // 'Food & Environmental',
+  // 'Materials Science',
+  // 'Pharmaceutical',
+  // 'Technology',
+  //   ];
 
-  const nav = document.querySelector('.nav-tools'); // your header container
-  nav.append(createCategoriesDropdown(categories));
+  // const nav = document.querySelector('.nav-tools'); // your header container
+  // nav.append(createCategoriesDropdown(categories));
 
   for (const pattern of HEADER_ACTIONS) {
     decorateAction(fragment, pattern);
