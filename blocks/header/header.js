@@ -9,6 +9,7 @@ const HEADER_ACTIONS = [
   '/tools/widgets/scheme',
   '/tools/widgets/language',
   '/tools/widgets/toggle',
+  '/tools/widgets/search',
 ];
 
 function closeAllMenus() {
@@ -52,6 +53,30 @@ function decorateLanguage(btn) {
     }
     toggleMenu(section);
   });
+}
+
+function decorateSearch(link) {
+  const li = link.closest('li');
+
+  const wrapper = document.createElement('div');
+  wrapper.className = 'search-wrapper';
+
+  const button = document.createElement('button');
+  button.className = 'search-button';
+  button.setAttribute('aria-label', 'Search');
+
+  const icon = document.createElement('span');
+  icon.className = 'search-icon';
+
+  const input = document.createElement('input');
+  input.type = 'search';
+  input.placeholder = 'Search';
+  input.className = 'search-input';
+
+  button.append(icon);
+  wrapper.append(button, input);
+
+  li.replaceChildren(wrapper);
 }
 
 function decorateScheme(btn) {
@@ -108,6 +133,8 @@ async function decorateAction(header, pattern) {
   if (pattern === '/tools/widgets/language') decorateLanguage(btn);
   if (pattern === '/tools/widgets/scheme') decorateScheme(btn);
   if (pattern === '/tools/widgets/toggle') decorateNavToggle(btn);
+  if (pattern === '/tools/widgets/search') decorateSearch(link);
+  
 }
 
   // TODO: finish single menu support

@@ -413,6 +413,31 @@ header {
   transform: rotate(-135deg);
 }
 
+.search-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.search-button {
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.search-icon::before {
+  content: "🔍";
+  font-size: 18px;
+}
+
+.search-input {
+  width: 180px;
+  height: 36px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  padding: 0 12px;
+}
 
 .single-menu {
   display: none;
