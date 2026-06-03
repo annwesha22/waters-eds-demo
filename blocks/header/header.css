@@ -46,6 +46,10 @@ header {
       "nav"
       "actions";
     grid-template-rows: var(--header-height) auto 1fr;
+    max-width: 1480px;
+    margin: 0 auto;
+    padding-inline: 48px;
+    box-sizing: border-box;
   }
 
   .action-wrapper {
