@@ -146,12 +146,38 @@ function decorateMegaMenu(li) {
 
 function decorateNavItem(li) {
   li.classList.add('main-nav-item');
-  const link = li.querySelector(':scope > p > a');
+
+  // Prefer <p><a> structure, but fall back to a plain <a> or <p> label
+  const link = li.querySelector(':scope > p > a') || li.querySelector(':scope > a');
   if (link) link.classList.add('main-nav-link');
+
   const menu = decorateMegaMenu(li) || decorateMenu(li);
   if (!(menu || link)) return;
-  link.addEventListener('click', (e) => {
+
+  // Determine what should receive the click to toggle the menu
+  let trigger = link;
+  if (!trigger) {
+    // No link — use the first <p> as the label, or create one from the li's text
+    trigger = li.querySelector(':scope > p');
+    if (!trigger) {
+      // Wrap any stray text nodes into a <p> so we have something clickable
+      const p = document.createElement('p');
+      // Move any non-menu children (text) into the p
+      [...li.childNodes].forEach((node) => {
+        if (node !== menu) p.append(node);
+      });
+      li.prepend(p);
+      trigger = p;
+    }
+    trigger.classList.add('main-nav-link');
+  }
+
+  if (!menu) return; // nothing to toggle
+
+  trigger.style.cursor = 'pointer';
+  trigger.addEventListener('click', (e) => {
     e.preventDefault();
+    e.stopPropagation(); // prevent docClose from immediately closing
     toggleMenu(li);
   });
 }

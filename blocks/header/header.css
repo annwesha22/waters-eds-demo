@@ -397,3 +397,12 @@ header {
 .single-menu-item .single-menu-link:hover {
   background: rgba(0, 0, 0, 0.05);
 }
+
+@media (width < 900px) {
+  .main-nav-item .single-menu {
+    position: static;
+    border: none;
+    min-width: 0;
+    padding: 0;
+  }
+}
