@@ -1,10 +1,10 @@
 header {
   --logo-width: 40px;
-  --logo-height: 40px;
+  --logo-height: 32px;
   --mega-columns: 4;
 
   display: block;
-  position: fixed;
+  position: relative;
   top: 0;
   left: 0;
   right: 0;
@@ -254,8 +254,9 @@ header {
     .header-content {
       max-width: var(--grid-container-width);
       margin: 0 auto;
-      grid-template: "brand nav actions" 1fr / auto 1fr auto;
+      grid-template: "brand nav actions" auto / auto 1fr auto;
       gap: var(--spacing-l);
+      align-items: center;
     }
 
     .menu,
@@ -295,10 +296,16 @@ header {
 
     .brand-section {
       border-bottom: initial;
+      display: flex;
+      align-items: center;
 
       .default-content {
+
         max-width: initial;
         margin: 0;
+        display: flex;
+        align-items: center;
+        height: 100%;
       }
 
       .action-wrapper.more {
@@ -307,9 +314,17 @@ header {
     }
 
     .main-nav-section {
+      display: flex;
+      align-items: center;
+
       .main-nav-list {
-        display: flex;
+        align-items: center;
         gap: var(--spacing-l);
+        display: flex;
+      }
+
+      nav {
+        height: 100%;
       }
 
       .main-nav-item {
@@ -322,7 +337,11 @@ header {
 
         &.is-open {
           .main-nav-link {
-            border-bottom: initial;
+            
+            display: flex;
+            align-items: center;
+            height: var(--header-height);
+            line-height: normal;
           }
         }
       }
