@@ -17,7 +17,7 @@ header {
   .single-menu,
   .language-menu,
   .mega-menu {
-    background-color: #c49595;
+    background-color: #f5f2f2;
   }
 
   ul {
@@ -48,7 +48,7 @@ header {
     grid-template-rows: var(--header-height) auto 1fr;
     max-width: 1480px;
     margin: 0 auto;
-    padding-inline: 48px;
+    width: 100%;
     box-sizing: border-box;
   }
 
@@ -276,7 +276,7 @@ header {
     .header-content {
       /* max-width: var(--grid-container-width); */
       max-width: 100%;
-      padding-inline: 12px;
+      padding-inline: 48px;
       margin: 0 auto;
       grid-template: "brand nav actions" auto / auto 1fr auto;
       gap: var(--spacing-l);
@@ -405,6 +405,12 @@ header {
         height: initial;
       }
     }
+  }
+
+  header .brand-section,
+  header .main-nav-section,
+  header .actions-section {
+    padding-inline: 48px;
   }
 }
 
