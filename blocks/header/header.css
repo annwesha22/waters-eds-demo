@@ -348,13 +348,15 @@ header {
 
     .main-nav-section {
       display: flex;
-      align-items: center;
+      align-items: stretch; /* Change from center to stretch */
       position: relative;
+      height: var(--header-height); /* Force full header height */
 
       .main-nav-list {
-        align-items: center;
+        align-items: stretch; /* Change from center to stretch */
         gap: var(--spacing-l);
         display: flex;
+        height: 100%;
       }
 
       nav {
@@ -363,20 +365,20 @@ header {
 
       .main-nav-item {
         border-bottom: initial;
+        display: flex;
+        align-items: center; /* Vertically centers the text content */
+        height: 100%;       /* Spans full height to push dropdown down */
 
         > * {
           max-width: initial;
           margin: initial;
         }
 
-        &.is-open {
-          .main-nav-link {
-            
-            display: flex;
-            align-items: center;
-            height: var(--header-height);
-            line-height: normal;
-          }
+        /* Ensure the trigger handles layout correctly */
+        .dropdown-trigger {
+          height: 100%;
+          display: flex;
+          align-items: center;
         }
       }
     }
