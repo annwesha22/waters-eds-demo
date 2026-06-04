@@ -203,6 +203,8 @@
 
 html {
   scroll-padding-top: calc(var(--header-height) + 1rem);
+  margin: 0;
+  padding: 0;
 }
 
 body {
@@ -212,7 +214,8 @@ body {
   font-family: "Trebuchet MS", sans-serif;
   font-size: var(--body-font-size-m);
   line-height: var(--body-line-height);
-  padding: var(--header-height) 0 0;
+  /* padding: var(--header-height) 0 0; */
+  padding: 0;
 
   &.session {
     /* only allow font loading if a session */
