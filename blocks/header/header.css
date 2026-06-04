@@ -289,6 +289,8 @@ header {
       padding-inline: 48px;
       box-sizing: border-box;
       background-color: #ffffff !important;
+      grid-template-areas: none !important;
+      grid-template-rows: none !important;
     }
 
     /* 1. Top Utility Strip Alignment */
@@ -331,12 +333,13 @@ header {
       flex-direction: row !important;
       align-items: center !important;
       justify-content: flex-start !important;
-      height: 80px !important; /* Locks the explicit white header row height bounds */
+      height: 80px !important; /* Force matching row line height */
       width: 100%;
       background-color: #ffffff !important;
+      box-sizing: border-box;
     }
 
-    /* Logo Brand Block */
+    /* Logo Brand Block styling overrides */
     .main-header-row > .default-content {
       display: flex !important;
       align-items: center !important;
@@ -358,20 +361,20 @@ header {
       }
     }
 
-    /* Main Navigation List Container */
+    /* Main Navigation List Container layout management rules */
     .main-header-row nav {
       display: flex !important;
       align-items: center !important;
       height: 100% !important;
       margin: 0;
-      padding-left: 50px; /* Creates layout breathing room directly after logo block */
+      padding-left: 64px; /* Space after logo */
       flex-grow: 1;
 
       .main-nav-list {
         display: flex !important;
         flex-direction: row !important;
         align-items: center !important;
-        gap: 36px !important; /* Spacing between menu columns */
+        gap: 40px !important; /* Separation space between navigation links */
         height: 100%;
         margin: 0;
         padding: 0;
@@ -392,7 +395,7 @@ header {
     /* Navigation Links Text Properties */
     .main-nav-link,
     .dropdown-trigger {
-      font-size: 15px;
+      font-size: 16px;
       color: #333333 !important;
       font-weight: 500 !important;
       text-decoration: none;
@@ -402,7 +405,7 @@ header {
     .actions-wrapper-right {
       display: flex !important;
       align-items: center !important;
-      margin-left: auto; /* Pushes the search layout to the far right */
+      margin-left: auto; /* Push input to the right edge */
       flex-shrink: 0;
     }
 
@@ -416,9 +419,9 @@ header {
     .search-input {
       width: 280px;
       height: 42px;
-      padding: 0 44px 0 16px; /* Right padding preserves text bounds before icon */
-      border: 1px solid #cccccc;
-      border-radius: 4px;
+      padding: 0 44px 0 16px !important; /* Left padding for typing, right room for icon */
+      border: 1px solid #cccccc !important;
+      border-radius: 4px !important; /* Crisp rectangle box shape */
       font-size: 14px;
       color: #333333;
       background-color: #ffffff;
@@ -428,9 +431,10 @@ header {
     .search-icon {
       position: absolute;
       left: auto !important;
-      right: 14px !important; /* Locks lens glyph onto inner right edge */
+      right: 14px !important; /* Align inner right edge */
       top: 50%;
       transform: translateY(-50%);
+      display: block;
     }
   }
 }

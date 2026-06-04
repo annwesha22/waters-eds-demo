@@ -303,50 +303,62 @@ async function decorateHeader(fragment) {
   const sections = fragment.querySelectorAll(':scope > .section');
   
   if (sections.length === 3) {
-    // 1. Label the top grey utility bar
+    // 1. Label the top utility strip
     sections[0].classList.add('top-utility-section');
     
-    // 2. Decorate the brand and nav content systems
+    // 2. Identify and explicitly process the actions element layer BEFORE nav parsing
+    await decorateActionSection(sections[2]);
+    
+    // 3. Process the standard logo/brand and core navigation layout systems
     decorateBrandSection(sections[1]);
     decorateNavSection(sections[2]);
     
-    // 3. Create a master horizontal flex row to hold everything below the top utility bar
+    // 4. Create the main horizontal flex row wrapper
     const mainHeaderRow = document.createElement('div');
     mainHeaderRow.className = 'main-header-row';
     
-    // Move the inner contents of brand and navigation directly into our row
+    // Move the logo brand elements inside
     const brandContent = sections[1].querySelector('.default-content');
-    const navContent = sections[2].querySelector('nav');
-    const searchContent = sections[2].querySelector('.search-wrapper');
-
-    if (brandContent) mainHeaderRow.append(brandContent);
-    if (navContent) mainHeaderRow.append(navContent);
+    if (brandContent) {
+      mainHeaderRow.append(brandContent);
+    }
     
-    // 4. Extract the search wrapper and package it as the rightmost element
-    if (searchContent) {
+    // 5. Build and isolate the primary navigation layout element structure
+    const navElement = document.createElement('nav');
+    const mainUl = sections[2].querySelector('.main-nav-list');
+    
+    if (mainUl) {
+      // Find the search list wrapper item if still nested inside the list container
+      const searchLiItem = mainUl.querySelector('.search-wrapper')?.closest('li');
+      if (searchLiItem) {
+        searchLiItem.remove(); // Pop it out so it doesn't stay stuck inside the navigation link stack
+      }
+      navElement.append(mainUl);
+    }
+    mainHeaderRow.append(navElement);
+    
+    // 6. Extract the search wrapper action block and pin it as the rightmost component
+    const searchWrapper = sections[2].querySelector('.search-wrapper');
+    if (searchWrapper) {
       const actionsDiv = document.createElement('div');
       actionsDiv.className = 'actions-wrapper-right';
-      actionsDiv.append(searchContent);
+      actionsDiv.append(searchWrapper);
       mainHeaderRow.append(actionsDiv);
     }
 
-    // Clean up empty navigation item stubs left behind
-    const emptyLi = mainHeaderRow.querySelectorAll('nav ul li:empty');
-    emptyLi.forEach(li => li.remove());
-
-    // 5. Re-inject our row directly after the utility bar, removing the old wrapper divs
+    // 7. Inject our finalized structural row directly right under the grey utility line bar
     sections[0].after(mainHeaderRow);
     sections[1].remove();
     sections[2].remove();
   } else {
-    // Standard template fallbacks if sections mismatch
+    // Graceful baseline fallbacks if structural fragment sections mismatch
     if (sections[0]) decorateBrandSection(sections[0]);
     if (sections[1]) decorateNavSection(sections[1]);
     if (sections[2]) decorateActionSection(sections[2]);
   }
 
   for (const pattern of HEADER_ACTIONS) {
-    decorateAction(fragment, pattern);
+    await decorateAction(fragment, pattern);
   }
 }
 /**
