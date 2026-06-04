@@ -488,11 +488,11 @@ header {
 
 .single-menu-inner {
   width: 100%;
-  padding: 8px 0; /* Vertical padding matching standard clean submenus */
+  /* Add 16px of padding on both the left and right sides */
+  padding: 12px 16px; 
   box-sizing: border-box;
 }
 
-/* Fix text alignment and link styles inside your submenu */
 .single-menu-list {
   width: 100%;
   margin: 0;
@@ -502,17 +502,19 @@ header {
 
 .single-menu-link {
   display: block;
-  padding: 10px 20px;
+  /* Adjust link padding so the hover background highlights nicely */
+  padding: 8px 12px; 
   color: #333333;
-  text-align: left; /* Ensures links don't get center text styling */
+  text-align: left; /* Keep text strictly left-aligned */
   font-size: 14px;
   text-decoration: none;
-  transition: background-color 0.2s ease;
+  border-radius: 4px; /* Optional: adds a soft look to the hover state */
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .single-menu-link:hover {
   background: #f5f5f5;
-  color: #007799; /* Change to match your brand color matching waters.com */
+  color: #007799; 
 }
 
 .main-nav-item.is-open .single-menu {
