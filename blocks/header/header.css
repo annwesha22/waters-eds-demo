@@ -219,7 +219,7 @@ header {
 
   .main-nav-section {
     grid-area: nav;
-
+    position: relative;
     .default-content {
       max-width: 100%;
       margin: 0;
@@ -354,6 +354,7 @@ header {
     .main-nav-section {
       display: flex;
       align-items: center;
+      position: relative;
 
       .main-nav-list {
         align-items: center;
@@ -456,19 +457,34 @@ header {
   display: none;
   position: absolute;
   top: 100%;
+
+  /* stretch across nav/header area */
   left: 0;
-  min-width: 260px;
+  right: 0;
+  width: 100vw;
+
   background: #fff;
   box-shadow: 0 8px 20px rgb(0 0 0 / 15%);
   z-index: 1000;
+  padding-top: 24px;
+  padding-bottom: 24px;
 }
 
 .main-nav-item.is-open .single-menu {
   display: block;
 }
 
+.main-nav-item.has-dropdown {
+  position: relative;
+}
+
 .single-menu-list {
-  padding: 12px 0;
+  /*padding: 12px 0;*/
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  width: fit-content;
 }
 
 .single-menu-link {
