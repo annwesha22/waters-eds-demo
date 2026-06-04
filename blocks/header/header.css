@@ -274,114 +274,144 @@ header {
 
 @media (width >= 900px) {
   header {
-    overflow: initial;
+    overflow: initial !important;
+    max-height: none !important; /* Allow the header to grow to fit the utility bar */
     background-color: #ffffff;
-    box-shadow: 0 1px 0 0 #e5e5e5; /* Soft bottom header delimiter line */
+    box-shadow: 0 1px 0 0 #e5e5e5;
 
-    /* The Main Header Wrapper Container Grid */
+    /* Turn off the template's default CSS grid */
     .header-content {
+      display: flex !important;
+      flex-direction: column !important;
+      grid-template-areas: none !important;
+      grid-template-rows: none !important;
       max-width: 1480px;
       margin: 0 auto;
       width: 100%;
       padding-inline: 48px;
-      display: flex;
-      flex-direction: column;
     }
 
-    /* 1. Top Utility Utility Bar Styling Rules */
+    /* 1. Top Utility Section Style */
     .top-utility-section {
-      display: flex;
+      display: flex !important;
       justify-content: flex-end;
       align-items: center;
       height: 36px;
       background-color: #f5f5f5;
-      margin-inline: -48px; /* Extends background full width edge-to-edge */
+      margin-inline: -48px; /* Span edge to edge */
       padding-inline: 48px;
       border-bottom: 1px solid #e5e5e5;
       font-size: 13px;
       color: #666666;
 
-      ul {
+      .default-content {
+        width: 100%;
         display: flex;
-        gap: 24px;
-        align-items: center;
+        justify-content: flex-end;
+      }
+
+      ul {
+        display: flex !important;
+        flex-direction: row !important;
+        gap: 24px !important;
+        margin: 0;
+        padding: 0;
+        list-style: none;
       }
       
       a {
         color: #555555;
-        font-weight: 400;
+        text-decoration: none;
       }
     }
 
-    /* 2. Main Nav Row Container */
-    .section:not(.top-utility-section) {
+    /* 2. Main Row Layer (Combines Brand, Nav, and Search side-by-side) */
+    .brand-section,
+    .main-nav-section {
       margin: 0;
       padding: 0;
     }
 
-    /* Unify primary layout containers into a cohesive row flow */
+    /* Container for the logo row */
     .brand-section {
-      display: flex;
+      display: inline-flex;
       align-items: center;
-      float: left;
+      float: left; /* Keep logo pinned left */
       height: var(--header-height);
-    }
-
-    .main-nav-section {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex: 1;
-      height: var(--header-height);
-      padding-left: 40px;
-
-      nav {
+      
+      .default-content {
         display: flex;
         align-items: center;
         height: 100%;
       }
     }
 
-    /* Styling of links matching target typography properties */
+    /* Navigation list container row */
+    .main-nav-section {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between;
+      height: var(--header-height);
+      padding-left: 40px;
+
+      .default-content {
+        display: flex;
+        align-items: center;
+        width: 100%;
+      }
+
+      nav {
+        display: flex;
+        align-items: center;
+        height: 100%;
+      }
+
+      .main-nav-list {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        gap: 32px !important;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        white-space: nowrap;
+      }
+
+      .main-nav-item {
+        border-bottom: none !important;
+        display: flex;
+        align-items: center;
+        height: 100%;
+      }
+    }
+
+    /* Links typography adjustments */
     .main-nav-link,
     .dropdown-trigger {
       font-size: 16px;
       color: #555555 !important;
-      font-weight: 500 !important; /* Semi-bold refined clean weights */
-      transition: color 0.15s ease;
+      font-weight: 500 !important;
     }
 
-    .main-nav-link:hover,
-    .dropdown-trigger:hover {
-      color: #007799 !important;
-    }
-
-    /* Actions Layout Pinning (Search to Right Side edge) */
+    /* Action wrapper on the right side */
     .actions-wrapper-right {
       display: flex;
       align-items: center;
-      margin-left: auto; /* Pushes input layout all the way to right side bound */
+      margin-left: auto; /* Push search to the right edge */
     }
 
-    /* Search Input Styling Box overrides matching the Mockup Frame */
     .search-input {
       width: 280px;
-      height: 44px;
-      padding: 0 44px 0 16px; /* Invert padding layout context */
+      height: 40px;
+      padding: 0 40px 0 16px;
       border: 1px solid #cccccc;
-      border-radius: 4px; /* Crisp square-cornered box profiles */
+      border-radius: 4px;
       font-size: 14px;
-      color: #333333;
-      background-color: #ffffff;
     }
 
     .search-icon {
       left: auto;
-      right: 16px; /* Pin magnifying glass to the inner right edge */
-    }
-    
-    .search-input::placeholder {
-      color: #999999;
+      right: 14px;
     }
   }
 }

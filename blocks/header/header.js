@@ -303,22 +303,25 @@ async function decorateHeader(fragment) {
   const sections = fragment.querySelectorAll(':scope > .section');
   
   if (sections.length === 3) {
-    // 3-section layout setup matching your document structure
     sections[0].classList.add('top-utility-section');
     decorateBrandSection(sections[1]);
     decorateNavSection(sections[2]);
     
-    // Move search items out into its action area container dynamically
-    const searchItem = sections[2].querySelector('.search-wrapper')?.closest('li');
+    // Find search element inside the navigation stack and slide it rightward
+    const searchItem = sections[2].querySelector('.search-wrapper');
     if (searchItem) {
       const actionsDiv = document.createElement('div');
       actionsDiv.className = 'actions-wrapper-right';
-      actionsDiv.append(searchItem.querySelector('.search-wrapper'));
+      actionsDiv.append(searchItem);
+      
+      // Append right next to the nav list block
       sections[2].querySelector('nav').after(actionsDiv);
-      searchItem.remove();
+      
+      // Clean up empty wrapping li tags if left behind
+      const emptyLi = sections[2].querySelector('nav ul li:empty');
+      if (emptyLi) emptyLi.remove();
     }
   } else {
-    // Fallback safety block
     if (sections[0]) decorateBrandSection(sections[0]);
     if (sections[1]) decorateNavSection(sections[1]);
     if (sections[2]) decorateActionSection(sections[2]);
