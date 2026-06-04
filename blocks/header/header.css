@@ -276,7 +276,6 @@ header {
     .header-content {
       /* max-width: var(--grid-container-width); */
       max-width: 100%;
-      padding-inline: 24px;
       margin: 0 auto;
       grid-template: "brand nav actions" auto / auto 1fr auto;
       gap: var(--spacing-l);
