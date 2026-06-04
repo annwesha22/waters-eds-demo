@@ -451,12 +451,13 @@ header {
 .single-menu {
   display: none;
   position: absolute;
-  top: var(--header-height); /* Change from 100% to header height */
-  left: 0; /* Change from 50% */
-  transform: none; /* Remove translateX */
+  top: 100%; /* Position directly below the parent */
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 0;
 
   width: 100%;
-  max-width: 100vw;
+  max-width: 1480px; /* Match header max-width */
 
   background: #fff;
   box-shadow: 0 8px 20px rgb(0 0 0 / 15%);
@@ -464,9 +465,9 @@ header {
 }
 
 .single-menu-inner {
-  max-width: 1480px;
-  margin: 0 auto;
-  padding: 24px 48px;
+  width: 100%;
+  padding: 24px 48px; /* Match header padding-inline */
+  box-sizing: border-box;
 }
 
 .main-nav-item.is-open .single-menu {
@@ -474,7 +475,7 @@ header {
 }
 
 .main-nav-item.has-dropdown {
-  position: relative;
+  position: static; /* Keep static positioning */
 }
 
 /* Ensure main-nav-item doesn't cause overlap */
