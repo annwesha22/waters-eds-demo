@@ -354,27 +354,26 @@ header {
 
       .main-nav-list {
         display: flex !important;
-        flex-direction: row !important; /* Locks list layout into a straight row side-by-side */
+        flex-direction: row !important;
         align-items: center; 
-        gap: var(--spacing-l);
+        gap: 32px !important; /* Forces a clear horizontal gap between every link */
         height: 100%;
-        white-space: nowrap; /* Prevents navigation link text from breaking into two lines */
-      }
-
-      nav {
-        height: 100%;
+        white-space: nowrap;
+        padding: 0;
+        margin: 0;
       }
 
       .main-nav-item {
         border-bottom: initial;
         display: flex;
-        align-items: center; /* Vertically centers the text content */
-        height: 100%;       /* Spans full height to push dropdown down */
+        align-items: center;
+        height: 100%;
+        padding: 0 4px; /* Adds individual breathing space around each text boundary */
+      }
 
-        > * {
-          max-width: initial;
-          margin: initial;
-        }
+      nav {
+        height: 100%;
+      }
 
         /* Ensure the trigger handles layout correctly */
         .dropdown-trigger {
@@ -515,6 +514,7 @@ header {
   position: relative;
   display: flex;
   align-items: center;
+  margin-left: 24px; /* Creates explicit separation before the search bar begins */
 }
 
 .search-input {
