@@ -165,42 +165,77 @@ function decorateNavItem(li) {
     link.classList.add('main-nav-link');
   }
 
-  const dropdown = decorateMenu(li);
+  // Check if this specific item is the "Categories" dropdown link
+  const linkText = link ? link.textContent.trim().toLowerCase() : '';
+  const isCategories = linkText === 'categories';
 
-  // Regular navigation link
-  if (!dropdown) {
-    return;
+  // Build structure early if it contains a static menu or if it's our dynamic Categories menu
+  const submenu = li.querySelector(':scope > ul');
+  if (submenu || isCategories) {
+    li.classList.add('has-dropdown');
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'single-menu';
+    const inner = document.createElement('div');
+    inner.className = 'single-menu-inner';
+
+    const ul = submenu || document.createElement('ul');
+    ul.className = 'single-menu-list';
+    
+    inner.append(ul);
+    wrapper.append(inner);
+    li.append(wrapper);
+
+    // Dynamic data fetching execution for the Categories sheet
+    if (isCategories) {
+      fetch('/docs/library/metadata/categories.json')
+        .then((response) => {
+          if (!response.ok) throw new Error('Failed to fetch categories spreadsheet');
+          return response.json();
+        })
+        .then((json) => {
+          // AEM spreadsheet JSON objects store data arrays inside the .data property
+          const categories = json.data || [];
+          
+          categories.forEach((row) => {
+            const item = document.createElement('li');
+            item.className = 'single-menu-item';
+
+            const a = document.createElement('a');
+            a.className = 'single-menu-link';
+            a.href = row.path;      // Map spreadsheet column 'path'
+            a.textContent = row.label; // Map spreadsheet column 'label'
+            
+            item.append(a);
+            ul.append(item);
+          });
+        })
+        .catch((err) => console.error('Error loading dynamic categories:', err));
+    } else {
+      // Fallback: Apply layout classes to pre-existing standard submenu items
+      [...ul.children].forEach((item) => {
+        item.classList.add('single-menu-item');
+        const itemLink = item.querySelector('a');
+        if (itemLink) itemLink.classList.add('single-menu-link');
+      });
+    }
   }
 
-  // Dropdown trigger
-  const trigger =
-    li.querySelector(':scope > p')
-    || li.querySelector(':scope > a');
+  // Dropdown click trigger logic setup
+  const trigger = li.querySelector(':scope > p') || li.querySelector(':scope > a');
+  if ((submenu || isCategories) && trigger) {
+    trigger.classList.add('dropdown-trigger');
 
-  trigger.classList.add('dropdown-trigger');
+    const arrow = document.createElement('span');
+    arrow.className = 'dropdown-arrow';
+    trigger.append(arrow);
 
-  const arrow = document.createElement('span');
-  arrow.className = 'dropdown-arrow';
-  //arrow.innerHTML = '⌄';
-  trigger.append(arrow);
-
-  trigger.addEventListener('click', (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    // const panel = li.querySelector('.single-menu');
-
-    // if (panel) {
-    //   const headerContent = document.querySelector('.header-content');
-
-    //   const triggerRect = trigger.getBoundingClientRect();
-    //   const containerRect = headerContent.getBoundingClientRect();
-
-    //   panel.style.paddingLeft =
-    //     `${triggerRect.left - containerRect.left}px`;
-    // }
-    toggleMenu(li);
-  });
+    trigger.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      toggleMenu(li);
+    });
+  }
 }
 
 function decorateBrandSection(section) {
