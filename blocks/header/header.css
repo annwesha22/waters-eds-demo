@@ -13,7 +13,7 @@ header {
   right: 0;
   z-index: 1000;
   overflow: hidden;
-  /* max-height: var(--header-height); */
+  max-height: var(--header-height);
   background-color: #ffffff;
 
   .single-menu,
@@ -331,6 +331,11 @@ header {
    3. DESKTOP MEDIA QUERY (FLUID ROW)
    ========================================================================== */
 @media (width >= 900px) {
+  main {
+    /* Header (80px) + Utility bar (36px) = 116px total header stack height */
+    padding-top: 116px !important; 
+    box-sizing: border-box;
+  }
   header {
     overflow: visible !important;
     max-height: none !important;
@@ -506,6 +511,11 @@ header {
    4. MOBILE RESPONSIVE OVERRIDES
    ========================================================================== */
 @media (width < 900px) {
+  main {
+    /* Adjust this to match your mobile header height if needed */
+    padding-top: 64px; 
+    box-sizing: border-box;
+  }
   header .header-content {
     padding-inline: 20px;
   }
