@@ -1,4 +1,6 @@
 footer {
+  margin-bottom: 0 !important;
+  padding-bottom: 0;
   a {
     text-decoration: none;
 
@@ -10,10 +12,12 @@ footer {
   .footer-content {
     max-width: 1480px;
     margin: 0 auto;
+    margin-bottom: 0;
   }
 
   .section {
     padding: 40px 48px;
+    margin-bottom: 0;
 
     .default-content {
       max-width: initial;
