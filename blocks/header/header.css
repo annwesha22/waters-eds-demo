@@ -1,3 +1,6 @@
+/* ==========================================================================
+   1. BASE SYSTEM & MOBILE LAYOUT (DEFAULT)
+   ========================================================================== */
 header {
   --logo-width: 40px;
   --logo-height: 32px;
@@ -11,7 +14,6 @@ header {
   z-index: 1000;
   overflow: hidden;
   max-height: var(--header-height);
-  /* background-color: light-dark(var(--color-light), var(--color-dark)); */
   background-color: #ffffff;
 
   .single-menu,
@@ -26,8 +28,7 @@ header {
     list-style: none;
   }
 
-  li,
-  p {
+  li, p {
     margin: 0;
   }
 
@@ -39,6 +40,7 @@ header {
     margin-block: 6px;
   }
 
+  /* Core structural default layout */
   .header-content {
     display: grid;
     grid-template-areas:
@@ -46,12 +48,10 @@ header {
       "nav"
       "actions";
     grid-template-rows: var(--header-height) auto 1fr;
-
     max-width: 1480px;
     margin: 0 auto;
     width: 100%;
-
-    padding-inline: 48px; /* same as footer */
+    padding-inline: 48px;
     box-sizing: border-box;
   }
 
@@ -93,14 +93,8 @@ header {
 
     .default-content {
       margin: 0;
-
-      > :first-child {
-        margin-top: 0;
-      }
-
-      > :last-child {
-        margin-bottom: 0;
-      }
+      > :first-child { margin-top: 0; }
+      > :last-child { margin-bottom: 0; }
     }
 
     ul {
@@ -113,10 +107,8 @@ header {
       margin-block: 12px;
     }
 
-    ul:not(:has(+ *)) {
-      li:last-child {
-        margin-bottom: 0;
-      }
+    ul:not(:has(+ *)) li:last-child {
+      margin-bottom: 0;
     }
 
     .section {
@@ -126,10 +118,7 @@ header {
     &.language {
       max-width: var(--grid-container-width);
       margin: 0 auto;
-
-      .section {
-        margin: 0;
-      }
+      .section { margin: 0; }
     }
   }
 
@@ -141,8 +130,7 @@ header {
       display: flex;
       justify-content: space-between;
 
-      p,
-      a {
+      p, a {
         display: flex;
         align-items: center;
         position: relative;
@@ -152,14 +140,8 @@ header {
         margin: 0;
         color: var(--color-brand);
 
-        img {
-          height: var(--logo-height);
-        }
-
-        svg {
-          width: var(--logo-width);
-          height: var(--logo-height);
-        }
+        img { height: var(--logo-height); }
+        svg { width: var(--logo-width); height: var(--logo-height); }
 
         .brand-text {
           display: block;
@@ -171,7 +153,7 @@ header {
     }
 
     .action-wrapper {
-      right: -23px; /* 64 minus waffle icon inset */
+      right: -23px;
     }
   }
 
@@ -183,18 +165,17 @@ header {
 
     > .default-content {
       display: flex;
-      /* justify-content: end; */
       gap: 20px;
       align-items: center;
     }
 
-    .actions-section .default-content ul {
+    .default-content ul {
       display: flex;
       align-items: center;
       margin: 0;
     }
 
-    .actions-section .default-content li {
+    .default-content li {
       margin: 0;
     }
 
@@ -205,10 +186,7 @@ header {
     .action-wrapper {
       height: var(--header-height);
       right: -13px;
-
-      button {
-        width: 44px;
-      }
+      button { width: 44px; }
     }
 
     &.is-open {
@@ -227,7 +205,6 @@ header {
 
     .main-nav-item {
       border-bottom: 1px solid light-dark(var(--color-gray-200), var(--color-gray-600));
-
       > * {
         max-width: var(--grid-container-width);
         margin: 0 auto;
@@ -239,20 +216,13 @@ header {
       line-height: 64px;
     }
 
-    .menu,
-    .mega-menu {
-      display: none;
-    }
+    .menu, .mega-menu { display: none; }
 
     .is-open {
       .main-nav-link {
         border-bottom: 1px solid light-dark(var(--color-gray-200), var(--color-gray-600));
       }
-
-      .menu,
-      .mega-menu {
-        display: block;
-      }
+      .menu, .mega-menu { display: block; }
     }
   }
 
@@ -261,17 +231,105 @@ header {
     max-height: initial;
     overflow: initial;
     bottom: 0;
-
-    .header-content {
-      height: 100%;
-    }
-
+    .header-content { height: 100%; }
     .brand-section {
       border-bottom: 1px solid light-dark(var(--color-gray-200), var(--color-gray-600));
     }
   }
 }
 
+/* Global Navigation Layout Context Defaults */
+.main-nav-item {
+  position: relative;
+}
+
+.main-nav-item.has-dropdown {
+  position: relative !important;
+}
+
+.dropdown-trigger {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.dropdown-arrow {
+  font-size: 12px;
+}
+
+.dropdown-arrow::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg) translateY(-2px);
+  display: block;
+}
+
+.main-nav-item.is-open .dropdown-arrow::before {
+  transform: rotate(-135deg);
+}
+
+/* ==========================================================================
+   2. DROPDOWN SUBMENU PANELS
+   ========================================================================== */
+.single-menu {
+  display: none;
+  position: absolute !important;
+  top: 100%; 
+  left: 0;   
+  margin-top: 0;
+  min-width: 200px; 
+  width: max-content; 
+  background: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+  z-index: 1000;
+}
+
+.single-menu-inner {
+  width: 100%;
+  padding: 12px 16px; 
+  box-sizing: border-box;
+}
+
+.single-menu-list {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.single-menu-link {
+  display: block;
+  padding: 8px 12px; 
+  color: #333333;
+  text-align: left;
+  font-size: 14px;
+  text-decoration: none;
+  border-radius: 4px;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.single-menu-link:hover {
+  background: #f5f5f5;
+  color: #007799; 
+}
+
+.main-nav-item.is-open .single-menu {
+  display: block;
+}
+
+.main-nav-item.is-open .main-nav-link {
+  position: relative;
+  z-index: 1001;
+}
+
+/* ==========================================================================
+   3. DESKTOP MEDIA QUERY (FLUID ROW)
+   ========================================================================== */
 @media (width >= 900px) {
   header {
     overflow: visible !important;
@@ -279,7 +337,6 @@ header {
     background-color: #ffffff !important;
     box-shadow: 0 1px 0 0 #e5e5e5;
 
-    /* Primary Container Layout */
     .header-content {
       display: flex !important;
       flex-direction: column !important;
@@ -293,7 +350,6 @@ header {
       grid-template-rows: none !important;
     }
 
-    /* 1. Top Utility Strip Alignment */
     .top-utility-section {
       display: flex !important;
       justify-content: flex-end;
@@ -327,19 +383,17 @@ header {
       }
     }
 
-    /* 2. Main Header Row (Logo + Navigation Links + Search Input Box) */
     .main-header-row {
       display: flex !important;
       flex-direction: row !important;
       align-items: center !important;
       justify-content: flex-start !important;
-      height: 80px !important; /* Force matching row line height */
+      height: 80px !important;
       width: 100%;
       background-color: #ffffff !important;
       box-sizing: border-box;
     }
 
-    /* Logo Brand Block styling overrides */
     .main-header-row > .default-content {
       display: flex !important;
       align-items: center !important;
@@ -361,20 +415,19 @@ header {
       }
     }
 
-    /* Main Navigation List Container layout management rules */
     .main-header-row nav {
       display: flex !important;
       align-items: center !important;
       height: 100% !important;
       margin: 0;
-      padding-left: 64px; /* Space after logo */
+      padding-left: 64px;
       flex-grow: 1;
 
       .main-nav-list {
         display: flex !important;
         flex-direction: row !important;
         align-items: center !important;
-        gap: 40px !important; /* Separation space between navigation links */
+        gap: 40px !important;
         height: 100%;
         margin: 0;
         padding: 0;
@@ -392,7 +445,6 @@ header {
       }
     }
 
-    /* Navigation Links Text Properties */
     .main-nav-link,
     .dropdown-trigger {
       font-size: 16px;
@@ -401,11 +453,10 @@ header {
       text-decoration: none;
     }
 
-    /* 3. Search Bar Pinning (Far Right Boundary) */
     .actions-wrapper-right {
       display: flex !important;
       align-items: center !important;
-      margin-left: auto; /* Push input to the right edge */
+      margin-left: auto;
       flex-shrink: 0;
     }
 
@@ -419,9 +470,9 @@ header {
     .search-input {
       width: 280px;
       height: 42px;
-      padding: 0 44px 0 16px !important; /* Left padding for typing, right room for icon */
+      padding: 0 44px 0 16px !important;
       border: 1px solid #cccccc !important;
-      border-radius: 4px !important; /* Crisp rectangle box shape */
+      border-radius: 4px !important;
       font-size: 14px;
       color: #333333;
       background-color: #ffffff;
@@ -431,132 +482,29 @@ header {
     .search-icon {
       position: absolute;
       left: auto !important;
-      right: 14px !important; /* Align inner right edge */
+      right: 14px !important;
       top: 50%;
       transform: translateY(-50%);
       display: block;
+      cursor: pointer;
+      pointer-events: auto !important;
+      transition: transform 0.1s ease;
+      
+      &::before {
+        content: "🔍";
+        font-size: 16px;
+      }
+
+      &:active {
+        transform: translateY(-50%) scale(0.9);
+      }
     }
   }
 }
 
-.main-nav-item {
-  position: relative;
-}
-
-.dropdown-trigger {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  cursor: pointer;
-}
-
-.dropdown-arrow {
-  font-size: 12px;
-}
-
-.dropdown-arrow::before {
-  content: "";
-  width: 8px;
-  height: 8px;
-  border-right: 2px solid currentColor;
-  border-bottom: 2px solid currentColor;
-  transform: rotate(45deg) translateY(-2px);
-  display: block;
-}
-
-.main-nav-item.is-open .dropdown-arrow::before {
-  transform: rotate(-135deg);
-}
-
-.single-menu {
-  display: none;
-  position: absolute !important; /* Force absolute context to pop it out of layout flow */
-  top: 100%; 
-  left: 0;   
-  margin-top: 0;
-  min-width: 200px; 
-  width: max-content; 
-  background: #ffffff;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  border-radius: 4px;
-  z-index: 1000;
-}
-
-.single-menu-inner {
-  width: 100%;
-  /* Add 16px of padding on both the left and right sides */
-  padding: 12px 16px; 
-  box-sizing: border-box;
-}
-
-.single-menu-list {
-  width: 100%;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.single-menu-link {
-  display: block;
-  /* Adjust link padding so the hover background highlights nicely */
-  padding: 8px 12px; 
-  color: #333333;
-  text-align: left; /* Keep text strictly left-aligned */
-  font-size: 14px;
-  text-decoration: none;
-  border-radius: 4px; /* Optional: adds a soft look to the hover state */
-  transition: background-color 0.2s ease, color 0.2s ease;
-}
-
-.single-menu-link:hover {
-  background: #f5f5f5;
-  color: #007799; 
-}
-
-.main-nav-item.is-open .single-menu {
-  display: block;
-}
-
-/* Ensure main-nav-item doesn't cause overlap */
-.main-nav-item.is-open .main-nav-link {
-  position: relative;
-  z-index: 1001;
-}
-
-.main-nav-item.has-dropdown {
-  position: relative !important; /* Forces the absolute menu to align to this specific tab link */
-}
-
-
-.search-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-  margin-left: 24px; /* Creates explicit separation before the search bar begins */
-}
-
-.search-input {
-  width: 220px;
-  height: 40px;
-  padding: 0 12px 0 40px;
-  border: 1px solid #d8d8d8;
-  border-radius: 20px;
-  font-size: 14px;
-}
-
-.search-icon {
-  position: absolute;
-  left: 14px;
-  top: 50%;
-  transform: translateY(-50%);
-  pointer-events: none;
-}
-
-.search-icon::before {
-  content: "🔍";
-  font-size: 16px;
-}
-
+/* ==========================================================================
+   4. MOBILE RESPONSIVE OVERRIDES
+   ========================================================================== */
 @media (width < 900px) {
   header .header-content {
     padding-inline: 20px;

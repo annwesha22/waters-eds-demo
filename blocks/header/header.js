@@ -161,17 +161,27 @@ function decorateNavItem(li) {
     li.querySelector(':scope > p > a')
     || li.querySelector(':scope > a');
 
-  if (link) {
+  // SAFE GUARD: If there is no anchor tag (like authored plain text), turn it into a link
+  if (!link) {
+    const text = li.textContent.trim();
+    if (text && text.toLowerCase() !== 'search') {
+      const newLink = document.createElement('a');
+      newLink.className = 'main-nav-link';
+      newLink.href = '#'; // Fallback placeholder path
+      newLink.textContent = text;
+      li.textContent = '';
+      li.append(newLink);
+    }
+  } else {
     link.classList.add('main-nav-link');
   }
 
   // Check if this specific item is the "Categories" dropdown link
-  const linkText = link ? link.textContent.trim().toLowerCase() : '';
-  const isCategories = linkText === 'categories';
+  const currentLink = li.querySelector('.main-nav-link');
+  const linkText = currentLink ? currentLink.textContent.trim().toLowerCase() : li.textContent.trim().toLowerCase();
+  const isCategories = linkText.includes('categories');
 
-  // Build structure early if it contains a static menu or if it's our dynamic Categories menu
-  const submenu = li.querySelector(':scope > ul');
-  if (submenu || isCategories) {
+  if (isCategories) {
     li.classList.add('has-dropdown');
 
     const wrapper = document.createElement('div');
@@ -179,7 +189,7 @@ function decorateNavItem(li) {
     const inner = document.createElement('div');
     inner.className = 'single-menu-inner';
 
-    const ul = submenu || document.createElement('ul');
+    const ul = document.createElement('ul');
     ul.className = 'single-menu-list';
     
     inner.append(ul);
@@ -187,57 +197,44 @@ function decorateNavItem(li) {
     li.append(wrapper);
 
     // Dynamic data fetching execution for the Categories sheet
-    if (isCategories) {
-      fetch('/docs/library/metadata/categories.json')
-        .then((response) => {
-          if (!response.ok) throw new Error('Failed to fetch categories spreadsheet');
-          return response.json();
-        })
-        .then((json) => {
-          // AEM spreadsheet JSON objects store data arrays inside the .data property
-          const categories = json.data || [];
-          
-          categories.forEach((row) => {
-            const item = document.createElement('li');
-            item.className = 'single-menu-item';
+    fetch('/docs/library/metadata/categories.json')
+      .then((response) => {
+        if (!response.ok) throw new Error('Failed to fetch categories spreadsheet');
+        return response.json();
+      })
+      .then((json) => {
+        const categories = json.data || [];
+        categories.forEach((row) => {
+          const item = document.createElement('li');
+          item.className = 'single-menu-item';
 
-            const a = document.createElement('a');
-            a.className = 'single-menu-link';
-            a.href = row.path;      // Map spreadsheet column 'path'
-            a.textContent = row.label; // Map spreadsheet column 'label'
-            
-            item.append(a);
-            ul.append(item);
-          });
-        })
-        .catch((err) => console.error('Error loading dynamic categories:', err));
-    } else {
-      // Fallback: Apply layout classes to pre-existing standard submenu items
-      [...ul.children].forEach((item) => {
-        item.classList.add('single-menu-item');
-        const itemLink = item.querySelector('a');
-        if (itemLink) itemLink.classList.add('single-menu-link');
-      });
-    }
+          const a = document.createElement('a');
+          a.className = 'single-menu-link';
+          a.href = row.path;      
+          a.textContent = row.label; 
+          
+          item.append(a);
+          ul.append(item);
+        });
+      })
+      .catch((err) => console.error('Error loading dynamic categories:', err));
   }
 
   // Dropdown click trigger logic setup
-  const trigger = li.querySelector(':scope > p') || li.querySelector(':scope > a');
-  if ((submenu || isCategories) && trigger) {
-    trigger.classList.add('dropdown-trigger');
+  if (isCategories && currentLink) {
+    currentLink.classList.add('dropdown-trigger');
 
     const arrow = document.createElement('span');
     arrow.className = 'dropdown-arrow';
-    trigger.append(arrow);
+    currentLink.append(arrow);
 
-    trigger.addEventListener('click', (e) => {
+    currentLink.addEventListener('click', (e) => {
       e.preventDefault();
       e.stopPropagation();
       toggleMenu(li);
     });
   }
 }
-
 function decorateBrandSection(section) {
   section.classList.add('brand-section');
   const brandLink = section.querySelector('a');
@@ -306,10 +303,10 @@ async function decorateHeader(fragment) {
     // 1. Label the top utility strip
     sections[0].classList.add('top-utility-section');
     
-    // 2. Identify and explicitly process the actions element layer BEFORE nav parsing
+    // 2. Explicitly process action block layout elements
     await decorateActionSection(sections[2]);
     
-    // 3. Process the standard logo/brand and core navigation layout systems
+    // 3. Process the standard logo/brand and core navigation systems
     decorateBrandSection(sections[1]);
     decorateNavSection(sections[2]);
     
@@ -323,21 +320,16 @@ async function decorateHeader(fragment) {
       mainHeaderRow.append(brandContent);
     }
     
-    // 5. Build and isolate the primary navigation layout element structure
+    // 5. Build and isolate primary navigation layout container
     const navElement = document.createElement('nav');
-    const mainUl = sections[2].querySelector('.main-nav-list');
+    const mainNavList = sections[2].querySelector('.main-nav-list');
     
-    if (mainUl) {
-      // Find the search list wrapper item if still nested inside the list container
-      const searchLiItem = mainUl.querySelector('.search-wrapper')?.closest('li');
-      if (searchLiItem) {
-        searchLiItem.remove(); // Pop it out so it doesn't stay stuck inside the navigation link stack
-      }
-      navElement.append(mainUl);
+    if (mainNavList) {
+      navElement.append(mainNavList);
     }
     mainHeaderRow.append(navElement);
     
-    // 6. Extract the search wrapper action block and pin it as the rightmost component
+    // 6. Extract search wrapper action block
     const searchWrapper = sections[2].querySelector('.search-wrapper');
     if (searchWrapper) {
       const actionsDiv = document.createElement('div');
@@ -351,7 +343,6 @@ async function decorateHeader(fragment) {
     sections[1].remove();
     sections[2].remove();
   } else {
-    // Graceful baseline fallbacks if structural fragment sections mismatch
     if (sections[0]) decorateBrandSection(sections[0]);
     if (sections[1]) decorateNavSection(sections[1]);
     if (sections[2]) decorateActionSection(sections[2]);
