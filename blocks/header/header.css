@@ -12,7 +12,7 @@ header {
   overflow: hidden;
   max-height: var(--header-height);
   /* background-color: light-dark(var(--color-light), var(--color-dark)); */
-  background-color: #71b3cf;
+  background-color: #ffffff;
 
   .single-menu,
   .language-menu,
