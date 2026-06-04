@@ -167,7 +167,7 @@ function decorateNavItem(li) {
 
   // Check if this specific item is the "Categories" dropdown link
   const linkText = link ? link.textContent.trim().toLowerCase() : '';
-  const isCategories = linkText === 'Categories';
+  const isCategories = linkText === 'categories';
 
   // Build structure early if it contains a static menu or if it's our dynamic Categories menu
   const submenu = li.querySelector(':scope > ul');
