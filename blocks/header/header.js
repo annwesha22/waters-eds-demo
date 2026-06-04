@@ -307,18 +307,24 @@ async function decorateHeader(fragment) {
     decorateBrandSection(sections[1]);
     decorateNavSection(sections[2]);
     
-    // Find search element inside the navigation stack and slide it rightward
-    const searchItem = sections[2].querySelector('.search-wrapper');
+    // Create a robust flex row wrapper for the main logo + nav content
+    const rowWrapper = document.createElement('div');
+    rowWrapper.className = 'sections-container';
+    
+    // Move logo and navigation contents inside it side-by-side
+    sections[1].replaceWith(rowWrapper);
+    rowWrapper.append(sections[1], sections[2]);
+
+    // Handle shifting the search input cleanly to the right side edge
+    const searchItem = rowWrapper.querySelector('.search-wrapper');
     if (searchItem) {
       const actionsDiv = document.createElement('div');
       actionsDiv.className = 'actions-wrapper-right';
       actionsDiv.append(searchItem);
       
-      // Append right next to the nav list block
-      sections[2].querySelector('nav').after(actionsDiv);
+      rowWrapper.querySelector('nav').after(actionsDiv);
       
-      // Clean up empty wrapping li tags if left behind
-      const emptyLi = sections[2].querySelector('nav ul li:empty');
+      const emptyLi = rowWrapper.querySelector('nav ul li:empty');
       if (emptyLi) emptyLi.remove();
     }
   } else {
