@@ -90,6 +90,19 @@
         .cover-content {
           padding: 0 calc(var(--spacing-xxl) * 2);
         }
+        
+        /* Forces the image frame to scale to the row height rather than a forced 1:1 ratio */
+        .cover-image {
+          padding-bottom: 0; 
+          align-self: stretch;
+          
+          picture, img {
+            position: relative;
+            height: 100%;
+            width: 100%;
+            object-fit: cover;
+          }
+        }
       }
     }
 
