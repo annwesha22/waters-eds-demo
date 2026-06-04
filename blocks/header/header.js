@@ -188,17 +188,17 @@ function decorateNavItem(li) {
     e.preventDefault();
     e.stopPropagation();
 
-    const panel = li.querySelector('.single-menu');
+    // const panel = li.querySelector('.single-menu');
 
-    if (panel) {
-      const headerContent = document.querySelector('.header-content');
+    // if (panel) {
+    //   const headerContent = document.querySelector('.header-content');
 
-      const triggerRect = trigger.getBoundingClientRect();
-      const containerRect = headerContent.getBoundingClientRect();
+    //   const triggerRect = trigger.getBoundingClientRect();
+    //   const containerRect = headerContent.getBoundingClientRect();
 
-      panel.style.paddingLeft =
-        `${triggerRect.left - containerRect.left}px`;
-    }
+    //   panel.style.paddingLeft =
+    //     `${triggerRect.left - containerRect.left}px`;
+    // }
     toggleMenu(li);
   });
 }
