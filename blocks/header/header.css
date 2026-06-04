@@ -375,13 +375,13 @@ header {
         height: 100%;
       }
 
-        /* Ensure the trigger handles layout correctly */
-        .dropdown-trigger {
-          height: 100%;
-          display: flex;
-          align-items: center;
-        }
+      /* Ensure the trigger handles layout correctly */
+      .dropdown-trigger {
+        height: 100%;
+        display: flex;
+        align-items: center;
       }
+      
     }
 
     .actions-section {
