@@ -303,31 +303,43 @@ async function decorateHeader(fragment) {
   const sections = fragment.querySelectorAll(':scope > .section');
   
   if (sections.length === 3) {
+    // 1. Label the top grey utility bar
     sections[0].classList.add('top-utility-section');
+    
+    // 2. Decorate the brand and nav content systems
     decorateBrandSection(sections[1]);
     decorateNavSection(sections[2]);
     
-    // Create a robust flex row wrapper for the main logo + nav content
-    const rowWrapper = document.createElement('div');
-    rowWrapper.className = 'sections-container';
+    // 3. Create a master horizontal flex row to hold everything below the top utility bar
+    const mainHeaderRow = document.createElement('div');
+    mainHeaderRow.className = 'main-header-row';
     
-    // Move logo and navigation contents inside it side-by-side
-    sections[1].replaceWith(rowWrapper);
-    rowWrapper.append(sections[1], sections[2]);
+    // Move the inner contents of brand and navigation directly into our row
+    const brandContent = sections[1].querySelector('.default-content');
+    const navContent = sections[2].querySelector('nav');
+    const searchContent = sections[2].querySelector('.search-wrapper');
 
-    // Handle shifting the search input cleanly to the right side edge
-    const searchItem = rowWrapper.querySelector('.search-wrapper');
-    if (searchItem) {
+    if (brandContent) mainHeaderRow.append(brandContent);
+    if (navContent) mainHeaderRow.append(navContent);
+    
+    // 4. Extract the search wrapper and package it as the rightmost element
+    if (searchContent) {
       const actionsDiv = document.createElement('div');
       actionsDiv.className = 'actions-wrapper-right';
-      actionsDiv.append(searchItem);
-      
-      rowWrapper.querySelector('nav').after(actionsDiv);
-      
-      const emptyLi = rowWrapper.querySelector('nav ul li:empty');
-      if (emptyLi) emptyLi.remove();
+      actionsDiv.append(searchContent);
+      mainHeaderRow.append(actionsDiv);
     }
+
+    // Clean up empty navigation item stubs left behind
+    const emptyLi = mainHeaderRow.querySelectorAll('nav ul li:empty');
+    emptyLi.forEach(li => li.remove());
+
+    // 5. Re-inject our row directly after the utility bar, removing the old wrapper divs
+    sections[0].after(mainHeaderRow);
+    sections[1].remove();
+    sections[2].remove();
   } else {
+    // Standard template fallbacks if sections mismatch
     if (sections[0]) decorateBrandSection(sections[0]);
     if (sections[1]) decorateNavSection(sections[1]);
     if (sections[2]) decorateActionSection(sections[2]);

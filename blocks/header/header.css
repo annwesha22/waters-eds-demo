@@ -274,32 +274,31 @@ header {
 
 @media (width >= 900px) {
   header {
-    overflow: initial !important;
-    max-height: none !important; /* Allow layout to grow to accommodate utility bar */
+    overflow: visible !important;
+    max-height: none !important;
     background-color: #ffffff !important;
     box-shadow: 0 1px 0 0 #e5e5e5;
 
-    /* The main layout wrapper framework */
+    /* Primary Container Layout */
     .header-content {
       display: flex !important;
       flex-direction: column !important;
-      grid-template-areas: none !important;
-      grid-template-rows: none !important;
       max-width: 1480px;
       margin: 0 auto;
       width: 100%;
       padding-inline: 48px;
       box-sizing: border-box;
+      background-color: #ffffff !important;
     }
 
-    /* 1. Top Utility Section Layout */
+    /* 1. Top Utility Strip Alignment */
     .top-utility-section {
       display: flex !important;
       justify-content: flex-end;
       align-items: center;
       height: 36px;
       background-color: #f5f5f5;
-      margin-inline: -48px; /* Extends grey bar edge-to-edge */
+      margin-inline: -48px;
       padding-inline: 48px;
       border-bottom: 1px solid #e5e5e5;
       font-size: 13px;
@@ -326,118 +325,112 @@ header {
       }
     }
 
-    /* 2. Main Header Row Container (Logo + Links Wrapper) */
-    /* This new master class wraps sections 2 & 3 neatly */
-    .brand-section,
-    .main-nav-section {
-      margin: 0;
-      padding: 0;
-    }
-
-    /* Target the container wrapping your core navigation block */
-    .sections-container:not(.top-utility-section) {
+    /* 2. Main Header Row (Logo + Navigation Links + Search Input Box) */
+    .main-header-row {
       display: flex !important;
       flex-direction: row !important;
       align-items: center !important;
-      justify-content: space-between !important;
-      height: 80px !important; /* Force a standard comfortable header row height */
+      justify-content: flex-start !important;
+      height: 80px !important; /* Locks the explicit white header row height bounds */
       width: 100%;
+      background-color: #ffffff !important;
     }
 
-    /* The Brand/Logo Wrapper block alignment */
-    .brand-section {
+    /* Logo Brand Block */
+    .main-header-row > .default-content {
       display: flex !important;
       align-items: center !important;
       height: 100% !important;
-      flex-shrink: 0; /* Prevents logo from squishing */
-      
-      .default-content {
-        display: flex;
-        align-items: center;
-        height: 100%;
-      }
+      margin: 0;
+      padding: 0;
+      flex-shrink: 0;
 
-      /* Make sure the image scaling looks sharp and centered */
       p, a {
         display: flex;
         align-items: center;
         height: 100%;
+        color: #333333;
       }
 
       img, svg {
-        height: 32px !important; /* Forces your logo height constraints */
+        height: 32px !important;
         width: auto !important;
       }
     }
 
-    /* Main Navigation Section Row Rules */
-    .main-nav-section {
+    /* Main Navigation List Container */
+    .main-header-row nav {
       display: flex !important;
       align-items: center !important;
-      flex-grow: 1; /* Allows links section to expand dynamically */
       height: 100% !important;
-      padding-left: 64px; /* Creates elegant separation space after logo */
-
-      .default-content {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        width: 100%;
-        height: 100%;
-      }
-
-      nav {
-        display: flex;
-        align-items: center;
-        height: 100%;
-      }
+      margin: 0;
+      padding-left: 50px; /* Creates layout breathing room directly after logo block */
+      flex-grow: 1;
 
       .main-nav-list {
         display: flex !important;
         flex-direction: row !important;
         align-items: center !important;
-        gap: 40px !important; /* Generous clean space between text categories */
+        gap: 36px !important; /* Spacing between menu columns */
         height: 100%;
         margin: 0;
         padding: 0;
+        list-style: none;
         white-space: nowrap;
       }
 
       .main-nav-item {
         border-bottom: none !important;
-        display: flex;
-        align-items: center;
-        height: 100%;
+        display: flex !important;
+        align-items: center !important;
+        height: 100% !important;
+        margin: 0;
+        padding: 0;
       }
     }
 
-    /* Link Typography Alignment */
+    /* Navigation Links Text Properties */
     .main-nav-link,
     .dropdown-trigger {
-      font-size: 16px;
+      font-size: 15px;
       color: #333333 !important;
       font-weight: 500 !important;
+      text-decoration: none;
     }
 
-    /* Push the Action Input Container box all the way to the right */
+    /* 3. Search Bar Pinning (Far Right Boundary) */
     .actions-wrapper-right {
+      display: flex !important;
+      align-items: center !important;
+      margin-left: auto; /* Pushes the search layout to the far right */
+      flex-shrink: 0;
+    }
+
+    .search-wrapper {
+      position: relative;
       display: flex;
       align-items: center;
-      margin-left: auto; 
+      margin: 0;
     }
 
     .search-input {
       width: 280px;
-      height: 40px;
-      padding: 0 40px 0 16px;
+      height: 42px;
+      padding: 0 44px 0 16px; /* Right padding preserves text bounds before icon */
       border: 1px solid #cccccc;
       border-radius: 4px;
       font-size: 14px;
+      color: #333333;
+      background-color: #ffffff;
+      box-sizing: border-box;
     }
 
     .search-icon {
-      left: auto;
-      right: 14px;
+      position: absolute;
+      left: auto !important;
+      right: 14px !important; /* Locks lens glyph onto inner right edge */
+      top: 50%;
+      transform: translateY(-50%);
     }
   }
 }
