@@ -353,10 +353,12 @@ header {
       height: var(--header-height); /* Force full header height */
 
       .main-nav-list {
-        align-items: stretch; /* Change from center to stretch */
+        display: flex !important;
+        flex-direction: row !important; /* Locks list layout into a straight row side-by-side */
+        align-items: center; 
         gap: var(--spacing-l);
-        display: flex;
         height: 100%;
+        white-space: nowrap; /* Prevents navigation link text from breaking into two lines */
       }
 
       nav {
@@ -451,12 +453,12 @@ header {
 
 .single-menu {
   display: none;
-  position: absolute;
-  top: 100%; /* Positions directly below the parent link link */
-  left: 0;   /* Align with the left edge of the parent nav item */
+  position: absolute !important; /* Force absolute context to pop it out of layout flow */
+  top: 100%; 
+  left: 0;   
   margin-top: 0;
-  min-width: 200px; /* Give the container a consistent base width */
-  width: max-content; /* Dynamically sizes to fit your content width cleanly */
+  min-width: 200px; 
+  width: max-content; 
   background: #ffffff;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   border-radius: 4px;
@@ -502,6 +504,10 @@ header {
 .main-nav-item.is-open .main-nav-link {
   position: relative;
   z-index: 1001;
+}
+
+.main-nav-item.has-dropdown {
+  position: relative !important; /* Forces the absolute menu to align to this specific tab link */
 }
 
 
