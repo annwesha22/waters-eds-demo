@@ -275,148 +275,113 @@ header {
 @media (width >= 900px) {
   header {
     overflow: initial;
+    background-color: #ffffff;
+    box-shadow: 0 1px 0 0 #e5e5e5; /* Soft bottom header delimiter line */
 
+    /* The Main Header Wrapper Container Grid */
     .header-content {
       max-width: 1480px;
       margin: 0 auto;
       width: 100%;
+      padding-inline: 48px;
+      display: flex;
+      flex-direction: column;
+    }
 
-      padding-inline: 48px; /* same as footer */
-
-      grid-template:
-        "brand nav actions"
-        auto / auto 1fr auto;
-
-      gap: var(--spacing-l);
+    /* 1. Top Utility Utility Bar Styling Rules */
+    .top-utility-section {
+      display: flex;
+      justify-content: flex-end;
       align-items: center;
-    }
+      height: 36px;
+      background-color: #f5f5f5;
+      margin-inline: -48px; /* Extends background full width edge-to-edge */
+      padding-inline: 48px;
+      border-bottom: 1px solid #e5e5e5;
+      font-size: 13px;
+      color: #666666;
 
-    .menu,
-    .mega-menu {
-      background-color: var(--color-shaded);
-      padding: var(--spacing-xl) 0;
-      position: absolute;
-      left: 0;
-      right: 0;
-      top: var(--header-height); /* Add this to position below header */
-
-      &.language {
-        display: none;
-        max-width: initial;
-        margin: 0;
-        width: 180px;
-        background-color: var(--color-shaded);
-        padding: var(--spacing-xl);
-        position: absolute;
-        left: auto;
-        right: 0;
-        z-index: 1001;
+      ul {
+        display: flex;
+        gap: 24px;
+        align-items: center;
+      }
+      
+      a {
+        color: #555555;
+        font-weight: 400;
       }
     }
 
-    .mega-menu {
-      > .fragment-content {
-        display: grid;
-        grid-template-columns: repeat(var(--mega-columns), 1fr);
-        max-width: var(--grid-container-width);
-        margin: 0 auto;
-
-        .section {
-          margin-block: initial;
-        }
-      }
+    /* 2. Main Nav Row Container */
+    .section:not(.top-utility-section) {
+      margin: 0;
+      padding: 0;
     }
 
+    /* Unify primary layout containers into a cohesive row flow */
     .brand-section {
-      border-bottom: initial;
       display: flex;
       align-items: center;
-
-      .default-content {
-
-        max-width: initial;
-        margin: 0;
-        display: flex;
-        align-items: center;
-        height: 100%;
-      }
-
-      .action-wrapper.more {
-        display: none;
-      }
+      float: left;
+      height: var(--header-height);
     }
 
     .main-nav-section {
       display: flex;
-      align-items: stretch; /* Change from center to stretch */
-      position: relative;
-      height: var(--header-height); /* Force full header height */
-
-      .main-nav-list {
-        display: flex !important;
-        flex-direction: row !important;
-        align-items: center; 
-        gap: 32px !important; /* Forces a clear horizontal gap between every link */
-        height: 100%;
-        white-space: nowrap;
-        padding: 0;
-        margin: 0;
-      }
-
-      .main-nav-item {
-        border-bottom: initial;
-        display: flex;
-        align-items: center;
-        height: 100%;
-        padding: 0 4px; /* Adds individual breathing space around each text boundary */
-      }
+      align-items: center;
+      justify-content: space-between;
+      flex: 1;
+      height: var(--header-height);
+      padding-left: 40px;
 
       nav {
-        height: 100%;
-      }
-
-      /* Ensure the trigger handles layout correctly */
-      .dropdown-trigger {
-        height: 100%;
         display: flex;
         align-items: center;
-      }
-      
-    }
-
-    .actions-section {
-      position: relative;
-      overflow: initial;
-
-      .default-content {
-        max-width: initial;
-        margin: 0;
-      }
-
-      .action-wrapper {
-        position: relative;
-        right: -10px;
-      }
-
-      .block-content {
-        border-bottom: initial;
-      }
-
-      &.is-open {
-        overflow: initial;
-
-        .menu.language {
-          display: block;
-        }
+        height: 100%;
       }
     }
 
-    &.is-mobile-open {
-      bottom: initial;
+    /* Styling of links matching target typography properties */
+    .main-nav-link,
+    .dropdown-trigger {
+      font-size: 16px;
+      color: #555555 !important;
+      font-weight: 500 !important; /* Semi-bold refined clean weights */
+      transition: color 0.15s ease;
+    }
 
-      .header-content {
-        height: initial;
-      }
+    .main-nav-link:hover,
+    .dropdown-trigger:hover {
+      color: #007799 !important;
+    }
+
+    /* Actions Layout Pinning (Search to Right Side edge) */
+    .actions-wrapper-right {
+      display: flex;
+      align-items: center;
+      margin-left: auto; /* Pushes input layout all the way to right side bound */
+    }
+
+    /* Search Input Styling Box overrides matching the Mockup Frame */
+    .search-input {
+      width: 280px;
+      height: 44px;
+      padding: 0 44px 0 16px; /* Invert padding layout context */
+      border: 1px solid #cccccc;
+      border-radius: 4px; /* Crisp square-cornered box profiles */
+      font-size: 14px;
+      color: #333333;
+      background-color: #ffffff;
+    }
+
+    .search-icon {
+      left: auto;
+      right: 16px; /* Pin magnifying glass to the inner right edge */
+    }
+    
+    .search-input::placeholder {
+      color: #999999;
     }
   }
 }

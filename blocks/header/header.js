@@ -239,30 +239,19 @@ function decorateNavItem(li) {
 }
 
 function decorateBrandSection(section) {
-  // section.classList.add('brand-section');
-  // const brandLink = section.querySelector('a');
-  // const [, text] = brandLink.childNodes;
-  // const span = document.createElement('span');
-  // span.className = 'brand-text';
-  // span.append(text);
-  // brandLink.append(span);
   section.classList.add('brand-section');
-
   const brandLink = section.querySelector('a');
   if (!brandLink) return;
 
-  const textNode = [...brandLink.childNodes]
-    .find((node) => node.nodeType === Node.TEXT_NODE
-      && node.textContent.trim());
-
-  if (!textNode) return;
-
-  const span = document.createElement('span');
-  span.className = 'brand-text';
-  span.textContent = textNode.textContent.trim();
-
-  textNode.remove();
-  brandLink.append(span);
+  // Wrap the plain text "Blog" or "Waters" into a styling span 
+  const textNode = [...brandLink.childNodes].find(node => node.nodeType === Node.TEXT_NODE && node.textContent.trim());
+  if (textNode) {
+    const span = document.createElement('span');
+    span.className = 'brand-text-suffix';
+    span.textContent = textNode.textContent.trim();
+    textNode.remove();
+    brandLink.append(span);
+  }
 }
 
 function decorateNavSection(section) {
@@ -312,15 +301,33 @@ async function decorateActionSection(section) {
 
 async function decorateHeader(fragment) {
   const sections = fragment.querySelectorAll(':scope > .section');
-  if (sections[0]) decorateBrandSection(sections[0]);
-  if (sections[1]) decorateNavSection(sections[1]);
-  if (sections[2]) decorateActionSection(sections[2]);
+  
+  if (sections.length === 3) {
+    // 3-section layout setup matching your document structure
+    sections[0].classList.add('top-utility-section');
+    decorateBrandSection(sections[1]);
+    decorateNavSection(sections[2]);
+    
+    // Move search items out into its action area container dynamically
+    const searchItem = sections[2].querySelector('.search-wrapper')?.closest('li');
+    if (searchItem) {
+      const actionsDiv = document.createElement('div');
+      actionsDiv.className = 'actions-wrapper-right';
+      actionsDiv.append(searchItem.querySelector('.search-wrapper'));
+      sections[2].querySelector('nav').after(actionsDiv);
+      searchItem.remove();
+    }
+  } else {
+    // Fallback safety block
+    if (sections[0]) decorateBrandSection(sections[0]);
+    if (sections[1]) decorateNavSection(sections[1]);
+    if (sections[2]) decorateActionSection(sections[2]);
+  }
 
   for (const pattern of HEADER_ACTIONS) {
     decorateAction(fragment, pattern);
   }
 }
-
 /**
  * loads and decorates the header
  * @param {Element} el The header element
