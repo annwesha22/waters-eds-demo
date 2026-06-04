@@ -11,14 +11,8 @@ export default async function init(el) {
   const { locale } = getConfig();
   const footerMeta = getMetadata('footer');
   const path = footerMeta || FOOTER_PATH;
-   console.log('locale:', locale);
-  console.log('locale.prefix:', locale?.prefix);
-  console.log('footerMeta:', footerMeta);
-  console.log('path:', path);
-  console.log('before fragment path:', `${locale?.prefix || ''}${path}`);
   try {
     const fragment = await loadFragment(`${locale.prefix}${path}`);
-    console.log('after fragment path:', fragment);
     fragment.classList.add('footer-content');
 
     const sections = [...fragment.querySelectorAll('.section')];
