@@ -457,17 +457,21 @@ header {
   display: none;
   position: absolute;
   top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
 
-  /* stretch across nav/header area */
-  left: 0;
-  right: 0;
-  width: 100vw;
+  width: 1480px;
+  max-width: 100vw;
 
   background: #fff;
   box-shadow: 0 8px 20px rgb(0 0 0 / 15%);
   z-index: 1000;
-  padding-top: 24px;
-  padding-bottom: 24px;
+}
+
+.single-menu-inner {
+  max-width: 1480px;
+  margin: 0 auto;
+  padding: 24px 48px;
 }
 
 .main-nav-item.is-open .single-menu {
@@ -479,12 +483,10 @@ header {
 }
 
 .single-menu-list {
-  /*padding: 12px 0;*/
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-
-  width: fit-content;
+  width: 250px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
 .single-menu-link {

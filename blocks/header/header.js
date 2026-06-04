@@ -121,8 +121,12 @@ function decorateMenu(li) {
 
   const wrapper = document.createElement('div');
   wrapper.className = 'single-menu';
+  const inner = document.createElement('div');
+  inner.className = 'single-menu-inner';
 
   submenu.classList.add('single-menu-list');
+  inner.append(submenu);
+  wrapper.append(inner);
 
   [...submenu.children].forEach((item) => {
     item.classList.add('single-menu-item');
@@ -133,7 +137,7 @@ function decorateMenu(li) {
     }
   });
 
-  wrapper.append(submenu);
+  /*wrapper.append(submenu);*/
   li.append(wrapper);
 
   return wrapper;
