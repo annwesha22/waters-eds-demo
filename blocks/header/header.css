@@ -277,12 +277,6 @@ header {
     overflow: initial;
 
     .header-content {
-      /* max-width: var(--grid-container-width); */
-      /* max-width: 100%;
-      margin: 0 auto;
-      grid-template: "brand nav actions" auto / auto 1fr auto;
-      gap: var(--spacing-l);
-      align-items: center; */
       max-width: 1480px;
       margin: 0 auto;
       width: 100%;
@@ -304,6 +298,7 @@ header {
       position: absolute;
       left: 0;
       right: 0;
+      top: var(--header-height); /* Add this to position below header */
 
       &.language {
         display: none;
@@ -456,12 +451,11 @@ header {
 .single-menu {
   display: none;
   position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  margin-top: 0; /* Remove any gap that might cause overlap */
+  top: var(--header-height); /* Change from 100% to header height */
+  left: 0; /* Change from 50% */
+  transform: none; /* Remove translateX */
 
-  width: 1480px;
+  width: 100%;
   max-width: 100vw;
 
   background: #fff;
@@ -472,7 +466,7 @@ header {
 .single-menu-inner {
   max-width: 1480px;
   margin: 0 auto;
-  padding: 24px 48px; /* Uncomment to align with header padding */
+  padding: 24px 48px;
 }
 
 .main-nav-item.is-open .single-menu {
