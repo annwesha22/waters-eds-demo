@@ -435,22 +435,54 @@ header {
       .language.menu {
         position: absolute !important;
         top: 100%;
-        right: 0; /* Align card perfectly with the right edge of the globe marker */
+        right: 0; /* Aligns card precisely below the language toggle marker */
         margin-top: 6px;
         background-color: #ffffff !important;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
         border-radius: 4px;
-        padding: 16px;
+        padding: 12px 0; /* Clear container bounds */
         z-index: 1010;
-        min-width: 180px;
-        display: none; /* Keep hidden until toggled */
-        
-        ul {
+        min-width: 160px;
+        display: none;
+        /* Enforce clean stacked row formatting */
+        .language-menu-list {
           display: flex !important;
-          flex-direction: column !important; /* Stack languages vertically inside the dropdown */
+          flex-direction: column !important; /* Stack vertically down */
+          gap: 0 !important;
+          margin: 0;
+          padding: 0;
+          list-style: none;
+          width: 100%;
+        }
+
+        .language-menu-item {
+          width: 100%;
+          margin: 0;
+          padding: 0;
+          display: block;
+        }
+
+        .language-menu-link {
+          display: block;
+          padding: 8px 20px;
+          color: #333333 !important;
+          font-size: 14px;
+          text-decoration: none;
+          text-align: left;
+          transition: background-color 0.15s ease;
+        }
+
+        .language-menu-link:hover {
+          background-color: #f5f5f5;
+          color: #007799 !important; /* Brand accent blue matching waters.com */
+        }
+        
+        /* ul {
+          display: flex !important;
+          flex-direction: column !important; 
           gap: 12px !important;
           align-items: flex-start !important;
-        }
+        } */
       }
 
       /* Watch for the is-open status class toggle directly on the list item */

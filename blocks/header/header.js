@@ -46,17 +46,36 @@ function decorateLanguage(btn) {
 
     let menu = utilityLi.querySelector('.language.menu');
     if (!menu) {
-      const content = document.createElement('div');
-      content.classList.add('block-content');
-      
+      // 1. Fetch the raw layout fragment from the document path
       const fragment = await loadFragment(`${locale.prefix}${HEADER_PATH}/languages`);
       
+      // 2. Create the clean container card
       menu = document.createElement('div');
       menu.className = 'language menu';
-      menu.append(fragment);
-      content.append(menu);
       
-      // Append right inside our scoped column list item wrapper
+      // 3. Extract the inner <ul> list elements from the fragment safely
+      const rawUl = fragment.querySelector('ul');
+      if (rawUl) {
+        // Apply class names for predictable styling
+        rawUl.className = 'language-menu-list';
+        
+        // Loop through each item to apply standard clean item styles
+        [...rawUl.children].forEach((li) => {
+          li.className = 'language-menu-item';
+          
+          const a = li.querySelector('a');
+          if (a) {
+            a.className = 'language-menu-link';
+          }
+        });
+        
+        menu.append(rawUl);
+      } else {
+        // Fallback: If no list found, append the raw fragment output
+        menu.append(fragment);
+      }
+      
+      // Append right inside our scoped absolute column list item wrapper
       utilityLi.append(menu);
     }
     toggleMenu(utilityLi);
