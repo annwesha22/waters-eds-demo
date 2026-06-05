@@ -37,20 +37,29 @@ function toggleMenu(menu) {
 }
 
 function decorateLanguage(btn) {
-  const section = btn.closest('.section');
-  btn.addEventListener('click', async () => {
-    let menu = section.querySelector('.language.menu');
+  // Find our custom utility list item wrapper instead of the old root section
+  const utilityLi = btn.closest('.utility-action-item') || btn.closest('.section');
+  
+  btn.addEventListener('click', async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    let menu = utilityLi.querySelector('.language.menu');
     if (!menu) {
       const content = document.createElement('div');
       content.classList.add('block-content');
+      
       const fragment = await loadFragment(`${locale.prefix}${HEADER_PATH}/languages`);
+      
       menu = document.createElement('div');
       menu.className = 'language menu';
       menu.append(fragment);
       content.append(menu);
-      section.append(content);
+      
+      // Append right inside our scoped column list item wrapper
+      utilityLi.append(menu);
     }
-    toggleMenu(section);
+    toggleMenu(utilityLi);
   });
 }
 

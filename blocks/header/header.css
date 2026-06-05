@@ -355,73 +355,109 @@ header {
       grid-template-rows: none !important;
     }
 
-    /* Place this inside your @media (width >= 900px) layout scope */
-  .top-utility-section {
-    position: relative;
-    overflow: visible !important;
-
-    ul {
+    /* 1. Top Utility Strip Alignment */
+    .top-utility-section {
       display: flex !important;
-      flex-direction: row !important;
-      align-items: center !important;
-      gap: 24px !important;
-    }
-
-    .utility-action-item {
-      display: flex;
+      justify-content: flex-end;
       align-items: center;
-      position: relative; /* Keeps the absolute menu card anchored directly to this list column item */
-    }
+      height: 36px;
+      background-color: #f5f5f5;
+      margin-inline: -48px;
+      padding-inline: 48px;
+      border-bottom: 1px solid #e5e5e5;
+      font-size: 13px;
+      color: #666666;
+      overflow: visible !important; /* Crucial: Allows dropdown card to overflow downwards */
 
-    .action-wrapper.language {
-      display: flex;
-      align-items: center;
-      height: 100%;
+      .default-content {
+        width: 100%;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+      }
 
-      button {
+      ul {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        gap: 32px !important; /* Generous gap between waters.com and language toggle */
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+      
+      a {
+        color: #555555;
+        text-decoration: none;
+      }
+
+      .utility-action-item {
+        position: relative; /* Anchor point for absolute dropdown overlay positioning */
         display: flex;
         align-items: center;
-        background: transparent;
-        border: none;
-        color: #555555;
-        font-size: 13px;
-        cursor: pointer;
-        padding: 0;
-        width: auto;
-        height: auto;
+        height: 100%;
+      }
 
-        .text {
-          display: inline-block !important;
-          width: auto !important;
+      .action-wrapper.language {
+        display: flex;
+        align-items: center;
+
+        button {
+          display: flex;
+          align-items: center;
+          background: transparent;
+          border: none;
+          padding: 0;
+          cursor: pointer;
+          width: auto !important; /* Clear fixed width limitations */
           height: auto !important;
-          overflow: visible !important;
-          margin-left: 6px;
-          font-size: 13px;
-          color: #555555;
+
+          .icon {
+            width: 20px;
+            height: 20px;
+            color: #333333;
+          }
+
+          .text {
+            display: block !important;
+            width: auto !important;
+            height: auto !important;
+            overflow: visible !important;
+            margin-left: 8px;
+            font-size: 13px;
+            color: #555555;
+            font-family: var(--font-family);
+          }
         }
       }
-    }
 
-    /* Fixed absolute language panel styling */
-    .language.menu {
-      position: absolute !important;
-      top: 100%;
-      right: 0; /* Aligns precisely to the right side bounds of the interactive text group */
-      margin-top: 8px;
-      background-color: #ffffff !important;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-      border-radius: 4px;
-      padding: 16px;
-      z-index: 1010;
-      min-width: 180px;
-      display: none;
-    }
+      /* Clean absolute menu positioning rules for language block content */
+      .language.menu {
+        position: absolute !important;
+        top: 100%;
+        right: 0; /* Align card perfectly with the right edge of the globe marker */
+        margin-top: 6px;
+        background-color: #ffffff !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+        border-radius: 4px;
+        padding: 16px;
+        z-index: 1010;
+        min-width: 180px;
+        display: none; /* Keep hidden until toggled */
+        
+        ul {
+          display: flex !important;
+          flex-direction: column !important; /* Stack languages vertically inside the dropdown */
+          gap: 12px !important;
+          align-items: flex-start !important;
+        }
+      }
 
-    /* FIX: Watch the specific parent list wrapper for open status checks */
-    .utility-action-item.is-open .language.menu {
-      display: block !important;
+      /* Watch for the is-open status class toggle directly on the list item */
+      .utility-action-item.is-open .language.menu {
+        display: block !important;
+      }
     }
-  }
 
     .main-header-row {
       display: flex !important;
