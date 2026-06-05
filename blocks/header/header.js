@@ -38,7 +38,7 @@ function toggleMenu(menu) {
 
 function decorateLanguage(btn) {
   // Find the parent list item context wrapping your button natively
-  const utilityLi = btn.closest('li') || btn.closest('.section');
+  const utilityLi = btn.closest('li') || btn.closest('.utility-action-item');
   if (!utilityLi) return;
   
   btn.removeAttribute('onclick');
@@ -86,7 +86,6 @@ function decorateLanguage(btn) {
     toggleMenu(utilityLi);
   });
 }
-
 
 function decorateScheme(btn) {
   btn.addEventListener('click', async () => {
@@ -142,10 +141,8 @@ async function decorateAction(header, pattern) {
   if (pattern === '/tools/widgets/language') decorateLanguage(btn);
   if (pattern === '/tools/widgets/scheme') decorateScheme(btn);
   if (pattern === '/tools/widgets/toggle') decorateNavToggle(btn);
-  
 }
 
-  // TODO: finish single menu support
 function decorateMenu(li) {
   const submenu = li.querySelector(':scope > ul');
   if (!submenu) return null;
@@ -170,12 +167,9 @@ function decorateMenu(li) {
     }
   });
 
-  /*wrapper.append(submenu);*/
   li.append(wrapper);
-
   return wrapper;
 }
-
 
 function decorateMegaMenu(li) {
   const menu = li.querySelector('.fragment-content');
@@ -194,13 +188,12 @@ function decorateNavItem(li) {
     li.querySelector(':scope > p > a')
     || li.querySelector(':scope > a');
 
-  // SAFE GUARD: If there is no anchor tag (like authored plain text), turn it into a link
   if (!link) {
     const text = li.textContent.trim();
     if (text && text.toLowerCase() !== 'search') {
       const newLink = document.createElement('a');
       newLink.className = 'main-nav-link';
-      newLink.href = '#'; // Fallback placeholder path
+      newLink.href = '#';
       newLink.textContent = text;
       li.textContent = '';
       li.append(newLink);
@@ -209,7 +202,6 @@ function decorateNavItem(li) {
     link.classList.add('main-nav-link');
   }
 
-  // Check if this specific item is the "Categories" dropdown link
   const currentLink = li.querySelector('.main-nav-link');
   const linkText = currentLink ? currentLink.textContent.trim().toLowerCase() : li.textContent.trim().toLowerCase();
   const isCategories = linkText.includes('categories');
@@ -229,7 +221,6 @@ function decorateNavItem(li) {
     wrapper.append(inner);
     li.append(wrapper);
 
-    // Dynamic data fetching execution for the Categories sheet
     fetch('/docs/library/metadata/categories.json')
       .then((response) => {
         if (!response.ok) throw new Error('Failed to fetch categories spreadsheet');
@@ -253,7 +244,6 @@ function decorateNavItem(li) {
       .catch((err) => console.error('Error loading dynamic categories:', err));
   }
 
-  // Dropdown click trigger logic setup
   if (isCategories && currentLink) {
     currentLink.classList.add('dropdown-trigger');
 
@@ -268,12 +258,12 @@ function decorateNavItem(li) {
     });
   }
 }
+
 function decorateBrandSection(section) {
   section.classList.add('brand-section');
   const brandLink = section.querySelector('a');
   if (!brandLink) return;
 
-  // Wrap the plain text "Blog" or "Waters" into a styling span 
   const textNode = [...brandLink.childNodes].find(node => node.nodeType === Node.TEXT_NODE && node.textContent.trim());
   if (textNode) {
     const span = document.createElement('span');
@@ -303,8 +293,7 @@ function decorateNavSection(section) {
 
 async function decorateActionSection(section) {
   section.classList.add('actions-section');
-
-   const items = section.querySelectorAll('li');
+  const items = section.querySelectorAll('li');
 
   items.forEach((item) => {
     const text = item.textContent.trim().toLowerCase();
@@ -328,101 +317,6 @@ async function decorateActionSection(section) {
     }
   });
 }
-
-// async function decorateHeader(fragment) {
-//   const sections = fragment.querySelectorAll(':scope > .section');
-  
-//   if (sections.length === 3) {
-//     // 1. Label the top utility strip wrapper natively
-//     sections[0].classList.add('top-utility-section');
-    
-//     // 2. Explicitly process action block layout elements
-//     await decorateActionSection(sections[2]);
-    
-//     // 3. Process standard logo/brand and core navigation systems
-//     decorateBrandSection(sections[1]);
-//     decorateNavSection(sections[2]);
-    
-//     // 4. Create the main horizontal flex row wrapper
-//     const mainHeaderRow = document.createElement('div');
-//     mainHeaderRow.className = 'main-header-row';
-    
-//     // Move the logo brand elements inside
-//     const brandContent = sections[1].querySelector('.default-content');
-//     if (brandContent) {
-//       mainHeaderRow.append(brandContent);
-//     }
-    
-//     // 5. Build and isolate primary navigation layout container
-//     const navElement = document.createElement('nav');
-//     const mainNavList = sections[2].querySelector('.main-nav-list');
-    
-//     if (mainNavList) {
-//       navElement.append(mainNavList);
-//     }
-//     mainHeaderRow.append(navElement);
-    
-//     // 6. Extract search wrapper action block
-//     const searchWrapper = sections[2].querySelector('.search-wrapper');
-//     if (searchWrapper) {
-//       const actionsDiv = document.createElement('div');
-//       actionsDiv.className = 'actions-wrapper-right';
-//       actionsDiv.append(searchWrapper);
-//       mainHeaderRow.append(actionsDiv);
-//     }
-
-//     // --- FIX FOR TOGGLE MISPLACEMENT: SCOPE THE IS-OPEN CLASS TO THE LI ITEM ONLY ---
-//     const topUtilityContent = sections[0].querySelector('.default-content');
-//     if (topUtilityContent) {
-//       const langWrapper = sections[2].querySelector('.action-wrapper.language');
-      
-//       if (langWrapper) {
-//         let utilityUl = topUtilityContent.querySelector('ul');
-//         if (!utilityUl) {
-//           utilityUl = document.createElement('ul');
-//           topUtilityContent.append(utilityUl);
-//         }
-
-//         const utilityLi = document.createElement('li');
-//         utilityLi.className = 'utility-action-item';
-//         utilityLi.append(langWrapper);
-//         utilityUl.append(utilityLi);
-
-//         const btn = langWrapper.querySelector('button');
-//         if (btn) {
-//           btn.removeAttribute('onclick');
-//           btn.addEventListener('click', (e) => {
-//             e.preventDefault();
-//             e.stopPropagation();
-//             // TARGET ONLY THE LI WRAPPER INSTEAD OF SECTIONS[0]
-//             toggleMenu(utilityLi); 
-//           });
-//         }
-//       }
-
-//       // Clean out raw stray text nodes safely
-//       const textNodes = [...topUtilityContent.childNodes].filter(node => node.nodeType === Node.TEXT_NODE);
-//       textNodes.forEach(node => {
-//         if (node.textContent.trim().toLowerCase() === 'language') {
-//           node.remove();
-//         }
-//       });
-//     }
-
-//     // 7. Inject our finalized structural row directly right under the grey utility line bar
-//     sections[0].after(mainHeaderRow);
-//     sections[1].remove();
-//     sections[2].remove();
-//   } else {
-//     if (sections[0]) decorateBrandSection(sections[0]);
-//     if (sections[1]) decorateNavSection(sections[1]);
-//     if (sections[2]) decorateActionSection(sections[2]);
-//   }
-
-//   for (const pattern of HEADER_ACTIONS) {
-//     await decorateAction(fragment, pattern);
-//   }
-// }
 
 async function decorateHeader(fragment) {
   const sections = fragment.querySelectorAll(':scope > .section');
@@ -471,7 +365,6 @@ async function decorateHeader(fragment) {
     }
 
     // --- NEW DIRECT UTILITY INTERACTION BINDING ---
-    // --- NEW DIRECT UTILITY INTERACTION BINDING ---
     const topUtilityContent = sections[0].querySelector('.default-content');
     if (topUtilityContent) {
       // Find the language wrapper directly inside the utility section where it was generated
@@ -485,17 +378,15 @@ async function decorateHeader(fragment) {
           topUtilityContent.append(utilityUl);
         }
 
-        // FORCE-CREATE THE MISSING LI WRAPPER ELEMENT FOR STABLE BOUNDS
+        // Safely check for or create the <li> item wrapper
         let utilityLi = langWrapper.closest('li');
         if (!utilityLi) {
           utilityLi = document.createElement('li');
-          // Insert the li right before the loose langWrapper, then move the wrapper inside it
-          langWrapper.before(utilityLi);
+          utilityLi.append(langWrapper);
         }
         
         utilityLi.className = 'utility-action-item';
-        utilityLi.append(langWrapper);
-        utilityUl.append(utilityLi); // Safely appends it as a child row item of the grid
+        utilityUl.append(utilityLi); 
           
         // Re-bind the language click event controller to the transformed button element
         const btn = langWrapper.querySelector('button');
@@ -511,6 +402,19 @@ async function decorateHeader(fragment) {
           node.remove();
         }
       });
+    }
+
+    // CRITICAL CORRECTION: Append the assembled rows to the DOM and clear old fragments
+    sections[0].after(mainHeaderRow);
+    sections[1].remove();
+    sections[2].remove();
+  } else {
+    if (sections[0]) decorateBrandSection(sections[0]);
+    if (sections[1]) decorateNavSection(sections[1]);
+    if (sections[2]) decorateActionSection(sections[2]);
+    
+    for (const pattern of HEADER_ACTIONS) {
+      await decorateAction(fragment, pattern);
     }
   }
 }
