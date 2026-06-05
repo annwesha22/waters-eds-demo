@@ -404,6 +404,20 @@ header {
         align-items: center;
         height: 100%;
       }
+      
+      .utility-action-item .language.menu {
+        position: absolute !important;
+        top: 100%;
+        right: 0;
+        margin-top: 6px;
+        background-color: #ffffff !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+        border-radius: 4px;
+        padding: 12px 0;
+        z-index: 1010;
+        min-width: 160px;
+        display: none;
+      }
 
       /* Target the action container component explicitly */
       .action-wrapper.globe,

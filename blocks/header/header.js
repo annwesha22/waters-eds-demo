@@ -37,8 +37,9 @@ function toggleMenu(menu) {
 }
 
 function decorateLanguage(btn) {
-  // Find our custom utility list item wrapper or fallback section context safely
-  const utilityLi = btn.closest('.utility-action-item') || btn.closest('.section') || document.querySelector('.utility-action-item');
+  // Look directly for our utility list wrapper node layer
+  const utilityLi = btn.closest('.utility-action-item');
+  if (!utilityLi) return;
   
   btn.removeAttribute('onclick');
 
@@ -46,20 +47,13 @@ function decorateLanguage(btn) {
     e.preventDefault();
     e.stopPropagation();
 
-    // Re-verify runtime target container
-    const activeTarget = btn.closest('.utility-action-item') || utilityLi;
-    if (!activeTarget) return;
-
-    let menu = activeTarget.querySelector('.language.menu');
+    let menu = utilityLi.querySelector('.language.menu');
     if (!menu) {
-      // 1. Fetch the raw layout fragment document options asynchronously
       const fragment = await loadFragment(`${locale.prefix}${HEADER_PATH}/languages`);
       
-      // 2. Build the structural overlay card container block
       menu = document.createElement('div');
       menu.className = 'language menu';
       
-      // 3. Extract the inner <ul> list payload safely
       const rawUl = fragment.querySelector('ul');
       if (rawUl) {
         rawUl.className = 'language-menu-list';
@@ -76,11 +70,10 @@ function decorateLanguage(btn) {
         menu.append(fragment);
       }
       
-      activeTarget.append(menu);
+      utilityLi.append(menu);
     }
     
-    // 4. Toggle visibility panel class tracking natively
-    toggleMenu(activeTarget);
+    toggleMenu(utilityLi);
   });
 }
 
@@ -435,7 +428,7 @@ async function decorateHeader(fragment) {
     decorateBrandSection(sections[1]);
     decorateNavSection(sections[2]);
     
-    // 4. CRITICAL FIX: Run action loops first so buttons are compiled inside sections[2] BEFORE migration
+    // 4. CRITICAL: Compile actions completely BEFORE shifting elements in DOM
     for (const pattern of HEADER_ACTIONS) {
       await decorateAction(fragment, pattern);
     }
@@ -467,10 +460,10 @@ async function decorateHeader(fragment) {
       mainHeaderRow.append(actionsDiv);
     }
 
-    // --- STRUCTURAL WIDGET MIGRATION ---
+    // --- STRUCTURAL WIDGET MIGRATION SYSTEM ---
     const topUtilityContent = sections[0].querySelector('.default-content');
     if (topUtilityContent) {
-      // Find the fully compiled action wrapper block from sections[2]
+      // Find the fully generated action wrapper block from sections[2]
       const langWrapper = sections[2].querySelector('.action-wrapper.globe') || sections[2].querySelector('.action-wrapper.language');
       
       if (langWrapper) {
@@ -484,10 +477,12 @@ async function decorateHeader(fragment) {
         // Create a proper <li> item wrapper so it receives grid positioning bounds
         const utilityLi = document.createElement('li');
         utilityLi.className = 'utility-action-item';
+        
+        // Append the language action block wrapper into our explicit <li> tag
         utilityLi.append(langWrapper);
         utilityUl.append(utilityLi);
 
-        // Bind the interactive drop panel logic to our new list container
+        // Bind the interactive drop panel click handling to our new list container
         const btn = langWrapper.querySelector('button');
         if (btn) {
           decorateLanguage(btn);
@@ -517,6 +512,7 @@ async function decorateHeader(fragment) {
     }
   }
 }
+
 /**
  * loads and decorates the header
  * @param {Element} el The header element
