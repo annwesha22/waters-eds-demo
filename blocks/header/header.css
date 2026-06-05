@@ -392,6 +392,10 @@ header {
         height: 100%;
         margin: 0;
       }
+
+      .top-utility-section ul li {
+        position: relative; /* Fixed reference anchor coordinates for dropdown panel positioning */
+      }
       
       a {
         color: #555555;
@@ -404,7 +408,7 @@ header {
         align-items: center;
         height: 100%;
       }
-      
+
       .utility-action-item .language.menu {
         position: absolute !important;
         top: 100%;

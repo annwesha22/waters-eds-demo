@@ -37,8 +37,8 @@ function toggleMenu(menu) {
 }
 
 function decorateLanguage(btn) {
-  // Look directly for our utility list wrapper node layer
-  const utilityLi = btn.closest('.utility-action-item');
+  // Find the parent list item context wrapping your button natively
+  const utilityLi = btn.closest('li') || btn.closest('.section');
   if (!utilityLi) return;
   
   btn.removeAttribute('onclick');
@@ -47,32 +47,42 @@ function decorateLanguage(btn) {
     e.preventDefault();
     e.stopPropagation();
 
+    // Check if the dropdown menu already exists inside this list item
     let menu = utilityLi.querySelector('.language.menu');
     if (!menu) {
+      // 1. Fetch the raw layout fragment from your authorized path
       const fragment = await loadFragment(`${locale.prefix}${HEADER_PATH}/languages`);
       
+      // 2. Create the clean absolute container card
       menu = document.createElement('div');
       menu.className = 'language menu';
       
+      // 3. Extract the inner <ul> list elements from your document payload
       const rawUl = fragment.querySelector('ul');
       if (rawUl) {
         rawUl.className = 'language-menu-list';
         
+        // Loop through each item to apply standard interactive menu classes
         [...rawUl.children].forEach((li) => {
           li.className = 'language-menu-item';
+          
           const a = li.querySelector('a');
           if (a) {
             a.className = 'language-menu-link';
           }
         });
+        
         menu.append(rawUl);
       } else {
+        // Fallback if no <ul> is found in the fragment
         menu.append(fragment);
       }
       
+      // Append right inside the scoped list item wrapper so it inherits absolute tracking coordinates
       utilityLi.append(menu);
     }
     
+    // 4. Fire your baseline state manager to toggle the dropdown visibility card
     toggleMenu(utilityLi);
   });
 }
