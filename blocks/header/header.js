@@ -428,7 +428,7 @@ async function decorateHeader(fragment) {
     decorateBrandSection(sections[1]);
     decorateNavSection(sections[2]);
     
-    // 4. CRITICAL: Compile actions completely BEFORE shifting elements in DOM
+    // 4. Compile actions completely across all sections (including the utility bar)
     for (const pattern of HEADER_ACTIONS) {
       await decorateAction(fragment, pattern);
     }
@@ -460,36 +460,27 @@ async function decorateHeader(fragment) {
       mainHeaderRow.append(actionsDiv);
     }
 
-    // --- STRUCTURAL WIDGET MIGRATION SYSTEM ---
+    // --- NEW DIRECT UTILITY INTERACTION BINDING ---
     const topUtilityContent = sections[0].querySelector('.default-content');
     if (topUtilityContent) {
-      // Find the fully generated action wrapper block from sections[2]
-      const langWrapper = sections[2].querySelector('.action-wrapper.globe') || sections[2].querySelector('.action-wrapper.language');
+      // Find the language wrapper directly inside the utility section where it was generated
+      const langWrapper = sections[0].querySelector('.action-wrapper.globe') || sections[0].querySelector('.action-wrapper.language');
       
       if (langWrapper) {
-        // Ensure a clean <ul> container exists inside the utility bar
-        let utilityUl = topUtilityContent.querySelector('ul');
-        if (!utilityUl) {
-          utilityUl = document.createElement('ul');
-          topUtilityContent.append(utilityUl);
-        }
-
-        // Create a proper <li> item wrapper so it receives grid positioning bounds
-        const utilityLi = document.createElement('li');
-        utilityLi.className = 'utility-action-item';
-        
-        // Append the language action block wrapper into our explicit <li> tag
-        utilityLi.append(langWrapper);
-        utilityUl.append(utilityLi);
-
-        // Bind the interactive drop panel click handling to our new list container
-        const btn = langWrapper.querySelector('button');
-        if (btn) {
-          decorateLanguage(btn);
+        // Find the <li> container wrapping this action box
+        const utilityLi = langWrapper.closest('li');
+        if (utilityLi) {
+          utilityLi.className = 'utility-action-item';
+          
+          // Re-bind the language click event controller to the transformed button element
+          const btn = langWrapper.querySelector('button');
+          if (btn) {
+            decorateLanguage(btn);
+          }
         }
       }
 
-      // Scrub raw authored static text nodes cleanly
+      // Clean out raw authored static text nodes cleanly
       const textNodes = [...topUtilityContent.childNodes].filter(node => node.nodeType === Node.TEXT_NODE);
       textNodes.forEach(node => {
         if (node.textContent.trim().toLowerCase() === 'language') {
