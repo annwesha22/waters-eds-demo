@@ -327,6 +327,7 @@ header {
   z-index: 1001;
 }
 
+
 /* ==========================================================================
    3. DESKTOP MEDIA QUERY (FLUID ROW)
    ========================================================================== */
@@ -391,9 +392,6 @@ header {
         align-items: center;
         height: 100%;
         margin: 0;
-      }
-
-      .top-utility-section ul li {
         position: relative; /* Fixed reference anchor coordinates for dropdown panel positioning */
       }
       
@@ -402,25 +400,12 @@ header {
         text-decoration: none;
       }
 
+      /* Base layout utility action item class tracking matching header.js */
       .utility-action-item {
-        position: relative; /* Fixed reference anchor coordinates for dropdown panel position */
+        position: relative; 
         display: flex;
         align-items: center;
         height: 100%;
-      }
-
-      .utility-action-item .language.menu {
-        position: absolute !important;
-        top: 100%;
-        right: 0;
-        margin-top: 6px;
-        background-color: #ffffff !important;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-        border-radius: 4px;
-        padding: 12px 0;
-        z-index: 1010;
-        min-width: 160px;
-        display: none;
       }
 
       /* Target the action container component explicitly */
@@ -462,7 +447,7 @@ header {
         }
       }
 
-      /* Drop-down menu overlay card styles */
+      /* Drop-down menu overlay card styles absolute layout */
       .language.menu {
         position: absolute !important;
         top: 100%;
@@ -474,7 +459,7 @@ header {
         padding: 12px 0;
         z-index: 1010;
         min-width: 160px;
-        display: none;
+        display: none; /* Hidden by default */
         
         .language-menu-list {
           display: flex !important;
@@ -491,6 +476,11 @@ header {
           margin: 0;
           padding: 0;
           display: block;
+
+          p {
+            margin: 0;
+            padding: 0;
+          }
         }
 
         .language-menu-link {
@@ -509,6 +499,7 @@ header {
         }
       }
 
+      /* Clear and explicit target selector block matching your script changes */
       .utility-action-item.is-open .language.menu {
         display: block !important;
       }
