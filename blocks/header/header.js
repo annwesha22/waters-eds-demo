@@ -471,22 +471,36 @@ async function decorateHeader(fragment) {
     }
 
     // --- NEW DIRECT UTILITY INTERACTION BINDING ---
+    // --- NEW DIRECT UTILITY INTERACTION BINDING ---
     const topUtilityContent = sections[0].querySelector('.default-content');
     if (topUtilityContent) {
       // Find the language wrapper directly inside the utility section where it was generated
       const langWrapper = sections[0].querySelector('.action-wrapper.globe') || sections[0].querySelector('.action-wrapper.language');
       
       if (langWrapper) {
-        // Find the <li> container wrapping this action box
-        const utilityLi = langWrapper.closest('li');
-        if (utilityLi) {
-          utilityLi.className = 'utility-action-item';
+        // Ensure a clean <ul> container exists inside the utility bar
+        let utilityUl = topUtilityContent.querySelector('ul');
+        if (!utilityUl) {
+          utilityUl = document.createElement('ul');
+          topUtilityContent.append(utilityUl);
+        }
+
+        // FORCE-CREATE THE MISSING LI WRAPPER ELEMENT FOR STABLE BOUNDS
+        let utilityLi = langWrapper.closest('li');
+        if (!utilityLi) {
+          utilityLi = document.createElement('li');
+          // Insert the li right before the loose langWrapper, then move the wrapper inside it
+          langWrapper.before(utilityLi);
+        }
+        
+        utilityLi.className = 'utility-action-item';
+        utilityLi.append(langWrapper);
+        utilityUl.append(utilityLi); // Safely appends it as a child row item of the grid
           
-          // Re-bind the language click event controller to the transformed button element
-          const btn = langWrapper.querySelector('button');
-          if (btn) {
-            decorateLanguage(btn);
-          }
+        // Re-bind the language click event controller to the transformed button element
+        const btn = langWrapper.querySelector('button');
+        if (btn) {
+          decorateLanguage(btn);
         }
       }
 
@@ -497,19 +511,6 @@ async function decorateHeader(fragment) {
           node.remove();
         }
       });
-    }
-
-    // 6. Append structural row and clean old DOM slots
-    sections[0].after(mainHeaderRow);
-    sections[1].remove();
-    sections[2].remove();
-  } else {
-    if (sections[0]) decorateBrandSection(sections[0]);
-    if (sections[1]) decorateNavSection(sections[1]);
-    if (sections[2]) decorateActionSection(sections[2]);
-    
-    for (const pattern of HEADER_ACTIONS) {
-      await decorateAction(fragment, pattern);
     }
   }
 }
