@@ -435,7 +435,7 @@ async function decorateHeader(fragment) {
     decorateBrandSection(sections[1]);
     decorateNavSection(sections[2]);
     
-    // 4. Fire action loops immediately so buttons are generated BEFORE migration layout steps
+    // 4. CRITICAL FIX: Run action loops first so buttons are compiled inside sections[2] BEFORE migration
     for (const pattern of HEADER_ACTIONS) {
       await decorateAction(fragment, pattern);
     }
@@ -467,23 +467,31 @@ async function decorateHeader(fragment) {
       mainHeaderRow.append(actionsDiv);
     }
 
-    // --- CLEAN WIDGET MIGRATION LOOP ---
+    // --- STRUCTURAL WIDGET MIGRATION ---
     const topUtilityContent = sections[0].querySelector('.default-content');
     if (topUtilityContent) {
-      // Find the fully generated action wrapper block from sections[2]
-      const langWrapper = sections[2].querySelector('.action-wrapper.language');
+      // Find the fully compiled action wrapper block from sections[2]
+      const langWrapper = sections[2].querySelector('.action-wrapper.globe') || sections[2].querySelector('.action-wrapper.language');
       
       if (langWrapper) {
+        // Ensure a clean <ul> container exists inside the utility bar
         let utilityUl = topUtilityContent.querySelector('ul');
         if (!utilityUl) {
           utilityUl = document.createElement('ul');
           topUtilityContent.append(utilityUl);
         }
 
+        // Create a proper <li> item wrapper so it receives grid positioning bounds
         const utilityLi = document.createElement('li');
         utilityLi.className = 'utility-action-item';
         utilityLi.append(langWrapper);
         utilityUl.append(utilityLi);
+
+        // Bind the interactive drop panel logic to our new list container
+        const btn = langWrapper.querySelector('button');
+        if (btn) {
+          decorateLanguage(btn);
+        }
       }
 
       // Scrub raw authored static text nodes cleanly

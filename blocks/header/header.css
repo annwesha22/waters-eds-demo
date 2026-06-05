@@ -356,7 +356,6 @@ header {
     }
 
     /* 1. Top Utility Strip Alignment */
-    /* 1. Top Utility Strip Alignment overrides */
     .top-utility-section {
       display: flex !important;
       justify-content: flex-end;
@@ -368,7 +367,7 @@ header {
       border-bottom: 1px solid #e5e5e5;
       font-size: 13px;
       color: #666666;
-      overflow: visible !important; /* Permits the list panel card overlay to drop down vertically */
+      overflow: visible !important; /* Permits dropdown container to reveal over edge boundaries */
 
       .default-content {
         width: 100%;
@@ -387,40 +386,53 @@ header {
         list-style: none;
       }
       
+      li {
+        display: flex;
+        align-items: center;
+        height: 100%;
+        margin: 0;
+      }
+      
       a {
         color: #555555;
         text-decoration: none;
       }
 
       .utility-action-item {
-        position: relative; /* Fixed reference anchor for absolute coordinate tracking */
+        position: relative; /* Fixed reference anchor coordinates for dropdown panel position */
         display: flex;
         align-items: center;
         height: 100%;
       }
 
+      /* Target the action container component explicitly */
+      .action-wrapper.globe,
       .action-wrapper.language {
         display: flex;
         align-items: center;
+        height: 100%;
 
         button {
-          display: flex;
-          align-items: center;
-          background: transparent;
-          border: none;
-          padding: 0;
-          cursor: pointer;
-          width: auto !important;
-          height: auto !important;
+          display: flex !important;
+          flex-direction: row !important;
+          align-items: center !important;
+          justify-content: center !important;
+          background: transparent !important;
+          border: none !important;
+          padding: 0 !important;
+          cursor: pointer !important;
+          width: auto !important; /* Resets structural button width limitations */
+          height: 100% !important;
 
           .icon {
-            width: 20px;
-            height: 20px;
+            width: 20px !important;
+            height: 20px !important;
             color: #333333;
+            display: inline-block;
           }
 
           .text {
-            display: block !important;
+            display: inline-block !important; /* Reveals language text inline right next to icon view */
             width: auto !important;
             height: auto !important;
             overflow: visible !important;
@@ -432,11 +444,11 @@ header {
         }
       }
 
-      /* Clean drop-down panel absolute rendering overlays */
+      /* Drop-down menu overlay card styles */
       .language.menu {
         position: absolute !important;
         top: 100%;
-        right: 0; /* Pins box flush below toggle node group */
+        right: 0;
         margin-top: 6px;
         background-color: #ffffff !important;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
@@ -444,11 +456,11 @@ header {
         padding: 12px 0;
         z-index: 1010;
         min-width: 160px;
-        display: none; /* Keep hidden by default state context */
+        display: none;
         
         .language-menu-list {
           display: flex !important;
-          flex-direction: column !important; /* Clear stack ordering flow down */
+          flex-direction: column !important;
           gap: 0 !important;
           margin: 0;
           padding: 0;
@@ -475,11 +487,10 @@ header {
 
         .language-menu-link:hover {
           background-color: #f5f5f5;
-          color: #007799 !important; /* Brand Blue Hover */
+          color: #007799 !important;
         }
       }
 
-      /* Fire state change cleanly on list item condition mapping matching script hooks */
       .utility-action-item.is-open .language.menu {
         display: block !important;
       }
