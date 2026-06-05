@@ -338,7 +338,6 @@ async function decorateHeader(fragment) {
       mainHeaderRow.append(actionsDiv);
     }
 
-    // --- FIX FOR CODES INTERACTION: MOVE WIDGET BUTTONS TO UTILITY STRIP BEFORE PURGING ---
     // --- FIX FOR TOGGLE MISPLACEMENT: SCOPE THE IS-OPEN CLASS TO THE LI ITEM ONLY ---
     const topUtilityContent = sections[0].querySelector('.default-content');
     if (topUtilityContent) {
