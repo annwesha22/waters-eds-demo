@@ -366,6 +366,24 @@ header {
       border-bottom: 1px solid #e5e5e5;
       font-size: 13px;
       color: #666666;
+      position: relative; /* Anchor position for any inner popup menu cards */
+    
+      .language-menu {
+        position: absolute;
+        top: 100%;
+        right: 48px; /* Perfectly aligns card menu stack flush below globe layout marker */
+        background-color: #ffffff;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        border-radius: 4px;
+        padding: 16px;
+        z-index: 1010;
+        min-width: 180px;
+        display: none;
+      }
+
+      &.is-open .language.menu {
+        display: block !important;
+      }
 
       .default-content {
         width: 100%;

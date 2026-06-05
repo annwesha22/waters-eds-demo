@@ -300,13 +300,13 @@ async function decorateHeader(fragment) {
   const sections = fragment.querySelectorAll(':scope > .section');
   
   if (sections.length === 3) {
-    // 1. Label the top utility strip
+    // 1. Label the top utility strip wrapper natively
     sections[0].classList.add('top-utility-section');
     
     // 2. Explicitly process action block layout elements
     await decorateActionSection(sections[2]);
     
-    // 3. Process the standard logo/brand and core navigation systems
+    // 3. Process standard logo/brand and core navigation systems
     decorateBrandSection(sections[1]);
     decorateNavSection(sections[2]);
     
@@ -336,6 +336,24 @@ async function decorateHeader(fragment) {
       actionsDiv.className = 'actions-wrapper-right';
       actionsDiv.append(searchWrapper);
       mainHeaderRow.append(actionsDiv);
+    }
+
+    // --- FIX FOR CODES INTERACTION: MOVE WIDGET BUTTONS TO UTILITY STRIP BEFORE PURGING ---
+    const topUtilityContent = sections[0].querySelector('.default-content');
+    const sourceActionsList = sections[2].querySelector('.default-content ul');
+    if (topUtilityContent && sourceActionsList) {
+      // Find language or scheme wrappers that were processed by decorateAction loops
+      const actionWrappers = sections[2].querySelectorAll('.action-wrapper');
+      actionWrappers.forEach((wrapper) => {
+        // Re-route the parent lookup point so closeAllMenus() targets sections[0]
+        const btn = wrapper.querySelector('button');
+        if (btn) {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleMenu(sections[0]); // Anchor the modal visibility class onto the top utility line
+          });
+        }
+      });
     }
 
     // 7. Inject our finalized structural row directly right under the grey utility line bar
