@@ -339,19 +339,40 @@ async function decorateHeader(fragment) {
     }
 
     // --- FIX FOR CODES INTERACTION: MOVE WIDGET BUTTONS TO UTILITY STRIP BEFORE PURGING ---
+    // --- FIX FOR TOGGLE MISPLACEMENT: SCOPE THE IS-OPEN CLASS TO THE LI ITEM ONLY ---
     const topUtilityContent = sections[0].querySelector('.default-content');
-    const sourceActionsList = sections[2].querySelector('.default-content ul');
-    if (topUtilityContent && sourceActionsList) {
-      // Find language or scheme wrappers that were processed by decorateAction loops
-      const actionWrappers = sections[2].querySelectorAll('.action-wrapper');
-      actionWrappers.forEach((wrapper) => {
-        // Re-route the parent lookup point so closeAllMenus() targets sections[0]
-        const btn = wrapper.querySelector('button');
+    if (topUtilityContent) {
+      const langWrapper = sections[2].querySelector('.action-wrapper.language');
+      
+      if (langWrapper) {
+        let utilityUl = topUtilityContent.querySelector('ul');
+        if (!utilityUl) {
+          utilityUl = document.createElement('ul');
+          topUtilityContent.append(utilityUl);
+        }
+
+        const utilityLi = document.createElement('li');
+        utilityLi.className = 'utility-action-item';
+        utilityLi.append(langWrapper);
+        utilityUl.append(utilityLi);
+
+        const btn = langWrapper.querySelector('button');
         if (btn) {
+          btn.removeAttribute('onclick');
           btn.addEventListener('click', (e) => {
+            e.preventDefault();
             e.stopPropagation();
-            toggleMenu(sections[0]); // Anchor the modal visibility class onto the top utility line
+            // TARGET ONLY THE LI WRAPPER INSTEAD OF SECTIONS[0]
+            toggleMenu(utilityLi); 
           });
+        }
+      }
+
+      // Clean out raw stray text nodes safely
+      const textNodes = [...topUtilityContent.childNodes].filter(node => node.nodeType === Node.TEXT_NODE);
+      textNodes.forEach(node => {
+        if (node.textContent.trim().toLowerCase() === 'language') {
+          node.remove();
         }
       });
     }
