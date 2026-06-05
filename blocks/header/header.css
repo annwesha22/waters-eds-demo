@@ -356,6 +356,7 @@ header {
     }
 
     /* 1. Top Utility Strip Alignment */
+    /* 1. Top Utility Strip Alignment overrides */
     .top-utility-section {
       display: flex !important;
       justify-content: flex-end;
@@ -367,7 +368,7 @@ header {
       border-bottom: 1px solid #e5e5e5;
       font-size: 13px;
       color: #666666;
-      overflow: visible !important; /* Crucial: Allows dropdown card to overflow downwards */
+      overflow: visible !important; /* Permits the list panel card overlay to drop down vertically */
 
       .default-content {
         width: 100%;
@@ -380,7 +381,7 @@ header {
         display: flex !important;
         flex-direction: row !important;
         align-items: center !important;
-        gap: 32px !important; /* Generous gap between waters.com and language toggle */
+        gap: 32px !important;
         margin: 0;
         padding: 0;
         list-style: none;
@@ -392,7 +393,7 @@ header {
       }
 
       .utility-action-item {
-        position: relative; /* Anchor point for absolute dropdown overlay positioning */
+        position: relative; /* Fixed reference anchor for absolute coordinate tracking */
         display: flex;
         align-items: center;
         height: 100%;
@@ -409,7 +410,7 @@ header {
           border: none;
           padding: 0;
           cursor: pointer;
-          width: auto !important; /* Clear fixed width limitations */
+          width: auto !important;
           height: auto !important;
 
           .icon {
@@ -431,23 +432,23 @@ header {
         }
       }
 
-      /* Clean absolute menu positioning rules for language block content */
+      /* Clean drop-down panel absolute rendering overlays */
       .language.menu {
         position: absolute !important;
         top: 100%;
-        right: 0; /* Aligns card precisely below the language toggle marker */
+        right: 0; /* Pins box flush below toggle node group */
         margin-top: 6px;
         background-color: #ffffff !important;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
         border-radius: 4px;
-        padding: 12px 0; /* Clear container bounds */
+        padding: 12px 0;
         z-index: 1010;
         min-width: 160px;
-        display: none;
-        /* Enforce clean stacked row formatting */
+        display: none; /* Keep hidden by default state context */
+        
         .language-menu-list {
           display: flex !important;
-          flex-direction: column !important; /* Stack vertically down */
+          flex-direction: column !important; /* Clear stack ordering flow down */
           gap: 0 !important;
           margin: 0;
           padding: 0;
@@ -474,18 +475,11 @@ header {
 
         .language-menu-link:hover {
           background-color: #f5f5f5;
-          color: #007799 !important; /* Brand accent blue matching waters.com */
+          color: #007799 !important; /* Brand Blue Hover */
         }
-        
-        /* ul {
-          display: flex !important;
-          flex-direction: column !important; 
-          gap: 12px !important;
-          align-items: flex-start !important;
-        } */
       }
 
-      /* Watch for the is-open status class toggle directly on the list item */
+      /* Fire state change cleanly on list item condition mapping matching script hooks */
       .utility-action-item.is-open .language.menu {
         display: block !important;
       }

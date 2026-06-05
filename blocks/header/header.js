@@ -37,48 +37,50 @@ function toggleMenu(menu) {
 }
 
 function decorateLanguage(btn) {
-  // Find our custom utility list item wrapper instead of the old root section
-  const utilityLi = btn.closest('.utility-action-item') || btn.closest('.section');
+  // Find our custom utility list item wrapper or fallback section context safely
+  const utilityLi = btn.closest('.utility-action-item') || btn.closest('.section') || document.querySelector('.utility-action-item');
   
+  btn.removeAttribute('onclick');
+
   btn.addEventListener('click', async (e) => {
     e.preventDefault();
     e.stopPropagation();
 
-    let menu = utilityLi.querySelector('.language.menu');
+    // Re-verify runtime target container
+    const activeTarget = btn.closest('.utility-action-item') || utilityLi;
+    if (!activeTarget) return;
+
+    let menu = activeTarget.querySelector('.language.menu');
     if (!menu) {
-      // 1. Fetch the raw layout fragment from the document path
+      // 1. Fetch the raw layout fragment document options asynchronously
       const fragment = await loadFragment(`${locale.prefix}${HEADER_PATH}/languages`);
       
-      // 2. Create the clean container card
+      // 2. Build the structural overlay card container block
       menu = document.createElement('div');
       menu.className = 'language menu';
       
-      // 3. Extract the inner <ul> list elements from the fragment safely
+      // 3. Extract the inner <ul> list payload safely
       const rawUl = fragment.querySelector('ul');
       if (rawUl) {
-        // Apply class names for predictable styling
         rawUl.className = 'language-menu-list';
         
-        // Loop through each item to apply standard clean item styles
         [...rawUl.children].forEach((li) => {
           li.className = 'language-menu-item';
-          
           const a = li.querySelector('a');
           if (a) {
             a.className = 'language-menu-link';
           }
         });
-        
         menu.append(rawUl);
       } else {
-        // Fallback: If no list found, append the raw fragment output
         menu.append(fragment);
       }
       
-      // Append right inside our scoped absolute column list item wrapper
-      utilityLi.append(menu);
+      activeTarget.append(menu);
     }
-    toggleMenu(utilityLi);
+    
+    // 4. Toggle visibility panel class tracking natively
+    toggleMenu(activeTarget);
   });
 }
 
@@ -324,6 +326,101 @@ async function decorateActionSection(section) {
   });
 }
 
+// async function decorateHeader(fragment) {
+//   const sections = fragment.querySelectorAll(':scope > .section');
+  
+//   if (sections.length === 3) {
+//     // 1. Label the top utility strip wrapper natively
+//     sections[0].classList.add('top-utility-section');
+    
+//     // 2. Explicitly process action block layout elements
+//     await decorateActionSection(sections[2]);
+    
+//     // 3. Process standard logo/brand and core navigation systems
+//     decorateBrandSection(sections[1]);
+//     decorateNavSection(sections[2]);
+    
+//     // 4. Create the main horizontal flex row wrapper
+//     const mainHeaderRow = document.createElement('div');
+//     mainHeaderRow.className = 'main-header-row';
+    
+//     // Move the logo brand elements inside
+//     const brandContent = sections[1].querySelector('.default-content');
+//     if (brandContent) {
+//       mainHeaderRow.append(brandContent);
+//     }
+    
+//     // 5. Build and isolate primary navigation layout container
+//     const navElement = document.createElement('nav');
+//     const mainNavList = sections[2].querySelector('.main-nav-list');
+    
+//     if (mainNavList) {
+//       navElement.append(mainNavList);
+//     }
+//     mainHeaderRow.append(navElement);
+    
+//     // 6. Extract search wrapper action block
+//     const searchWrapper = sections[2].querySelector('.search-wrapper');
+//     if (searchWrapper) {
+//       const actionsDiv = document.createElement('div');
+//       actionsDiv.className = 'actions-wrapper-right';
+//       actionsDiv.append(searchWrapper);
+//       mainHeaderRow.append(actionsDiv);
+//     }
+
+//     // --- FIX FOR TOGGLE MISPLACEMENT: SCOPE THE IS-OPEN CLASS TO THE LI ITEM ONLY ---
+//     const topUtilityContent = sections[0].querySelector('.default-content');
+//     if (topUtilityContent) {
+//       const langWrapper = sections[2].querySelector('.action-wrapper.language');
+      
+//       if (langWrapper) {
+//         let utilityUl = topUtilityContent.querySelector('ul');
+//         if (!utilityUl) {
+//           utilityUl = document.createElement('ul');
+//           topUtilityContent.append(utilityUl);
+//         }
+
+//         const utilityLi = document.createElement('li');
+//         utilityLi.className = 'utility-action-item';
+//         utilityLi.append(langWrapper);
+//         utilityUl.append(utilityLi);
+
+//         const btn = langWrapper.querySelector('button');
+//         if (btn) {
+//           btn.removeAttribute('onclick');
+//           btn.addEventListener('click', (e) => {
+//             e.preventDefault();
+//             e.stopPropagation();
+//             // TARGET ONLY THE LI WRAPPER INSTEAD OF SECTIONS[0]
+//             toggleMenu(utilityLi); 
+//           });
+//         }
+//       }
+
+//       // Clean out raw stray text nodes safely
+//       const textNodes = [...topUtilityContent.childNodes].filter(node => node.nodeType === Node.TEXT_NODE);
+//       textNodes.forEach(node => {
+//         if (node.textContent.trim().toLowerCase() === 'language') {
+//           node.remove();
+//         }
+//       });
+//     }
+
+//     // 7. Inject our finalized structural row directly right under the grey utility line bar
+//     sections[0].after(mainHeaderRow);
+//     sections[1].remove();
+//     sections[2].remove();
+//   } else {
+//     if (sections[0]) decorateBrandSection(sections[0]);
+//     if (sections[1]) decorateNavSection(sections[1]);
+//     if (sections[2]) decorateActionSection(sections[2]);
+//   }
+
+//   for (const pattern of HEADER_ACTIONS) {
+//     await decorateAction(fragment, pattern);
+//   }
+// }
+
 async function decorateHeader(fragment) {
   const sections = fragment.querySelectorAll(':scope > .section');
   
@@ -331,33 +428,37 @@ async function decorateHeader(fragment) {
     // 1. Label the top utility strip wrapper natively
     sections[0].classList.add('top-utility-section');
     
-    // 2. Explicitly process action block layout elements
+    // 2. Run standard baseline action block layout processing elements
     await decorateActionSection(sections[2]);
     
-    // 3. Process standard logo/brand and core navigation systems
+    // 3. Process corporate branding block and main core navigation
     decorateBrandSection(sections[1]);
     decorateNavSection(sections[2]);
     
-    // 4. Create the main horizontal flex row wrapper
+    // 4. Fire action loops immediately so buttons are generated BEFORE migration layout steps
+    for (const pattern of HEADER_ACTIONS) {
+      await decorateAction(fragment, pattern);
+    }
+
+    // 5. Create the main horizontal flex row wrapper
     const mainHeaderRow = document.createElement('div');
     mainHeaderRow.className = 'main-header-row';
     
-    // Move the logo brand elements inside
+    // Move logo content inside
     const brandContent = sections[1].querySelector('.default-content');
     if (brandContent) {
       mainHeaderRow.append(brandContent);
     }
     
-    // 5. Build and isolate primary navigation layout container
+    // Build navigation container
     const navElement = document.createElement('nav');
     const mainNavList = sections[2].querySelector('.main-nav-list');
-    
     if (mainNavList) {
       navElement.append(mainNavList);
     }
     mainHeaderRow.append(navElement);
     
-    // 6. Extract search wrapper action block
+    // Extract and pin the search wrapper block to the right
     const searchWrapper = sections[2].querySelector('.search-wrapper');
     if (searchWrapper) {
       const actionsDiv = document.createElement('div');
@@ -366,9 +467,10 @@ async function decorateHeader(fragment) {
       mainHeaderRow.append(actionsDiv);
     }
 
-    // --- FIX FOR TOGGLE MISPLACEMENT: SCOPE THE IS-OPEN CLASS TO THE LI ITEM ONLY ---
+    // --- CLEAN WIDGET MIGRATION LOOP ---
     const topUtilityContent = sections[0].querySelector('.default-content');
     if (topUtilityContent) {
+      // Find the fully generated action wrapper block from sections[2]
       const langWrapper = sections[2].querySelector('.action-wrapper.language');
       
       if (langWrapper) {
@@ -382,20 +484,9 @@ async function decorateHeader(fragment) {
         utilityLi.className = 'utility-action-item';
         utilityLi.append(langWrapper);
         utilityUl.append(utilityLi);
-
-        const btn = langWrapper.querySelector('button');
-        if (btn) {
-          btn.removeAttribute('onclick');
-          btn.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            // TARGET ONLY THE LI WRAPPER INSTEAD OF SECTIONS[0]
-            toggleMenu(utilityLi); 
-          });
-        }
       }
 
-      // Clean out raw stray text nodes safely
+      // Scrub raw authored static text nodes cleanly
       const textNodes = [...topUtilityContent.childNodes].filter(node => node.nodeType === Node.TEXT_NODE);
       textNodes.forEach(node => {
         if (node.textContent.trim().toLowerCase() === 'language') {
@@ -404,7 +495,7 @@ async function decorateHeader(fragment) {
       });
     }
 
-    // 7. Inject our finalized structural row directly right under the grey utility line bar
+    // 6. Append structural row and clean old DOM slots
     sections[0].after(mainHeaderRow);
     sections[1].remove();
     sections[2].remove();
@@ -412,10 +503,10 @@ async function decorateHeader(fragment) {
     if (sections[0]) decorateBrandSection(sections[0]);
     if (sections[1]) decorateNavSection(sections[1]);
     if (sections[2]) decorateActionSection(sections[2]);
-  }
-
-  for (const pattern of HEADER_ACTIONS) {
-    await decorateAction(fragment, pattern);
+    
+    for (const pattern of HEADER_ACTIONS) {
+      await decorateAction(fragment, pattern);
+    }
   }
 }
 /**
