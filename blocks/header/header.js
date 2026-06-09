@@ -221,7 +221,7 @@ function decorateNavItem(li) {
     wrapper.append(inner);
     li.append(wrapper);
 
-    fetch('/library/metadata/categories.json')
+    fetch('/docs/library/metadata/categories.json')
       .then((response) => {
         if (!response.ok) throw new Error('Failed to fetch categories spreadsheet');
         return response.json();
