@@ -13,7 +13,7 @@ import { DA_ORIGIN } from 'https://da.live/nx/public/utils/constants.js';
  */
 async function fetchTaggingData(token, actions, org, repo) {
   try {
-    const taggingUrl = `${DA_ORIGIN}/source/${org}/${repo}/docs/library/tagging.json`;
+    const taggingUrl = `${DA_ORIGIN}/source/annwesha22/waters-eds-demo/docs/library/tagging.json`;
 
     const response = await actions.daFetch(taggingUrl);
 
