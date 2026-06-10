@@ -125,10 +125,19 @@ header {
   .brand-section {
     grid-area: brand;
 
+    min-height: var(--header-height);
+
     .default-content {
       height: var(--header-height);
       display: flex;
       justify-content: space-between;
+      p {
+        display: flex;
+        align-items: center;
+        margin: 0;
+        min-width: 189px;
+        min-height: 32px;
+      }
 
       p, a {
         display: flex;
@@ -149,6 +158,22 @@ header {
           height: 0;
           overflow: hidden;
         }
+      }
+      picture {
+        display: flex;
+        align-items: center;
+        width: 189px;
+        height: 32px;
+        flex-shrink: 0;
+      }
+
+      img {
+        width: 189px;
+        height: 32px;
+        aspect-ratio: 189 / 32;
+        object-fit: contain;
+        height: revert;
+        max-width: none;
       }
     }
 
