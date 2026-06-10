@@ -416,3 +416,8 @@ aem-sidekick {
     opacity: 1;
   }
 }
+
+img {
+  max-width: 100%;
+  height: auto;
+}
