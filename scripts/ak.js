@@ -100,17 +100,63 @@ function loadTemplate() {
   });
 }
 
+const RESPONSIVE_BREAKPOINTS = [
+  { media: '(min-width: 1440px)', width: 2000 },
+  { media: '(min-width: 1200px)', width: 1200 },
+  { media: '(min-width: 900px)',  width: 900  },
+  { media: '(min-width: 600px)',  width: 750  },
+  { media: '(min-width: 400px)',  width: 480  },
+  { media: null,                  width: 380  },
+];
+
 function decoratePictures(el) {
   const pics = el.querySelectorAll('picture');
   for (const pic of pics) {
-    const source = pic.querySelector('source');
-    const clone = source.cloneNode();
-    const [pathname, params] = clone.getAttribute('srcset').split('?');
-    const search = new URLSearchParams(params);
-    search.set('width', 3000);
-    clone.setAttribute('srcset', `${pathname}?${search.toString()}`);
-    clone.setAttribute('media', '(min-width: 1440px)');
-    pic.prepend(clone);
+    const originalSource = pic.querySelector('source');
+    if (!originalSource) continue;
+
+    const srcset = originalSource.getAttribute('srcset') || '';
+    const [pathname, params] = srcset.split('?');
+    if (!pathname) continue;
+
+    const baseParams = new URLSearchParams(params);
+
+    pic.querySelectorAll('source').forEach((s) => s.remove());
+
+    for (const bp of RESPONSIVE_BREAKPOINTS) {
+      const search = new URLSearchParams(baseParams);
+      search.set('width', bp.width);
+      search.set('format', 'webply');
+      search.set('optimize', 'medium');
+
+      const source = document.createElement('source');
+      source.setAttribute('srcset', `${pathname}?${search.toString()}`);
+      source.setAttribute('type', 'image/webp');
+      if (bp.media) source.setAttribute('media', bp.media);
+
+      const img = pic.querySelector('img');
+      pic.insertBefore(source, img);
+    }
+
+    const img = pic.querySelector('img');
+    if (img) {
+      const fallbackParams = new URLSearchParams(baseParams);
+      fallbackParams.set('width', 750);
+      fallbackParams.set('format', 'webply');
+      fallbackParams.set('optimize', 'medium');
+      img.src = `${pathname}?${fallbackParams.toString()}`;
+
+      if (!img.getAttribute('sizes')) {
+        img.setAttribute('sizes', [
+          '(min-width: 1440px) 2000px',
+          '(min-width: 1200px) 1200px',
+          '(min-width: 900px) 900px',
+          '(min-width: 600px) 750px',
+          '(min-width: 400px) 480px',
+          '380px',
+        ].join(', '));
+      }
+    }
   }
 }
 
@@ -245,8 +291,7 @@ function groupChildren(section) {
 
     if (!currentGroup || currentType !== isDiv) {
       currentGroup = document.createElement('div');
-      currentGroup.className = isDiv
-        ? 'block-content' : 'default-content';
+      currentGroup.className = isDiv ? 'block-content' : 'default-content';
       groups.push(currentGroup);
     }
 
