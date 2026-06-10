@@ -217,22 +217,95 @@ function displayTaggingData(taggingData, actions) {
     if (selectedTags.size === 0) return;
 
     try {
-      // Send all selected tags
       const selectedTagsArray = Array.from(selectedTags);
-      const tagsText = selectedTagsArray.join(', ');
+      const newTagsText = selectedTagsArray.join(', ');
+      
+      let metadataUpdated = false;
 
-      await actions.sendText(tagsText);
+      // 1. Attempt to access the parent da.live editor canvas
+      if (window.parent && window.parent.document) {
+        const editor = window.parent.document.querySelector('.da-editor-content, [contenteditable="true"]');
+        
+        if (editor) {
+          // 2. Find all tables in the document
+          const tables = Array.from(editor.querySelectorAll('table'));
+          
+          // 3. Look for the Metadata table
+          const metaTable = tables.find(table => {
+            const firstCell = table.querySelector('tr td, tr th');
+            return firstCell && firstCell.textContent.trim().toLowerCase() === 'metadata';
+          });
+
+          if (metaTable) {
+            // THE TABLE EXISTS: Look for the 'tags' row
+            const rows = Array.from(metaTable.querySelectorAll('tr'));
+            let tagsRow = rows.find(row => {
+              const keyCell = row.querySelector('td:first-child');
+              return keyCell && keyCell.textContent.trim().toLowerCase() === 'tags';
+            });
+
+            if (tagsRow) {
+              // Row exists: Append the new tags to the existing ones
+              const valueCell = tagsRow.querySelector('td:nth-child(2)');
+              if (valueCell) {
+                const currentTags = valueCell.textContent.trim();
+                
+                // Only append if there are existing tags, otherwise just set it
+                const updatedTags = currentTags ? `${currentTags}, ${newTagsText}` : newTagsText;
+                valueCell.textContent = updatedTags;
+                metadataUpdated = true;
+
+                // Force an input event so ProseMirror registers the DOM change
+                valueCell.dispatchEvent(new Event('input', { bubbles: true }));
+              }
+            } else {
+              // Row doesn't exist: Create the 'tags' row in the existing table
+              const tbody = metaTable.querySelector('tbody') || metaTable;
+              const newRow = document.createElement('tr');
+              newRow.innerHTML = `<td>tags</td><td>${newTagsText}</td>`;
+              tbody.appendChild(newRow);
+              metadataUpdated = true;
+
+              // Force an input event so ProseMirror registers the DOM change
+              tbody.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+          }
+        }
+      }
+
+      // 4. FALLBACK: If no table was found or updated, insert a new one
+      if (!metadataUpdated) {
+        const metadataTableHTML = `
+          <table>
+            <tr><td colspan="2">Metadata</td></tr>
+            <tr><td>tags</td><td>${newTagsText}</td></tr>
+          </table><p></p>
+        `;
+
+        if (typeof actions.sendHtml === 'function') {
+          await actions.sendHtml(metadataTableHTML);
+        } else {
+          const insertEvent = new CustomEvent('da:insert-html', { 
+            detail: metadataTableHTML, 
+            bubbles: true 
+          });
+          if (window.parent && window.parent.document) {
+            const editor = window.parent.document.querySelector('.da-editor-content, [contenteditable="true"]');
+            if (editor) editor.dispatchEvent(insertEvent);
+          }
+        }
+      }
+
       await actions.closeLibrary();
 
       // eslint-disable-next-line no-console
-      console.log('Selected tags sent to document:', selectedTagsArray);
+      console.log('Tags successfully applied:', selectedTagsArray);
     } catch (error) {
       // eslint-disable-next-line no-console
-      console.error('Error sending selected tags to document:', error);
+      console.error('Error applying selected tags:', error);
 
-      // Show error feedback
+      // Show error feedback in UI
       const originalText = sendSelectedBtn.textContent;
-
       sendSelectedBtn.textContent = '✗ Error';
       sendSelectedBtn.className = 'btn btn-error';
       sendSelectedBtn.disabled = true;
