@@ -1,18 +1,35 @@
+/* Disclaimer block - full-bleed background, centered text */
 .disclaimer {
   --disclaimer-bg: var(--global-palette8, #f7f8fa);
   --disclaimer-border: var(--global-palette7, #edf2f7);
   --disclaimer-text: var(--global-palette4, #4a5568);
 
   box-sizing: border-box;
-  width: 100%;
+
+  /* Full-bleed background (scrollbar-safe) */
+  width: var(--global-vw, 100%);
+  max-width: var(--global-vw, 100%);
+  margin-left: calc(50% - var(--global-vw, 100%) / 2);
+  margin-right: calc(50% - var(--global-vw, 100%) / 2);
+
+  /* Background spans the full width */
   background-color: var(--disclaimer-bg);
   border-top: 3px solid var(--disclaimer-border);
-  padding: 2.5rem 1.5rem;
+
+  /* Vertical spacing only; horizontal centering handled by inner wrapper */
+  padding: 2.5rem 0;
+}
+
+/* Inner wrapper centers the text with equal space on both sides */
+.disclaimer > div {
+  box-sizing: border-box;
+  max-width: 1140px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
 }
 
 .disclaimer p {
-  max-width: 1140px;
-  margin: 0 auto;
+  margin: 0;
   font-weight: 300;
   font-size: 1rem;
   line-height: 1.5;
