@@ -1,24 +1,23 @@
-/* Section background + top border */
 .section.disclaimer-container {
-  background: #eef1f4; /* equivalent to palette8 */
-  border-top: 3px solid #dfe6ec;
+    background-color: #eef1f4;
+    border-top: 3px solid #e2e8ef;
 }
 
-/* Block wrapper */
 .disclaimer-wrapper {
-  max-width: 1440px;
-  margin: 0 auto;
-  padding: 70px 20px;
+    display: flex;
+    justify-content: center;
+    padding: 80px 40px;
 }
 
-/* Text */
 .disclaimer {
-  max-width: 900px;
-  margin: 0 auto;
-  color: #4f5f73;
-  font-size: 18px;
-  line-height: 1.6;
-  font-weight: 300;
-  letter-spacing: 0.02em;
-  text-align: left;
+    width: 100%;
+    max-width: 900px;
+    font-size: 10px;
+    line-height: 1.75;
+    font-weight: 300;
+    letter-spacing: 0.02em;
+    color: #56667a;
+    text-align: justify;
+    text-align-last: center;
+    /* centers the last line */
 }
