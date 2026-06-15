@@ -20,17 +20,18 @@
 }
 
 .disclaimer > div {
-  /* Constrain the text for readability and center it */
+  /* Constrain the text for readability and center it horizontally */
   max-width: 1140px;
   margin: 0 auto;
 }
 
 .disclaimer p {
-  margin: 0;
+  margin: 0 auto;
+  max-width: 1140px;
   font-weight: 300;
-  font-size: 2rem;        /* 16px */
+  font-size: 1rem;        /* 16px */
   line-height: 1.5;
   letter-spacing: 0.02em;
   color: var(--disclaimer-text);
-  text-align: left;       /* Kadence default; change to center if desired */
+  text-align: center;     /* Center the text */
 }
