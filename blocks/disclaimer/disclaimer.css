@@ -36,7 +36,7 @@
 .disclaimer p {
   margin: 0;
   font-weight: 300;
-  font-size: 1rem;
+  font-size: 14px;
   line-height: 1.5;
   letter-spacing: 0.02em;
   color: var(--disclaimer-text);
