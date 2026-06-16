@@ -18,8 +18,9 @@ function formatTag(tag) {
 }
 
 export default async function decorate(block) {
-    // eslint-disable-next-line no-console
-console.log(block.className);
+  // eslint-disable-next-line no-console
+  console.log(block.className);
+
   const isTagPage = block.classList.contains('tagpage');
 
   // eslint-disable-next-line no-console
@@ -54,75 +55,163 @@ console.log(block.className);
         .forEach((tag) => uniqueTags.add(tag));
     });
 
-    block.innerHTML = `
-      <div class="article-filters">
-        <button
-          class="filter-btn active"
-          data-tag="all"
-        >
-          All
-        </button>
+    if (isTagPage) {
+      block.innerHTML = `
+        <div class="tagpage-layout">
 
-        ${[...uniqueTags]
-          .sort()
-          .map(
-            (tag) => `
-              <button
-                class="filter-btn"
-                data-tag="${tag}"
-              >
-                ${formatTag(tag)}
-              </button>
-            `,
-          )
-          .join('')}
-      </div>
+          <div class="tagpage-content">
 
-      <div class="article-grid">
-        ${articles
-          .map(
-            (article) => `
-              <a
-                class="article-card"
-                href="${article.path}"
-                data-tags="${article.tags || ''}"
-              >
-                <img
-                  src="${article.image}"
-                  alt="${article.title}"
-                  loading="lazy"
+            <div class="article-grid tagpage-grid">
+              ${articles
+                .map(
+                  (article) => `
+                    <a
+                      class="article-card tagpage-card"
+                      href="${article.path}"
+                      data-tags="${article.tags || ''}"
+                    >
+                      <img
+                        src="${article.image}"
+                        alt="${article.title}"
+                        loading="lazy"
+                      >
+
+                      <div class="article-card-content">
+
+                        <h3>${article.title}</h3>
+
+                        <div class="article-meta">
+                          <span>${formatDate(
+                            article['publication-date'],
+                          )}</span>
+                          <span>|</span>
+                          <span>${article.author}</span>
+                        </div>
+
+                        <div class="article-reading-time">
+                          Reading Time:
+                          ${article['reading-time']} minutes
+                        </div>
+
+                        <p class="article-description">
+                          ${article.description}
+                        </p>
+
+                      </div>
+                    </a>
+                  `,
+                )
+                .join('')}
+            </div>
+
+            <div class="article-pagination"></div>
+
+          </div>
+
+          <aside class="tagpage-sidebar">
+
+            <div class="sidebar-section">
+              <h3>Categories</h3>
+
+              <ul>
+                <li>Clinical</li>
+                <li>ESG</li>
+                <li>Featured</li>
+                <li>Food & Environmental</li>
+                <li>Materials Science</li>
+                <li>Pharmaceutical</li>
+                <li>Technology</li>
+              </ul>
+            </div>
+
+            <div class="sidebar-section">
+              <h3>Popular Topics</h3>
+
+              <ul>
+                <li>ACQUITY QDa</li>
+                <li>Bioanalysis</li>
+                <li>Biopharma</li>
+                <li>HPLC</li>
+                <li>LC-MS</li>
+                <li>Mass Spectrometry</li>
+              </ul>
+            </div>
+
+          </aside>
+
+        </div>
+      `;
+    } else {
+      block.innerHTML = `
+        <div class="article-filters">
+          <button
+            class="filter-btn active"
+            data-tag="all"
+          >
+            All
+          </button>
+
+          ${[...uniqueTags]
+            .sort()
+            .map(
+              (tag) => `
+                <button
+                  class="filter-btn"
+                  data-tag="${tag}"
                 >
+                  ${formatTag(tag)}
+                </button>
+              `,
+            )
+            .join('')}
+        </div>
 
-                <div class="article-card-content">
+        <div class="article-grid">
+          ${articles
+            .map(
+              (article) => `
+                <a
+                  class="article-card"
+                  href="${article.path}"
+                  data-tags="${article.tags || ''}"
+                >
+                  <img
+                    src="${article.image}"
+                    alt="${article.title}"
+                    loading="lazy"
+                  >
 
-                  <h3>${article.title}</h3>
+                  <div class="article-card-content">
 
-                  <div class="article-meta">
-                    <span>${formatDate(
-                      article['publication-date'],
-                    )}</span>
-                    <span>|</span>
-                    <span>${article.author}</span>
+                    <h3>${article.title}</h3>
+
+                    <div class="article-meta">
+                      <span>${formatDate(
+                        article['publication-date'],
+                      )}</span>
+                      <span>|</span>
+                      <span>${article.author}</span>
+                    </div>
+
+                    <div class="article-reading-time">
+                      Reading Time:
+                      ${article['reading-time']} minutes
+                    </div>
+
+                    <p class="article-description">
+                      ${article.description}
+                    </p>
+
                   </div>
+                </a>
+              `,
+            )
+            .join('')}
+        </div>
 
-                  <div class="article-reading-time">
-                    Reading Time:
-                    ${article['reading-time']} minutes
-                  </div>
-
-                  <p class="article-description">
-                    ${article.description}
-                  </p>
-
-                </div>
-              </a>
-            `,
-          )
-          .join('')}
-      </div>
-
-      <div class="article-pagination"></div>
-    `;
+        <div class="article-pagination"></div>
+      `;
+    }
 
     const buttons = block.querySelectorAll('.filter-btn');
     const cards = block.querySelectorAll('.article-card');
@@ -166,8 +255,10 @@ console.log(block.className);
           .split(',')
           .map((tag) => tag.trim());
 
-        const matchesTag = activeTag === 'all'
-          || tags.includes(activeTag);
+        const matchesTag = isTagPage
+          ? true
+          : activeTag === 'all'
+            || tags.includes(activeTag);
 
         if (matchesTag) {
           matchingCards.push(card);
@@ -194,20 +285,22 @@ console.log(block.className);
       renderPagination(totalPages);
     }
 
-    buttons.forEach((button) => {
-      button.addEventListener('click', () => {
-        buttons.forEach((btn) => {
-          btn.classList.remove('active');
+    if (!isTagPage) {
+      buttons.forEach((button) => {
+        button.addEventListener('click', () => {
+          buttons.forEach((btn) => {
+            btn.classList.remove('active');
+          });
+
+          button.classList.add('active');
+
+          activeTag = button.dataset.tag;
+          currentPage = 1;
+
+          updateVisibility();
         });
-
-        button.classList.add('active');
-
-        activeTag = button.dataset.tag;
-        currentPage = 1;
-
-        updateVisibility();
       });
-    });
+    }
 
     updateVisibility();
   } catch (error) {
