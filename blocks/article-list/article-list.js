@@ -1,3 +1,14 @@
 export default async function decorate(block) {
-  block.innerHTML = '<h2>Article List JS Loaded Successfully</h2>';
+  try {
+    const response = await fetch('/tools/tools-query-index.json');
+
+    block.innerHTML = `
+      <h2>Status: ${response.status}</h2>
+    `;
+  } catch (e) {
+    block.innerHTML = `
+      <h2>Error</h2>
+      <pre>${e.message}</pre>
+    `;
+  }
 }
