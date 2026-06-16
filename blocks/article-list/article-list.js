@@ -63,8 +63,6 @@ export default async function decorate(block) {
     }
 
     const PAGE_SIZE = 6;
-
-    const PAGE_SIZE = 6;
     let currentPage = 1;
     let activeTag = "all";
 
