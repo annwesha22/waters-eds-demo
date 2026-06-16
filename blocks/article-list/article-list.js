@@ -18,6 +18,15 @@ function formatTag(tag) {
 }
 
 export default async function decorate(block) {
+  const isTagPage = block.classList.contains('tagpage');
+
+  // eslint-disable-next-line no-console
+  console.log(
+    `Article List Variant: ${
+      isTagPage ? 'tagpage' : 'default'
+    }`,
+  );
+
   try {
     const response = await fetch('/tools/tools-query-index.json');
 
