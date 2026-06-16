@@ -3,25 +3,27 @@
   flex-direction: column;
   gap: var(--spacing-xl);
   background-color: #f7f7f7;
-  padding: 48px;
+  padding: 0;
 
   .article-header-content {
     flex: 1;
+    padding: 56px;
   }
 
   .article-header-title {
-    font-size: 32px;
-    font-weight: 400;
-    line-height: 1.25;
-    color: #333;
-    margin: 0 0 20px;
+    font-size: 48px;
+    font-weight: 300;
+    line-height: 1.15;
+    color: #1f1f1f;
+    margin: 0 0 24px;
+    letter-spacing: -0.02em;
   }
 
   .article-header-separator {
     border: none;
-    border-top: 3px solid #00a7b5;
-    width: 40px;
-    margin: 0 0 20px;
+    border-top: 4px solid #00a7b5;
+    width: 56px;
+    margin: 0 0 24px;
   }
 
   .article-header-meta {
@@ -29,12 +31,14 @@
     flex-wrap: wrap;
     align-items: center;
     gap: 10px;
-    font-size: var(--body-font-size-s);
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
     color: #666;
-    margin-bottom: 16px;
+    margin-bottom: 20px;
 
     a {
-      color: #00a7b5;
+      color: #00778b;
       text-decoration: none;
 
       &:hover {
@@ -44,20 +48,22 @@
   }
 
   .article-header-divider {
-    color: #ccc;
+    color: #bdbdbd;
   }
 
   .article-header-reading-time {
-    font-size: var(--body-font-size-s);
+    font-size: 14px;
     color: #666;
+    font-weight: 400;
   }
 
   .article-header-image {
     flex: 1;
+    min-height: 500px;
 
     img {
       width: 100%;
-      height: auto;
+      height: 100%;
       display: block;
       object-fit: cover;
     }
@@ -67,26 +73,45 @@
 @media (width >= 900px) {
   .article-header {
     flex-direction: row;
-    align-items: center;
+    align-items: stretch;
     max-width: 100%;
+    gap: 0;
 
     .article-header-content {
-      flex: 1.1;
-      padding-right: var(--spacing-xxl);
+      flex: 1;
+      padding: 72px;
     }
 
     .article-header-image {
       flex: 1;
+      min-height: 560px;
     }
   }
 }
 
 @media (width < 900px) {
   .article-header {
-    padding: 32px 20px;
+    padding: 0;
+
+    .article-header-content {
+      padding: 32px 24px;
+    }
 
     .article-header-title {
-      font-size: 24px;
+      font-size: 32px;
+      line-height: 1.2;
+    }
+
+    .article-header-meta {
+      font-size: 12px;
+    }
+
+    .article-header-image {
+      min-height: auto;
+
+      img {
+        height: auto;
+      }
     }
   }
 }
