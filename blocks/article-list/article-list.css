@@ -89,6 +89,31 @@
   overflow: hidden;
 }
 
+.article-pagination {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 40px;
+}
+
+.page-btn {
+  min-width: 40px;
+  height: 40px;
+  border: 1px solid #d5dce3;
+  background: #fff;
+  cursor: pointer;
+}
+
+.page-btn.active {
+  background: #005eb8;
+  color: #fff;
+  border-color: #005eb8;
+}
+
+.page-btn:hover {
+  border-color: #005eb8;
+}
+
 .article-list-error {
   color: #c00;
   padding: 20px;

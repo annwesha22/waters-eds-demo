@@ -28,6 +28,10 @@ export default async function decorate(block) {
     const json = await response.json();
     const articles = json.data || [];
 
+    const PAGE_SIZE = 6;
+    let currentPage = 1;
+    let activeTag = 'all';
+
     const uniqueTags = new Set();
 
     articles.forEach((article) => {
@@ -105,10 +109,79 @@ export default async function decorate(block) {
           )
           .join('')}
       </div>
+
+      <div class="article-pagination"></div>
     `;
 
     const buttons = block.querySelectorAll('.filter-btn');
     const cards = block.querySelectorAll('.article-card');
+    const paginationContainer = block.querySelector('.article-pagination');
+
+    function renderPagination(totalPages) {
+      paginationContainer.innerHTML = '';
+
+      if (totalPages <= 1) {
+        return;
+      }
+
+      for (let page = 1; page <= totalPages; page += 1) {
+        const button = document.createElement('button');
+
+        button.textContent = page;
+
+        button.className = page === currentPage
+          ? 'page-btn active'
+          : 'page-btn';
+
+        button.addEventListener('click', () => {
+          currentPage = page;
+          updateVisibility();
+
+          window.scrollTo({
+            top: block.offsetTop - 50,
+            behavior: 'smooth',
+          });
+        });
+
+        paginationContainer.appendChild(button);
+      }
+    }
+
+    function updateVisibility() {
+      const matchingCards = [];
+
+      cards.forEach((card) => {
+        const tags = card.dataset.tags
+          .split(',')
+          .map((tag) => tag.trim());
+
+        const matchesTag = activeTag === 'all'
+          || tags.includes(activeTag);
+
+        if (matchesTag) {
+          matchingCards.push(card);
+        }
+      });
+
+      cards.forEach((card) => {
+        card.style.display = 'none';
+      });
+
+      const start = (currentPage - 1) * PAGE_SIZE;
+      const end = start + PAGE_SIZE;
+
+      matchingCards
+        .slice(start, end)
+        .forEach((card) => {
+          card.style.display = '';
+        });
+
+      const totalPages = Math.ceil(
+        matchingCards.length / PAGE_SIZE,
+      );
+
+      renderPagination(totalPages);
+    }
 
     buttons.forEach((button) => {
       button.addEventListener('click', () => {
@@ -118,24 +191,14 @@ export default async function decorate(block) {
 
         button.classList.add('active');
 
-        const selectedTag = button.dataset.tag;
+        activeTag = button.dataset.tag;
+        currentPage = 1;
 
-        cards.forEach((card) => {
-          if (selectedTag === 'all') {
-            card.style.display = '';
-            return;
-          }
-
-          const tags = card.dataset.tags
-            .split(',')
-            .map((tag) => tag.trim());
-
-          card.style.display = tags.includes(selectedTag)
-            ? ''
-            : 'none';
-        });
+        updateVisibility();
       });
     });
+
+    updateVisibility();
   } catch (error) {
     block.innerHTML = `
       <div class="article-list-error">
