@@ -1,0 +1,46 @@
+.article-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+}
+
+.article-card {
+  display: block;
+  background: #fff;
+  text-decoration: none;
+  color: inherit;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 10%);
+}
+
+.article-card img {
+  width: 100%;
+  display: block;
+}
+
+.article-card h3 {
+  padding: 16px;
+  margin: 0;
+}
+
+.article-meta,
+.article-reading-time,
+.article-card p {
+  padding-inline: 16px;
+}
+
+.article-card p {
+  display: -webkit-box;
+  -webkit-line-clamp: 5;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.article-list-search {
+  margin-bottom: 24px;
+}
+
+.article-list-search input {
+  width: 100%;
+  max-width: 400px;
+}
