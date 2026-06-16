@@ -1,14 +1,17 @@
 export default async function decorate(block) {
-  try {
-    const response = await fetch('/tools/tools-query-index.json');
+  const response = await fetch('/tools/tools-query-index.json');
+  const json = await response.json();
 
-    block.innerHTML = `
-      <h2>Status: ${response.status}</h2>
-    `;
-  } catch (e) {
-    block.innerHTML = `
-      <h2>Error</h2>
-      <pre>${e.message}</pre>
-    `;
-  }
+  const articles = json.data || [];
+
+  block.innerHTML = `
+    <div class="article-grid">
+      ${articles.map((article) => `
+        <article class="article-card">
+          <h3>${article.title}</h3>
+          <p>${article.description}</p>
+        </article>
+      `).join('')}
+    </div>
+  `;
 }
