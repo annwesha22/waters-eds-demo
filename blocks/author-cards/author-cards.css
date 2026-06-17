@@ -1,3 +1,16 @@
+/* Neutralize section grid layout that breaks the card flex layout */
+.section.grid-2:has(.author-cards),
+.section:has(.author-cards) {
+  --grid-size: 1;
+
+  display: block;
+}
+
+.author-cards-wrapper {
+  display: block;
+  width: 100%;
+}
+
 /* Break out of the narrow content column so two cards fit side-by-side */
 .author-cards {
   width: 100%;
