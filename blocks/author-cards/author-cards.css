@@ -1,21 +1,30 @@
+/* Break out of the narrow content column so two cards fit side-by-side */
+.author-cards {
+  width: 100%;
+  max-width: 1100px;
+  margin-inline: auto;
+}
+
 .author-cards .author-wrapper {
   display: flex;
   flex-wrap: wrap;
   gap: 40px;
 }
 
+/* Each card = exactly half the row (minus the gap) */
 .author-cards .author-item {
-  display: flex;
+  display: flex;            /* image left | text right */
   flex: 0 0 calc((100% - 40px) / 2);
+  max-width: calc((100% - 40px) / 2);
   gap: 20px;
   padding: 20px;
   box-shadow: 0 6px 12px 0 rgba(0, 0, 0, 0.14);
   box-sizing: border-box;
 }
 
+/* Image — left side, fixed basis */
 .author-cards .author-pic {
-  flex: 0 0 180px;
-  height: auto;
+  flex: 0 0 160px;
 }
 
 .author-cards .author-pic img {
@@ -25,8 +34,11 @@
   object-fit: cover;
 }
 
+/* Description — right side, fills remaining space */
 .author-cards .author-info {
+  flex: 1;
   align-self: center;
+  min-width: 0;             /* allow text to wrap inside flex */
 }
 
 .author-cards .author-info h2 {
@@ -63,13 +75,13 @@
   text-decoration: underline;
 }
 
-/* Stay 2-up until small screens */
+/* Mobile — one card per row, image stacks on top */
 @media (width <= 600px) {
   .author-cards .author-item {
     flex: 0 0 100%;
-    display: block;
     max-width: 400px;
     margin: 0 auto;
+    display: block;
   }
 
   .author-cards .author-pic {
