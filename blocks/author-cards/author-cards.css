@@ -10,10 +10,11 @@
   gap: 20px;
   padding: 20px;
   box-shadow: 0 6px 12px 0 rgba(0, 0, 0, 0.14);
+  box-sizing: border-box;
 }
 
 .author-cards .author-pic {
-  flex: 0 0 220px;
+  flex: 0 0 180px;
   height: auto;
 }
 
@@ -62,21 +63,17 @@
   text-decoration: underline;
 }
 
-@media (width <= 1200px) {
-  .author-cards .author-item {
-    flex: 0 0 100%;
-    max-width: 1000px;
-    margin: 0 auto;
-  }
-}
-
+/* Stay 2-up until small screens */
 @media (width <= 600px) {
   .author-cards .author-item {
+    flex: 0 0 100%;
     display: block;
     max-width: 400px;
+    margin: 0 auto;
   }
 
   .author-cards .author-pic {
+    flex: none;
     padding-bottom: 20px;
   }
 }
