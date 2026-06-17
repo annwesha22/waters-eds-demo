@@ -7,6 +7,10 @@ body.has-template main {
     padding-top: 20px !important;
   }
 
+  main > .section > div{
+     padding-inline: 0px;
+   }
+
   main > .section {
     padding: 24px 0;
   }
@@ -73,11 +77,6 @@ body.has-template main {
     margin: var(--spacing-xl) 0;
     font-style: italic;
     color: var(--color-gray-700);
-  }
-
-  main > .section:last-child {
-    max-width: 1200px;
-    padding: 48px;
   }
 }
 

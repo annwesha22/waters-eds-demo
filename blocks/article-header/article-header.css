@@ -72,7 +72,6 @@
 
     .article-header-content {
       flex: 1.1;
-      padding-right: var(--spacing-xxl);
     }
 
     .article-header-image {
