@@ -3,18 +3,7 @@ body.has-template main {
 }
 
 .blog-article-template {
-  /* --- Article content — narrow centered column --- */
-  main > .section {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 24px 48px;
-  }
-
-  /* --- Article header section (first section) --- */
   main > .section:first-child {
-    max-width: 800px;
-    padding-top: 48px;
-
     h1 {
       font-size: var(--heading-font-size-xxl);
       font-weight: 700;
@@ -22,8 +11,6 @@ body.has-template main {
       margin-bottom: var(--spacing-m);
     }
   }
-
-  /* --- Article metadata (date, author, category) --- */
   .article-meta {
     display: flex;
     flex-wrap: wrap;
@@ -38,11 +25,20 @@ body.has-template main {
     }
   }
 
-  /* --- Body content typography --- */
+  main > .section:not(:first-child) {
+    padding: 24px 0;
+  }
+
   main p {
-    font-size: var(--body-font-size-l);
-    line-height: 1.8;
-    margin-bottom: var(--spacing-l);
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.7;
+    color: #333;
+    margin: 0 0 20px;
+  }
+
+  main p:last-child {
+    margin-bottom: 0;
   }
 
   main h2 {
@@ -70,14 +66,12 @@ body.has-template main {
     color: var(--color-gray-700);
   }
 
-  /* --- Related posts section (wider) --- */
   main > .section:last-child {
     max-width: 1200px;
     padding: 48px;
   }
 }
 
-/* Mobile */
 @media (width < 900px) {
   .blog-article-template {
     main > .section,
