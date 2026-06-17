@@ -24,6 +24,7 @@
     }
   }
 
+
   .blog-hero-separator {
     border: none;
     border-top: 3px solid #00778b;
@@ -60,13 +61,14 @@
   .blog-hero-cta a {
     font-size: var(--body-font-size-s);
     font-weight: 600;
-    color: #00778b;
-    text-transform: uppercase;
+    padding: 0.5rem 1.25rem;
+    background-color: #0070c0;
+    color: #fff;
     text-decoration: none;
-    letter-spacing: 0.5px;
+    border-radius: 4px;
 
     &:hover {
-      text-decoration: underline;
+      background-color: #005788;
     }
   }
 
