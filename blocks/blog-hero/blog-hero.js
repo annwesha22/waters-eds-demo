@@ -13,14 +13,40 @@ function formatDate(value) {
   return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 }
 
-// Build the list of featured articles from the bulk metadata sheet only.
+function slugify(name) {
+  return name.toLowerCase().trim().replace(/&/g, '').replace(/\s+/g, '-').replace(/-+/g, '-');
+}
+
+async function fetchTaxonomy() {
+  const map = {};
+  try {
+    const resp = await fetch('/blog/taxonomy.json');
+    if (!resp.ok) return map;
+    const json = await resp.json();
+
+    const sheetNames = json[':names'] || Object.keys(json).filter((k) => json[k] && json[k].data);
+    const allRows = [];
+    if (sheetNames.length) {
+      sheetNames.forEach((s) => { if (json[s] && json[s].data) allRows.push(...json[s].data); });
+    } else if (json.data) {
+      allRows.push(...json.data);
+    }
+
+    allRows.forEach((r) => {
+      const name = r.Tag || r.Name || r.Category;
+      const slug = r.Slug;
+      if (name && slug) map[name.trim().toLowerCase()] = slug;
+    });
+  } catch { /* ignore */ }
+  return map;
+}
+
 async function fetchFeaturedPosts() {
   try {
     const resp = await fetch('/blog/metadata.json');
     if (!resp.ok) return [];
     const json = await resp.json();
     const rows = json.data || [];
-
     return rows
       .filter((r) => r.URL && !r.URL.includes('*'))
       .filter((r) => String(r.featured).toLowerCase() === 'true')
@@ -42,8 +68,10 @@ export default async function init(el) {
   el.innerHTML = '';
 
   let post = null;
+  let taxonomy = {};
   try {
-    const posts = await fetchFeaturedPosts();
+    const [posts, tax] = await Promise.all([fetchFeaturedPosts(), fetchTaxonomy()]);
+    taxonomy = tax;
     posts.sort((a, b) => (new Date(b.date) - new Date(a.date)));
     [post] = posts;
   } catch (e) {
@@ -56,6 +84,9 @@ export default async function init(el) {
   const date = formatDate(post.date);
   const authorSlug = post.author ? post.author.toLowerCase().replace(/\s+/g, '-') : '';
 
+  const category = tags[0] || '';
+  const categorySlug = category ? (taxonomy[category.toLowerCase()] || slugify(category)) : '';
+
   el.innerHTML = `
     <div class="blog-hero-content">
       <h2 class="blog-hero-title">
@@ -65,7 +96,7 @@ export default async function init(el) {
       <div class="blog-hero-meta">
         <span class="blog-hero-date">${date}</span>
         ${post.author ? `<span class="blog-hero-divider">|</span><span class="blog-hero-author">By <a href="/author/${authorSlug}">${post.author}</a></span>` : ''}
-        ${tags.length ? `<span class="blog-hero-divider">|</span><a href="/blog/?category=${encodeURIComponent(tags[0])}" class="blog-hero-tag">${tags[0]}</a>` : ''}
+        ${category ? `<span class="blog-hero-divider">|</span><a href="/blog/categories/${categorySlug}" class="blog-hero-tag">${category}</a>` : ''}
       </div>
       ${post.description ? `<p class="blog-hero-excerpt">${post.description}</p>` : ''}
       <p class="blog-hero-cta"><a href="${post.path}">Read More</a></p>
