@@ -1,3 +1,39 @@
+function slugify(name) {
+  return name.toLowerCase().trim().replace(/&/g, '').replace(/\s+/g, '-').replace(/-+/g, '-');
+}
+
+function parseTags(raw) {
+  if (!raw) return [];
+  if (Array.isArray(raw)) return raw;
+  if (typeof raw !== 'string') return [String(raw)];
+  try { return JSON.parse(raw); } catch { /* not JSON */ }
+  return raw.replace(/^"|"$/g, '').split(',').map((t) => t.trim()).filter(Boolean);
+}
+
+async function fetchTaxonomy() {
+  const map = {};
+  try {
+    const resp = await fetch('/blog/taxonomy.json');
+    if (!resp.ok) return map;
+    const json = await resp.json();
+
+    const sheetNames = json[':names'] || Object.keys(json).filter((k) => json[k] && json[k].data);
+    const allRows = [];
+    if (sheetNames.length) {
+      sheetNames.forEach((s) => { if (json[s] && json[s].data) allRows.push(...json[s].data); });
+    } else if (json.data) {
+      allRows.push(...json.data);
+    }
+
+    allRows.forEach((r) => {
+      const name = r.Tag || r.Name || r.Category;
+      const slug = r.Slug;
+      if (name && slug) map[name.trim().toLowerCase()] = slug;
+    });
+  } catch { /* ignore */ }
+  return map;
+}
+
 async function fetchSearchData() {
   try {
     const resp = await fetch('/blog/metadata.json');
@@ -12,11 +48,20 @@ async function fetchSearchData() {
         description: r.description || '',
         author: r.author || '',
         category: r.category || '',
+        tags: r['article:tag'] || '',
         image: r['og:image'] || r['og-image'] || r.image || '',
       }));
   } catch {
     return [];
   }
+}
+
+function categoriesOf(item) {
+  const fromCategory = item.category
+    ? item.category.split(',').map((c) => c.trim().replace(/^"|"$/g, '')).filter(Boolean)
+    : [];
+  const fromTags = parseTags(item.tags);
+  return [...new Set([...fromCategory, ...fromTags])];
 }
 
 function matchesQuery(item, query) {
@@ -25,8 +70,36 @@ function matchesQuery(item, query) {
     item.description,
     item.author,
     item.category,
+    parseTags(item.tags).join(' '),
   ].join(' ').toLowerCase();
   return haystack.includes(query);
+}
+
+// Decide the best destination for a submitted query.
+function resolveDestination(query, items, taxonomy) {
+  // 1. Exact category / tag match -> category landing page
+  const allCategories = new Set();
+  items.forEach((item) => categoriesOf(item).forEach((c) => allCategories.add(c)));
+
+  const categoryMatch = [...allCategories]
+    .find((c) => c.toLowerCase() === query || c.toLowerCase().includes(query));
+  if (categoryMatch) {
+    const slug = taxonomy[categoryMatch.toLowerCase()] || slugify(categoryMatch);
+    return `/blog/categories/${slug}`;
+  }
+
+  // 2. Exact author match -> author landing page
+  const authorMatch = items
+    .map((item) => item.author)
+    .filter(Boolean)
+    .find((a) => a.toLowerCase() === query || a.toLowerCase().includes(query));
+  if (authorMatch) {
+    return `/blog/author/${slugify(authorMatch)}`;
+  }
+
+  // 3. Fall back to first matching article
+  const article = items.find((item) => matchesQuery(item, query));
+  return article ? article.path : null;
 }
 
 function renderResults(resultsEl, items, query) {
@@ -44,12 +117,15 @@ function renderResults(resultsEl, items, query) {
     return;
   }
 
-  resultsEl.innerHTML = matches.map((item) => `
-    <a class="search-result" href="${item.path}">
-      <span class="search-result-title">${item.title}</span>
-      ${item.category ? `<span class="search-result-category">${item.category.split(',')[0].trim().replace(/^"|"$/g, '')}</span>` : ''}
-    </a>
-  `).join('');
+  resultsEl.innerHTML = matches.map((item) => {
+    const category = categoriesOf(item)[0] || '';
+    return `
+      <a class="search-result" href="${item.path}">
+        <span class="search-result-title">${item.title}</span>
+        ${category ? `<span class="search-result-category">${category}</span>` : ''}
+      </a>
+    `;
+  }).join('');
   resultsEl.hidden = false;
 }
 
@@ -77,31 +153,40 @@ export default function init(el) {
   results.className = 'search-results';
   results.hidden = true;
 
-  // Lazy-load the metadata once, on first interaction
+  // Lazy-load metadata + taxonomy once. Absolute paths => works on ANY page.
   let dataPromise = null;
   const ensureData = () => {
-    if (!dataPromise) dataPromise = fetchSearchData();
+    if (!dataPromise) {
+      dataPromise = Promise.all([fetchSearchData(), fetchTaxonomy()])
+        .then(([items, taxonomy]) => ({ items, taxonomy }));
+    }
     return dataPromise;
   };
 
   const runSearch = async () => {
     const query = input.value.trim().toLowerCase();
-    const items = await ensureData();
+    const { items } = await ensureData();
     renderResults(results, items, query);
   };
 
   input.addEventListener('focus', ensureData);
+
+  // Live dropdown as the user types
   input.addEventListener('input', runSearch);
 
-  btn.addEventListener('click', () => {
-    const query = input.value.trim();
-    if (query) {
-      window.location.href = `/search?q=${encodeURIComponent(query)}`;
-    }
+  // Click the search icon/button -> trigger the action
+  btn.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    submit();
   });
 
+  // Enter key in the input -> trigger the action
   input.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') btn.click();
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      submit();
+    }
   });
 
   // Hide results when clicking outside the block
@@ -110,6 +195,7 @@ export default function init(el) {
       results.hidden = true;
     }
   });
+
 
   wrapper.append(input, btn);
   el.append(wrapper, results);
