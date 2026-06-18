@@ -77,22 +77,22 @@ function matchesQuery(item, query) {
 
 // Decide the best destination for a submitted query.
 function resolveDestination(query, items, taxonomy) {
-  // 1. Exact category / tag match -> category landing page
+  // 1. Category / tag match -> category landing page
   const allCategories = new Set();
   items.forEach((item) => categoriesOf(item).forEach((c) => allCategories.add(c)));
 
   const categoryMatch = [...allCategories]
-    .find((c) => c.toLowerCase() === query || c.toLowerCase().includes(query));
+    .find((c) => c.toLowerCase() === query)
+    || [...allCategories].find((c) => c.toLowerCase().includes(query));
   if (categoryMatch) {
     const slug = taxonomy[categoryMatch.toLowerCase()] || slugify(categoryMatch);
     return `/blog/categories/${slug}`;
   }
 
-  // 2. Exact author match -> author landing page
-  const authorMatch = items
-    .map((item) => item.author)
-    .filter(Boolean)
-    .find((a) => a.toLowerCase() === query || a.toLowerCase().includes(query));
+  // 2. Author match -> author landing page
+  const authors = items.map((item) => item.author).filter(Boolean);
+  const authorMatch = authors.find((a) => a.toLowerCase() === query)
+    || authors.find((a) => a.toLowerCase().includes(query));
   if (authorMatch) {
     return `/blog/author/${slugify(authorMatch)}`;
   }
@@ -169,6 +169,20 @@ export default function init(el) {
     renderResults(results, items, query);
   };
 
+  const submit = async () => {
+    const query = input.value.trim().toLowerCase();
+    if (!query) {
+      input.focus();
+      return;
+    }
+    const { items, taxonomy } = await ensureData();
+    const dest = resolveDestination(query, items, taxonomy);
+    if (dest) {
+      window.location.href = dest;
+    }
+  };
+
+  // Preload data as soon as the user interacts
   input.addEventListener('focus', ensureData);
 
   // Live dropdown as the user types
@@ -195,7 +209,6 @@ export default function init(el) {
       results.hidden = true;
     }
   });
-
 
   wrapper.append(input, btn);
   el.append(wrapper, results);
