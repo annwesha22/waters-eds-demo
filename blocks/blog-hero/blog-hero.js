@@ -56,7 +56,7 @@ async function fetchFeaturedPosts() {
         description: r.description || '',
         author: r.author || '',
         date: r['publication-date'] || '',
-        tags: r['article:tag'] || '',
+        category: r.category || '',
         image: r['og:image'] || r['og-image'] || r.image || '',
       }));
   } catch {
@@ -68,10 +68,8 @@ export default async function init(el) {
   el.innerHTML = '';
 
   let post = null;
-  let taxonomy = {};
   try {
-    const [posts, tax] = await Promise.all([fetchFeaturedPosts(), fetchTaxonomy()]);
-    taxonomy = tax;
+    const posts = await fetchFeaturedPosts();
     posts.sort((a, b) => (new Date(b.date) - new Date(a.date)));
     [post] = posts;
   } catch (e) {
@@ -80,12 +78,11 @@ export default async function init(el) {
 
   if (!post) return;
 
-  const tags = parseTags(post.tags);
   const date = formatDate(post.date);
   const authorSlug = post.author ? post.author.toLowerCase().replace(/\s+/g, '-') : '';
-
-  const category = tags[0] || '';
-  const categorySlug = category ? (taxonomy[category.toLowerCase()] || slugify(category)) : '';
+  const firstCategory = post.category
+    ? post.category.split(',')[0].trim().replace(/^"|"$/g, '')
+    : '';
 
   el.innerHTML = `
     <div class="blog-hero-content">
@@ -96,7 +93,7 @@ export default async function init(el) {
       <div class="blog-hero-meta">
         <span class="blog-hero-date">${date}</span>
         ${post.author ? `<span class="blog-hero-divider">|</span><span class="blog-hero-author">By <a href="/author/${authorSlug}">${post.author}</a></span>` : ''}
-        ${category ? `<span class="blog-hero-divider">|</span><a href="/blog/categories/${categorySlug}" class="blog-hero-tag">${category}</a>` : ''}
+        ${firstCategory ? `<span class="blog-hero-divider">|</span><a href="/blog/?category=${encodeURIComponent(firstCategory)}" class="blog-hero-tag">${firstCategory}</a>` : ''}
       </div>
       ${post.description ? `<p class="blog-hero-excerpt">${post.description}</p>` : ''}
       <p class="blog-hero-cta"><a href="${post.path}">Read More</a></p>

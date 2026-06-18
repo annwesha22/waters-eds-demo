@@ -43,7 +43,7 @@
     const date = meta['publication-date'] || '';
     const author = meta.author || '';
     const image = meta['og:image'] || '';
-    const category = meta['article:tag'] || '';
+    const category = meta['category'] || '';
 
     const readTime = estimateReadingTime();
     const authorSlug = author ? author.toLowerCase().replace(/\s+/g, '-') : '';
