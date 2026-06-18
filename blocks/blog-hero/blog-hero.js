@@ -92,7 +92,7 @@ export default async function init(el) {
       <hr class="blog-hero-separator" />
       <div class="blog-hero-meta">
         <span class="blog-hero-date">${date}</span>
-        ${post.author ? `<span class="blog-hero-divider">|</span><span class="blog-hero-author">By <a href="/author/${authorSlug}">${post.author}</a></span>` : ''}
+        ${post.author ? `<span class="blog-hero-divider">|</span><span class="blog-hero-author">By <a href="/blog/author/${authorSlug}">${post.author}</a></span>` : ''}
         ${firstCategory ? `<span class="blog-hero-divider">|</span><a href="/blog/?category=${encodeURIComponent(firstCategory)}" class="blog-hero-tag">${firstCategory}</a>` : ''}
       </div>
       ${post.description ? `<p class="blog-hero-excerpt">${post.description}</p>` : ''}

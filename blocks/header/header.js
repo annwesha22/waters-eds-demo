@@ -1,7 +1,7 @@
 import { getConfig, getMetadata } from '../../scripts/ak.js';
 import { loadFragment } from '../fragment/fragment.js';
 import { setColorScheme } from '../section-metadata/section-metadata.js';
-
+import initSearch from '../search/search.js';
 const { locale } = getConfig();
 
 const HEADER_PATH = '/fragments/nav/header';
@@ -301,22 +301,15 @@ async function decorateActionSection(section) {
     if (text === 'search') {
       item.textContent = '';
 
-      const wrapper = document.createElement('div');
-      wrapper.className = 'search-wrapper';
-
-      const icon = document.createElement('span');
-      icon.className = 'search-icon';
-
-      const input = document.createElement('input');
-      input.type = 'search';
-      input.placeholder = 'Search';
-      input.className = 'search-input';
-
-      wrapper.append(icon, input);
-      item.append(wrapper);
+      // Mount the real search block (fetches /blog/metadata.json)
+      const searchBlock = document.createElement('div');
+      searchBlock.className = 'search';
+      item.append(searchBlock);
+      initSearch(searchBlock);
     }
   });
 }
+
 
 async function decorateHeader(fragment) {
   const sections = fragment.querySelectorAll(':scope > .section');
@@ -402,6 +395,14 @@ async function decorateHeader(fragment) {
           node.remove();
         }
       });
+
+      const searchWrapper = sections[2].querySelector('.search');
+    if (searchWrapper) {
+      const actionsDiv = document.createElement('div');
+      actionsDiv.className = 'actions-wrapper-right';
+      actionsDiv.append(searchWrapper);
+      mainHeaderRow.append(actionsDiv);
+    }
     }
 
     // CRITICAL CORRECTION: Append the assembled rows to the DOM and clear old fragments

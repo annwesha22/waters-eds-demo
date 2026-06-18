@@ -55,8 +55,7 @@
         <hr class="article-header-separator" />
         <div class="article-header-meta">
           ${date ? `<span class="article-header-date">${formatDate(date)}</span>` : ''}
-          ${author ? `<span class="article-header-divider">|</span><span class="article-header-author">By <a href="/author/${authorSlug}">${author}</a></span>` : ''}
-          ${firstCategory ? `<span class="article-header-divider">|</span><a href="/blog/?category=${encodeURIComponent(firstCategory)}" class="article-header-tag">${firstCategory}</a>` : ''}
+          ${author ? `<span class="article-header-divider">|</span><span class="article-header-author">By <a href="/blog/author/${authorSlug}">${author}</a></span>` : ''}          ${firstCategory ? `<span class="article-header-divider">|</span><a href="/blog/?category=${encodeURIComponent(firstCategory)}" class="article-header-tag">${firstCategory}</a>` : ''}
         </div>
         ${readTime ? `<div class="article-header-reading-time">Reading Time: ${readTime} minutes</div>` : ''}
       </div>
