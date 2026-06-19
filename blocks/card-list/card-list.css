@@ -1,0 +1,291 @@
+/* ============================================================
+   Section reset (both variations break out of the grid)
+   ============================================================ */
+.section.grid-2:has(.card-list.author),
+.section:has(.card-list.author),
+.section.grid-2:has(.card-list.category),
+.section:has(.card-list.category) {
+  --grid-size: 1;
+
+  display: block;
+}
+
+.card-list-wrapper {
+  display: block;
+  width: 100%;
+}
+
+/* ============================================================
+   AUTHOR variation
+   ============================================================ */
+.card-list.author {
+  width: 100%;
+  max-width: 1100px;
+  margin-inline: auto;
+}
+
+.card-list.author .author-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 40px;
+}
+
+.card-list.author .author-item {
+  display: flex;
+  flex: 0 0 calc((100% - 40px) / 2);
+  max-width: calc((100% - 40px) / 2);
+  gap: 20px;
+  padding: 20px;
+  box-shadow: 0 6px 12px 0 rgba(0, 0, 0, 0.14);
+  box-sizing: border-box;
+}
+
+.card-list.author .author-pic {
+  flex: 0 0 160px;
+}
+
+.card-list.author .author-pic img {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+}
+
+.card-list.author .author-info {
+  flex: 1;
+  align-self: center;
+  min-width: 0;
+}
+
+.card-list.author .author-info h2 {
+  font-size: 20px;
+  line-height: 1.5;
+  margin: 0 0 8px;
+}
+
+.card-list.author .author-info h2 a {
+  color: #222;
+  text-decoration: none;
+}
+
+.card-list.author .author-info h2 a:hover {
+  color: #006ba8;
+  text-decoration: underline;
+}
+
+.card-list.author .author-info p {
+  font-size: 16px;
+  line-height: 1.625;
+  color: #333;
+  margin: 0 0 8px;
+}
+
+.card-list.author .author-info .archive-link {
+  font-size: 16px;
+  line-height: 36px;
+  color: #00778b;
+  text-decoration: none;
+}
+
+.card-list.author .author-info .archive-link:hover {
+  text-decoration: underline;
+}
+
+@media (width <= 600px) {
+  .card-list.author .author-item {
+    flex: 0 0 100%;
+    max-width: 400px;
+    margin: 0 auto;
+    display: block;
+  }
+
+  .card-list.author .author-pic {
+    flex: none;
+    padding-bottom: 20px;
+  }
+}
+
+/* ============================================================
+   CATEGORY variation
+   ============================================================ */
+.card-list.category {
+  width: 100%;
+  max-width: 1280px;
+  margin-inline: auto;
+}
+
+/* Archive header */
+.card-list.category .category-header {
+  margin-bottom: 40px;
+}
+
+.card-list.category .category-header h1 {
+  margin: 0;
+  font-size: 42px;
+  line-height: 1.2;
+  font-weight: 400;
+  color: #333;
+  text-transform: capitalize;
+}
+
+/* Listing */
+.card-list.category .category-list-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  width: 100%;
+}
+
+/* Card */
+.card-list.category .category-card {
+  display: grid;
+  grid-template-columns: 45% 55%;
+  background: #eff2f4;
+  box-shadow: 0 4px 12px rgb(0 0 0 / 10%);
+  overflow: hidden;
+  min-height: 360px;
+}
+
+/* Thumbnail */
+.card-list.category .category-card-image {
+  position: relative;
+  height: 100%;
+}
+
+.card-list.category .category-card-image a {
+  display: block;
+  height: 100%;
+}
+
+.card-list.category .category-card-image img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+/* Content */
+.card-list.category .category-card-content {
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* Title */
+.card-list.category .category-card-title {
+  margin: 0 0 18px;
+  font-size: 20px;
+  line-height: 1.45;
+  font-weight: 400;
+}
+
+.card-list.category .category-card-title a {
+  color: #006ba8;
+  text-decoration: none;
+}
+
+.card-list.category .category-card-title a:hover {
+  color: #008bbd;
+  text-decoration: none;
+}
+
+/* Meta */
+.card-list.category .category-card-meta {
+  margin-bottom: 24px;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #444;
+}
+
+.card-list.category .category-card-meta .author {
+  color: #006ba8;
+}
+
+.card-list.category .category-card-meta .author a {
+  color: #006ba8;
+  text-decoration: none;
+}
+
+.card-list.category .category-card-meta .author a:hover {
+  text-decoration: underline;
+}
+
+.card-list.category .category-card-meta .date {
+  color: #444;
+}
+
+.card-list.category .category-card-meta .reading-time {
+  display: block;
+  margin-top: 2px;
+  color: #444;
+}
+
+/* Description */
+.card-list.category .category-card-description {
+  margin: 0;
+  color: #444;
+  font-size: 18px;
+  line-height: 1.8;
+  font-weight: 400;
+}
+
+/* Empty state */
+.card-list.category .no-results {
+  text-align: center;
+  padding: 80px 0;
+}
+
+.card-list.category .no-results h2 {
+  margin: 0;
+}
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .card-list.category .category-card {
+    grid-template-columns: 1fr;
+  }
+
+  .card-list.category .category-card-image {
+    min-height: 320px;
+  }
+
+  .card-list.category .category-card-content {
+    padding: 32px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 767px) {
+  .card-list.category .category-header h1 {
+    font-size: 34px;
+  }
+
+  .card-list.category .category-card {
+    display: block;
+    min-height: auto;
+  }
+
+  .card-list.category .category-card-image {
+    min-height: 240px;
+  }
+
+  .card-list.category .category-card-content {
+    padding: 24px;
+  }
+
+  .card-list.category .category-card-title {
+    font-size: 18px;
+    margin-bottom: 12px;
+  }
+
+  .card-list.category .category-card-meta {
+    font-size: 15px;
+    margin-bottom: 16px;
+  }
+
+  .card-list.category .category-card-description {
+    font-size: 16px;
+    line-height: 1.7;
+  }
+}
