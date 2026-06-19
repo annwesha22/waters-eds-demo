@@ -1,3 +1,5 @@
+import { loadCSS } from '../../scripts/lib-franklin.js';
+
 function slugify(name) {
   return name.toLowerCase().trim().replace(/&/g, '').replace(/\s+/g, '-').replace(/-+/g, '-');
 }
@@ -233,8 +235,12 @@ function renderResults(resultsEl, items, query, taxonomy) {
   resultsEl.hidden = false;
 }
 
-export default function init(el) {
-  const placeholder = el.querySelector('p')?.textContent?.trim() || 'Search topics, titles, and authors';
+export default async function init(el) {
+  await loadCSS('/blocks/search/search.css');
+
+  const placeholder =
+    el.querySelector('p')?.textContent?.trim()
+    || 'Search topics, titles, and authors';
 
   el.innerHTML = '';
 
