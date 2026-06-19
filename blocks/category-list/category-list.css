@@ -1,19 +1,30 @@
-/* ==========================================
-   Category Archive
-   ========================================== */
-
-.category-list {
-  max-width: 1280px;
-  margin: 0 auto;
+.section.grid-2:has(.category-list),
+.section:has(.category-list) {
+  --grid-size: 1;
+  display: block;
 }
 
+.category-list-wrapper {
+  width: 100%;
+}
+
+.category-list {
+  width: 100%;
+  max-width: 1280px;
+  margin-inline: auto;
+}
+
+/* ==========================================
+   Archive Header
+   ========================================== */
+
 .category-header {
-  margin-bottom: 50px;
+  margin-bottom: 40px;
 }
 
 .category-header h1 {
   margin: 0;
-  font-size: 44px;
+  font-size: 42px;
   line-height: 1.2;
   font-weight: 400;
   color: #333;
@@ -21,7 +32,7 @@
 }
 
 /* ==========================================
-   Archive List
+   Archive Listing
    ========================================== */
 
 .category-list-wrapper {
@@ -36,18 +47,20 @@
 
 .category-card {
   display: grid;
-  grid-template-columns: 44% 56%;
-  background: #f7f7f7;
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+  grid-template-columns: 45% 55%;
+  background: #eff2f4;
+  box-shadow: 0 4px 12px rgb(0 0 0 / 10%);
   overflow: hidden;
+  min-height: 360px;
 }
 
 /* ==========================================
-   Image
+   Thumbnail
    ========================================== */
 
 .category-card-image {
   position: relative;
+  height: 100%;
 }
 
 .category-card-image a {
@@ -56,19 +69,18 @@
 }
 
 .category-card-image img {
-  display: block;
   width: 100%;
   height: 100%;
-  min-height: 420px;
+  display: block;
   object-fit: cover;
 }
 
 /* ==========================================
-   Content
+   Content Area
    ========================================== */
 
 .category-card-content {
-  padding: 42px 50px;
+  padding: 40px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -79,19 +91,20 @@
    ========================================== */
 
 .category-card-title {
-  margin: 0 0 24px;
-  font-size: 28px;
+  margin: 0 0 18px;
+  font-size: 20px;
   line-height: 1.45;
   font-weight: 400;
 }
 
 .category-card-title a {
-  color: #0071bc;
+  color: #006ba8;
   text-decoration: none;
 }
 
 .category-card-title a:hover {
-  text-decoration: underline;
+  color: #008bbd;
+  text-decoration: none;
 }
 
 /* ==========================================
@@ -99,18 +112,18 @@
    ========================================== */
 
 .category-card-meta {
-  margin-bottom: 28px;
-  color: #4d4d4d;
-  font-size: 18px;
+  margin-bottom: 24px;
+  font-size: 16px;
   line-height: 1.6;
+  color: #444;
 }
 
 .category-card-meta .author {
-  color: #0071bc;
+  color: #006ba8;
 }
 
 .category-card-meta .author a {
-  color: #0071bc;
+  color: #006ba8;
   text-decoration: none;
 }
 
@@ -119,13 +132,13 @@
 }
 
 .category-card-meta .date {
-  color: #4d4d4d;
+  color: #444;
 }
 
 .category-card-meta .reading-time {
   display: block;
-  margin-top: 4px;
-  color: #4d4d4d;
+  margin-top: 2px;
+  color: #444;
 }
 
 /* ==========================================
@@ -149,16 +162,21 @@
   padding: 80px 0;
 }
 
+.no-results h2 {
+  margin: 0;
+}
+
 /* ==========================================
    Tablet
    ========================================== */
 
 @media (max-width: 1024px) {
+
   .category-card {
     grid-template-columns: 1fr;
   }
 
-  .category-card-image img {
+  .category-card-image {
     min-height: 320px;
   }
 
@@ -177,7 +195,12 @@
     font-size: 34px;
   }
 
-  .category-card-image img {
+  .category-card {
+    display: block;
+    min-height: auto;
+  }
+
+  .category-card-image {
     min-height: 240px;
   }
 
@@ -186,13 +209,13 @@
   }
 
   .category-card-title {
-    font-size: 24px;
-    margin-bottom: 16px;
+    font-size: 18px;
+    margin-bottom: 12px;
   }
 
   .category-card-meta {
-    font-size: 16px;
-    margin-bottom: 18px;
+    font-size: 15px;
+    margin-bottom: 16px;
   }
 
   .category-card-description {
