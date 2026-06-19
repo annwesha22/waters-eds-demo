@@ -238,12 +238,30 @@ function decorateNavItem(li) {
         return response.json();
       })
       .then((json) => {
-      const rows = json.data || [];
+      const sheetNames =
+        json[':names']
+        || Object.keys(json).filter((k) => json[k]?.data);
 
-      rows.forEach((row) => {
-        const category = row.Category?.trim();
-        const slug = row.Slug?.trim();
+      let rows = [];
 
+      if (sheetNames.length) {
+        sheetNames.forEach((sheet) => {
+          if (json[sheet]?.data) {
+            rows.push(...json[sheet].data);
+          }
+        });
+      } else {
+        rows = json.data || [];
+      }
+        console.log('taxonomy rows', rows);
+        rows.forEach(async (row) => {
+        const category =
+        row.Category?.trim()
+        || row.category?.trim();
+
+        const slug =
+        row.Slug?.trim()
+        || row.slug?.trim();
         if (!category || !slug) return;
 
         const item = document.createElement('li');
