@@ -11,6 +11,16 @@ const HEADER_ACTIONS = [
   '/tools/widgets/toggle',
 ];
 
+async function loadSearchAssets() {
+  const href = '/blocks/search/search.css';
+
+  if (!document.querySelector(`link[href="${href}"]`)) {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = href;
+    document.head.append(link);
+  }
+}
 
 function closeAllMenus() {
   const openMenus = document.body.querySelectorAll('header .is-open');
@@ -306,6 +316,7 @@ async function decorateActionSection(section) {
     const text = item.textContent.trim().toLowerCase();
 
     if (text === 'search') {
+      await loadSearchAssets();
       item.textContent = '';
 
       const searchBlock = document.createElement('div');
