@@ -11,6 +11,17 @@ const HEADER_ACTIONS = [
   '/tools/widgets/toggle',
 ];
 
+async function loadSearchAssets() {
+  const href = '/blocks/search/search.css';
+
+  if (!document.querySelector(`link[href="${href}"]`)) {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = href;
+    document.head.append(link);
+  }
+}
+
 function closeAllMenus() {
   const openMenus = document.body.querySelectorAll('header .is-open');
   for (const openMenu of openMenus) {
@@ -301,13 +312,13 @@ async function decorateActionSection(section) {
   section.classList.add('actions-section');
   const items = section.querySelectorAll('li');
 
-  items.forEach((item) => {
+  items.forEach(async (item) => {
     const text = item.textContent.trim().toLowerCase();
 
     if (text === 'search') {
+      await loadSearchAssets();
       item.textContent = '';
 
-      // Mount the real search block (fetches /blog/metadata.json)
       const searchBlock = document.createElement('div');
       searchBlock.className = 'search';
       item.append(searchBlock);

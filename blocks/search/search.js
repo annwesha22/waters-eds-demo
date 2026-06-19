@@ -1,12 +1,3 @@
-function loadSearchCSS() {
-  const href = `${new URL('./search.css', import.meta.url).pathname}`;
-  if (document.querySelector(`link[href="${href}"]`)) return;
-  const link = document.createElement('link');
-  link.rel = 'stylesheet';
-  link.href = href;
-  document.head.append(link);
-}
-
 function slugify(name) {
   return name.toLowerCase().trim().replace(/&/g, '').replace(/\s+/g, '-').replace(/-+/g, '-');
 }
