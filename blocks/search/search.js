@@ -234,7 +234,7 @@ function renderResults(resultsEl, items, query, taxonomy) {
 }
 
 export default function init(el) {
-  const placeholder = el.querySelector('p')?.textContent?.trim() || 'Search topics, titles, and authors';
+  const placeholder = el.querySelector('p')?.textContent?.trim() || 'Search titles, authors, categories';
 
   el.innerHTML = '';
 
