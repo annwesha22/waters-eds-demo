@@ -3,7 +3,7 @@
   flex-direction: column;
   gap: var(--spacing-xl);
   background-color: #f7f7f7;
-  padding: 48px;
+  padding: 30px;
 
   .article-header-content {
     flex: 1;
@@ -72,7 +72,6 @@
 
     .article-header-content {
       flex: 1.1;
-      padding-right: var(--spacing-xxl);
     }
 
     .article-header-image {
@@ -87,6 +86,20 @@
 
     .article-header-title {
       font-size: 24px;
+    }
+  }
+}
+
+/* Mobile */
+@media (width < 900px) {
+  .blog-article-template {
+    main > .section,
+    main > .section:first-child {
+      padding: 20px;
+    }
+
+    main p {
+      font-size: var(--body-font-size-m);
     }
   }
 }

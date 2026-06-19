@@ -1,7 +1,7 @@
 import { getConfig, getMetadata } from '../../scripts/ak.js';
 import { loadFragment } from '../fragment/fragment.js';
 import { setColorScheme } from '../section-metadata/section-metadata.js';
-
+import initSearch from '../search/search.js';
 const { locale } = getConfig();
 
 const HEADER_PATH = '/fragments/nav/header';
@@ -10,6 +10,17 @@ const HEADER_ACTIONS = [
   '/tools/widgets/language',
   '/tools/widgets/toggle',
 ];
+
+async function loadSearchAssets() {
+  const href = '/blocks/search/search.css';
+
+  if (!document.querySelector(`link[href="${href}"]`)) {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = href;
+    document.head.append(link);
+  }
+}
 
 function closeAllMenus() {
   const openMenus = document.body.querySelectorAll('header .is-open');
@@ -221,26 +232,50 @@ function decorateNavItem(li) {
     wrapper.append(inner);
     li.append(wrapper);
 
-    fetch('/docs/library/metadata/categories.json')
+    fetch('/blog/taxonomy.json')
       .then((response) => {
         if (!response.ok) throw new Error('Failed to fetch categories spreadsheet');
         return response.json();
       })
       .then((json) => {
-        const categories = json.data || [];
-        categories.forEach((row) => {
-          const item = document.createElement('li');
-          item.className = 'single-menu-item';
+      const sheetNames =
+        json[':names']
+        || Object.keys(json).filter((k) => json[k]?.data);
 
-          const a = document.createElement('a');
-          a.className = 'single-menu-link';
-          a.href = row.path;      
-          a.textContent = row.label; 
-          
-          item.append(a);
-          ul.append(item);
+      let rows = [];
+
+      if (sheetNames.length) {
+        sheetNames.forEach((sheet) => {
+          if (json[sheet]?.data) {
+            rows.push(...json[sheet].data);
+          }
         });
-      })
+      } else {
+        rows = json.data || [];
+      }
+        console.log('taxonomy rows', rows);
+        rows.forEach(async (row) => {
+        const category =
+        row.Category?.trim()
+        || row.category?.trim();
+
+        const slug =
+        row.Slug?.trim()
+        || row.slug?.trim();
+        if (!category || !slug) return;
+
+        const item = document.createElement('li');
+        item.className = 'single-menu-item';
+
+        const a = document.createElement('a');
+        a.className = 'single-menu-link';
+        a.href = `/blog/categories/${slug}`;
+        a.textContent = category;
+
+        item.append(a);
+        ul.append(item);
+      });
+    })
       .catch((err) => console.error('Error loading dynamic categories:', err));
   }
 
@@ -295,28 +330,21 @@ async function decorateActionSection(section) {
   section.classList.add('actions-section');
   const items = section.querySelectorAll('li');
 
-  items.forEach((item) => {
+  items.forEach(async (item) => {
     const text = item.textContent.trim().toLowerCase();
 
     if (text === 'search') {
+      await loadSearchAssets();
       item.textContent = '';
 
-      const wrapper = document.createElement('div');
-      wrapper.className = 'search-wrapper';
-
-      const icon = document.createElement('span');
-      icon.className = 'search-icon';
-
-      const input = document.createElement('input');
-      input.type = 'search';
-      input.placeholder = 'Search';
-      input.className = 'search-input';
-
-      wrapper.append(icon, input);
-      item.append(wrapper);
+      const searchBlock = document.createElement('div');
+      searchBlock.className = 'search';
+      item.append(searchBlock);
+      initSearch(searchBlock);
     }
   });
 }
+
 
 async function decorateHeader(fragment) {
   const sections = fragment.querySelectorAll(':scope > .section');
@@ -356,11 +384,11 @@ async function decorateHeader(fragment) {
     mainHeaderRow.append(navElement);
     
     // Extract and pin the search wrapper block to the right
-    const searchWrapper = sections[2].querySelector('.search-wrapper');
-    if (searchWrapper) {
+    const searchBlock = sections[2].querySelector('.search');
+    if (searchBlock) {
       const actionsDiv = document.createElement('div');
       actionsDiv.className = 'actions-wrapper-right';
-      actionsDiv.append(searchWrapper);
+      actionsDiv.append(searchBlock);
       mainHeaderRow.append(actionsDiv);
     }
 
