@@ -240,7 +240,7 @@ export default async function init(el) {
 
   const placeholder =
     el.querySelector('p')?.textContent?.trim()
-    || 'Search topics, titles, and authors';
+    || 'Search topics, titles and authors';
 
   el.innerHTML = '';
 
