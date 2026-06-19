@@ -1,3 +1,4 @@
+import './search.css';
 function slugify(name) {
   return name.toLowerCase().trim().replace(/&/g, '').replace(/\s+/g, '-').replace(/-+/g, '-');
 }
