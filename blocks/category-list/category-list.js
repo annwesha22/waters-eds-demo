@@ -148,6 +148,9 @@ export default async function init(block) {
   });
 
   block.innerHTML = `
+    <div class="category-header">
+      <h1>${categorySlug.replace(/-/g, ' ')}</h1>
+    </div>
 
     <div class="category-list-wrapper">
       ${articles.map(renderCard).join('')}
