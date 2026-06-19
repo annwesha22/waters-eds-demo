@@ -221,26 +221,32 @@ function decorateNavItem(li) {
     wrapper.append(inner);
     li.append(wrapper);
 
-    fetch('/docs/library/metadata/categories.json')
+    fetch('/blog/taxonomy.json')
       .then((response) => {
         if (!response.ok) throw new Error('Failed to fetch categories spreadsheet');
         return response.json();
       })
       .then((json) => {
-        const categories = json.data || [];
-        categories.forEach((row) => {
-          const item = document.createElement('li');
-          item.className = 'single-menu-item';
+      const rows = json.data || [];
 
-          const a = document.createElement('a');
-          a.className = 'single-menu-link';
-          a.href = row.path;      
-          a.textContent = row.label; 
-          
-          item.append(a);
-          ul.append(item);
-        });
-      })
+      rows.forEach((row) => {
+        const category = row.Category?.trim();
+        const slug = row.Slug?.trim();
+
+        if (!category || !slug) return;
+
+        const item = document.createElement('li');
+        item.className = 'single-menu-item';
+
+        const a = document.createElement('a');
+        a.className = 'single-menu-link';
+        a.href = `/blog/categories/${slug}`;
+        a.textContent = category;
+
+        item.append(a);
+        ul.append(item);
+      });
+    })
       .catch((err) => console.error('Error loading dynamic categories:', err));
   }
 
@@ -349,11 +355,11 @@ async function decorateHeader(fragment) {
     mainHeaderRow.append(navElement);
     
     // Extract and pin the search wrapper block to the right
-    const searchWrapper = sections[2].querySelector('.search-wrapper');
-    if (searchWrapper) {
+    const searchBlock = sections[2].querySelector('.search');
+    if (searchBlock) {
       const actionsDiv = document.createElement('div');
       actionsDiv.className = 'actions-wrapper-right';
-      actionsDiv.append(searchWrapper);
+      actionsDiv.append(searchBlock);
       mainHeaderRow.append(actionsDiv);
     }
 
@@ -395,14 +401,6 @@ async function decorateHeader(fragment) {
           node.remove();
         }
       });
-
-      const searchWrapper = sections[2].querySelector('.search');
-    if (searchWrapper) {
-      const actionsDiv = document.createElement('div');
-      actionsDiv.className = 'actions-wrapper-right';
-      actionsDiv.append(searchWrapper);
-      mainHeaderRow.append(actionsDiv);
-    }
     }
 
     // CRITICAL CORRECTION: Append the assembled rows to the DOM and clear old fragments

@@ -26,7 +26,12 @@ async function fetchTaxonomy() {
     }
 
     allRows.forEach((r) => {
-      const name = r.Tag || r.Name || r.Category;
+      const name =
+      r.Author
+      || r.Tag
+      || r.Category
+      || r.Name
+      || r.Title;
       const slug = r.Slug;
       if (name && slug) map[name.trim().toLowerCase()] = slug;
     });
@@ -64,68 +69,167 @@ function categoriesOf(item) {
   return [...new Set([...fromCategory, ...fromTags])];
 }
 
+function authorsOf(items) {
+  return [...new Set(
+    items
+      .map((item) => item.author?.trim())
+      .filter(Boolean),
+  )];
+}
+
+function buildSearchEntities(items, taxonomy) {
+  const entities = [];
+
+  // Categories
+  const categories = new Set();
+
+  items.forEach((item) => {
+    categoriesOf(item).forEach((category) => {
+      categories.add(category);
+    });
+  });
+
+  categories.forEach((category) => {
+    const slug = taxonomy[category.toLowerCase()]
+      || slugify(category);
+
+    entities.push({
+      type: 'category',
+      title: category,
+      path: `/blog/categories/${slug}`,
+    });
+  });
+
+  authorsOf(items).forEach((author) => {
+  const slug = taxonomy[author.toLowerCase()]
+    || slugify(author);
+
+    entities.push({
+      type: 'author',
+      title: author,
+      path: `/blog/author/${slug}`,
+    });
+  });
+
+  return entities;
+}
+
+
 function matchesQuery(item, query) {
-  const haystack = [
+  const q = query.toLowerCase();
+  return [
     item.title,
     item.description,
     item.author,
     item.category,
-    parseTags(item.tags).join(' '),
-  ].join(' ').toLowerCase();
-  return haystack.includes(query);
+    ...parseTags(item.tags),
+  ]
+    .filter(Boolean)
+    .some((value) => value.toLowerCase().includes(q));
 }
 
-// Decide the best destination for a submitted query.
 function resolveDestination(query, items, taxonomy) {
-  // 1. Category / tag match -> category landing page
-  const allCategories = new Set();
-  items.forEach((item) => categoriesOf(item).forEach((c) => allCategories.add(c)));
+  const q = query.toLowerCase().trim();
 
-  const categoryMatch = [...allCategories]
-    .find((c) => c.toLowerCase() === query)
-    || [...allCategories].find((c) => c.toLowerCase().includes(query));
-  if (categoryMatch) {
-    const slug = taxonomy[categoryMatch.toLowerCase()] || slugify(categoryMatch);
-    return `/blog/categories/${slug}`;
+  const entities = buildSearchEntities(items, taxonomy);
+
+  const exactEntity = entities.find(
+    (e) => e.title.toLowerCase() === q,
+  );
+
+  if (exactEntity) {
+    return exactEntity.path;
   }
 
-  // 2. Author match -> author landing page
-  const authors = items.map((item) => item.author).filter(Boolean);
-  const authorMatch = authors.find((a) => a.toLowerCase() === query)
-    || authors.find((a) => a.toLowerCase().includes(query));
-  if (authorMatch) {
-    return `/blog/author/${slugify(authorMatch)}`;
+  const exactArticle = items.find(
+    (item) => item.title.toLowerCase() === q,
+  );
+
+  if (exactArticle) {
+    return exactArticle.path;
+  }
+  const partialEntity = entities.find(
+    (e) => e.title.toLowerCase().includes(q),
+  );
+
+  if (partialEntity) {
+    return partialEntity.path;
   }
 
-  // 3. Fall back to first matching article
-  const article = items.find((item) => matchesQuery(item, query));
-  return article ? article.path : null;
+  const article = items.find(
+    (item) => matchesQuery(item, q),
+  );
+
+  return article?.path || null;
 }
 
-function renderResults(resultsEl, items, query) {
+function renderResults(resultsEl, items, query, taxonomy) {
   if (!query) {
     resultsEl.innerHTML = '';
     resultsEl.hidden = true;
     return;
   }
 
-  const matches = items.filter((item) => matchesQuery(item, query)).slice(0, 8);
+  const entities = buildSearchEntities(items, taxonomy);
 
-  if (!matches.length) {
+  const articleResults = items
+    .filter((item) => matchesQuery(item, query))
+    .slice(0, 5)
+    .map((item) => ({
+      type: 'article',
+      title: item.title,
+      category: categoriesOf(item)[0] || '',
+      author: item.author || '',
+      path: item.path,
+    }));
+
+  const entityResults = entities
+    .filter((entity) => entity.title.toLowerCase().includes(query))
+    .slice(0, 3);
+
+  const results = [...entityResults, ...articleResults].slice(0, 8);
+
+  if (!results.length) {
     resultsEl.innerHTML = '<p class="search-no-results">No results found</p>';
     resultsEl.hidden = false;
     return;
   }
 
-  resultsEl.innerHTML = matches.map((item) => {
-    const category = categoriesOf(item)[0] || '';
+  resultsEl.innerHTML = results.map((item) => {
+    if (item.type === 'author') {
+      return `
+        <a class="search-result" href="${item.path}">
+          <div class="search-result-content">
+            <span class="search-result-title">${item.title}</span>
+            <span class="search-result-meta">Author</span>
+          </div>
+        </a>
+      `;
+    }
+
+    if (item.type === 'category') {
+      return `
+        <a class="search-result" href="${item.path}">
+          <div class="search-result-content">
+            <span class="search-result-title">${item.title}</span>
+            <span class="search-result-meta">Category</span>
+          </div>
+        </a>
+      `;
+    }
+
     return `
       <a class="search-result" href="${item.path}">
-        <span class="search-result-title">${item.title}</span>
-        ${category ? `<span class="search-result-category">${category}</span>` : ''}
+        <div class="search-result-content">
+          <span class="search-result-title">${item.title}</span>
+          <span class="search-result-meta">
+            ${item.category || ''}${item.author ? ` • ${item.author}` : ''}
+          </span>
+        </div>
       </a>
     `;
   }).join('');
+
   resultsEl.hidden = false;
 }
 
@@ -165,8 +269,8 @@ export default function init(el) {
 
   const runSearch = async () => {
     const query = input.value.trim().toLowerCase();
-    const { items } = await ensureData();
-    renderResults(results, items, query);
+    const { items, taxonomy } = await ensureData();
+    renderResults(results, items, query, taxonomy);
   };
 
   const submit = async () => {
@@ -182,20 +286,16 @@ export default function init(el) {
     }
   };
 
-  // Preload data as soon as the user interacts
   input.addEventListener('focus', ensureData);
 
-  // Live dropdown as the user types
   input.addEventListener('input', runSearch);
 
-  // Click the search icon/button -> trigger the action
   btn.addEventListener('click', (e) => {
     e.preventDefault();
     e.stopPropagation();
     submit();
   });
 
-  // Enter key in the input -> trigger the action
   input.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
       e.preventDefault();
@@ -203,7 +303,6 @@ export default function init(el) {
     }
   });
 
-  // Hide results when clicking outside the block
   document.addEventListener('click', (e) => {
     if (!el.contains(e.target)) {
       results.hidden = true;
