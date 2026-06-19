@@ -1,4 +1,12 @@
-import './search.css';
+function loadSearchCSS() {
+  const href = `${new URL('./search.css', import.meta.url).pathname}`;
+  if (document.querySelector(`link[href="${href}"]`)) return;
+  const link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.href = href;
+  document.head.append(link);
+}
+
 function slugify(name) {
   return name.toLowerCase().trim().replace(/&/g, '').replace(/\s+/g, '-').replace(/-+/g, '-');
 }
@@ -222,7 +230,7 @@ function renderResults(resultsEl, items, query, taxonomy) {
     return `
       <a class="search-result" href="${item.path}">
         <div class="search-result-content">
-          <span class="search-result-title">${item.title}</span>
+        <span class="search-result-title">${item.title}</span>
           <span class="search-result-meta">
             ${item.category || ''}${item.author ? ` • ${item.author}` : ''}
           </span>
@@ -252,13 +260,12 @@ export default function init(el) {
   btn.setAttribute('aria-label', 'Search');
   btn.innerHTML = `<svg class="icon icon-search">
     <use href="/img/icons/search.svg#search"></use>
-  </svg>`;
+    </svg>`;
 
   const results = document.createElement('div');
   results.className = 'search-results';
   results.hidden = true;
 
-  // Lazy-load metadata + taxonomy once. Absolute paths => works on ANY page.
   let dataPromise = null;
   const ensureData = () => {
     if (!dataPromise) {
