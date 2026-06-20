@@ -33,7 +33,8 @@ async function fetchTaxonomy() {
     }
 
     allRows.forEach((r) => {
-      const name = r.Tag || r.Name || r.Category;
+      // Taxonomy sheet now uses "Category" + "Slug" columns
+      const name = r.Category || r.Tag || r.Name;
       const slug = r.Slug;
       if (name && slug) map[name.trim().toLowerCase()] = slug;
     });
@@ -68,8 +69,13 @@ export default async function init(el) {
   el.innerHTML = '';
 
   let post = null;
+  let taxonomy = {};
   try {
-    const posts = await fetchFeaturedPosts();
+    const [posts, taxonomyMap] = await Promise.all([
+      fetchFeaturedPosts(),
+      fetchTaxonomy(),
+    ]);
+    taxonomy = taxonomyMap;
     posts.sort((a, b) => (new Date(b.date) - new Date(a.date)));
     [post] = posts;
   } catch (e) {
@@ -84,6 +90,10 @@ export default async function init(el) {
     ? post.category.split(',')[0].trim().replace(/^"|"$/g, '')
     : '';
 
+  const categorySlug = firstCategory
+    ? (taxonomy[firstCategory.toLowerCase()] || slugify(firstCategory))
+    : '';
+
   el.innerHTML = `
     <div class="blog-hero-content">
       <h2 class="blog-hero-title">
@@ -93,7 +103,7 @@ export default async function init(el) {
       <div class="blog-hero-meta">
         <span class="blog-hero-date">${date}</span>
         ${post.author ? `<span class="blog-hero-divider">|</span><span class="blog-hero-author">By <a href="/blog/author/${authorSlug}">${post.author}</a></span>` : ''}
-        ${firstCategory ? `<span class="blog-hero-divider">|</span><a href="/blog/?category=${encodeURIComponent(firstCategory)}" class="blog-hero-tag">${firstCategory}</a>` : ''}
+        ${firstCategory ? `<span class="blog-hero-divider">|</span><a href="/blog/categories/${categorySlug}" class="blog-hero-tag">${firstCategory}</a>` : ''}
       </div>
       ${post.description ? `<p class="blog-hero-excerpt">${post.description}</p>` : ''}
       <p class="blog-hero-cta"><a href="${post.path}">Read More</a></p>
