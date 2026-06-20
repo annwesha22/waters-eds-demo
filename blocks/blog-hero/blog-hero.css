@@ -73,11 +73,13 @@
   }
 
   .blog-hero-image {
+    aspect-ratio: 3 / 2;
     flex: 1;
 
     img {
       width: 100%;
-      height: auto;
+      height: 100%;
+      display: block;
       border-radius: 4px;
       object-fit: cover;
     }

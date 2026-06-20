@@ -125,7 +125,16 @@ function renderCategoryCard(article) {
   return `
     <article class="category-card">
       <a class="category-card-image" href="${article.url}">
-        ${image ? `<img src="${image}" alt="${article.title}" loading="lazy">` : ''}
+      ${
+          image
+            ? `<img
+                src="${image}"
+                alt="${article.title}"
+                width="750"
+                height="500"
+                loading="lazy">`
+            : ''
+        }
       </a>
       <div class="category-card-content">
         <h2 class="category-card-title">

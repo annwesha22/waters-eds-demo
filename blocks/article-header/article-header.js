@@ -97,6 +97,6 @@
         </div>
         ${readTime ? `<div class="article-header-reading-time">Reading Time: ${readTime} minutes</div>` : ''}
       </div>
-      ${(image && !image.includes('default-meta-image')) ? `<div class="article-header-image"><img src="${image.split('?')[0]}?width=750&format=webply&optimize=medium" alt="${title}" /></div>` : ''}
+    ${(image && !image.includes('default-meta-image')) ? `<div class="article-header-image"><img src="${image.split('?')[0]}?width=750&format=webply&optimize=medium" alt="${title}" width="750" height="500" /></div>` : ''}
     `;
   }
