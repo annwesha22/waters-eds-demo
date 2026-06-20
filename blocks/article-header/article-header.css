@@ -3,7 +3,7 @@
   flex-direction: column;
   gap: var(--spacing-xl);
   background-color: #f7f7f7;
-  padding: 20%;
+  padding: 20px;
 
   .article-header-content {
     flex: 1;
