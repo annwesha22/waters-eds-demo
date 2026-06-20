@@ -54,12 +54,15 @@
 
   .article-header-image {
     flex: 1;
+    width: 100%;
+    max-width: 750px;
+    margin-inline: auto;
 
     img {
       width: 100%;
       height: auto;
       display: block;
-      object-fit: cover;
+      object-fit: contain;
     }
   }
 }

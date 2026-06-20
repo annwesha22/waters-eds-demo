@@ -66,6 +66,16 @@
     }
   }
 
+  // Preload an image and resolve its natural dimensions (for correct, crop-free sizing).
+  function getImageSize(src) {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => resolve({ width: img.naturalWidth, height: img.naturalHeight });
+      img.onerror = () => resolve(null);
+      img.src = src;
+    });
+  }
+
   export default async function init(el) {
     const [meta, taxonomy] = await Promise.all([
       fetchBulkMetadata(),
@@ -86,6 +96,14 @@
       ? (taxonomy[firstCategory.toLowerCase()] || slugify(firstCategory))
       : '';
 
+    let imageHtml = '';
+    if (image && !image.includes('default-meta-image')) {
+      const src = `${image.split('?')[0]}?width=750&format=webply&optimize=medium`;
+      const size = await getImageSize(src);
+      const dims = size ? `width="${size.width}" height="${size.height}"` : '';
+      imageHtml = `<div class="article-header-image"><img src="${src}" alt="${title}" ${dims} /></div>`;
+    }
+
     el.innerHTML = `
       <div class="article-header-content">
         <h1 class="article-header-title">${title}</h1>
@@ -97,6 +115,6 @@
         </div>
         ${readTime ? `<div class="article-header-reading-time">Reading Time: ${readTime} minutes</div>` : ''}
       </div>
-    ${(image && !image.includes('default-meta-image')) ? `<div class="article-header-image"><img src="${image.split('?')[0]}?width=750&format=webply&optimize=medium" alt="${title}" width="750" height="500" /></div>` : ''}
+      ${imageHtml}
     `;
   }
