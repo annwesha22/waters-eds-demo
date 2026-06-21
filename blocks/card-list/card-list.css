@@ -289,3 +289,258 @@
     line-height: 1.7;
   }
 }
+
+/* ============================================================
+   TAGS VARIATION
+   ============================================================ */
+.section.grid-2:has(.card-list.tags),
+.section:has(.card-list.tags) {
+  --grid-size: 1;
+  display: block;
+}
+
+.card-list.tags {
+  max-width: 1440px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* ============================================================
+   Layout
+   ============================================================ */
+.card-list.tags .tags-layout {
+  display: grid;
+  grid-template-columns: 320px minmax(0, 3fr);
+  gap: 48px;
+  align-items: start;
+}
+
+/* ============================================================
+   Page Header
+   ============================================================ */
+.card-list.tags .tags-header {
+  margin-bottom: 48px;
+}
+
+.card-list.tags .tags-header h1 {
+  margin: 0;
+  font-size: 42px;
+  line-height: 1.2;
+  font-weight: 300;
+  color: #333;
+  text-transform: capitalize;
+}
+
+/* ============================================================
+   Articles Column
+   ============================================================ */
+.card-list.tags .tags-results {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+/* ============================================================
+   Card
+   ============================================================ */
+.card-list.tags .tag-card {
+  display: grid;
+  grid-template-columns: 45% 55%;
+  background: #fff;
+  box-shadow: 0 6px 16px rgb(0 0 0 / 8%);
+  overflow: hidden;
+}
+
+.card-list.tags .tag-card-image {
+  position: relative;
+  min-height: 320px;
+}
+
+.card-list.tags .tag-card-image a {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.card-list.tags .tag-card-image img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+/* ============================================================
+   Content
+   ============================================================ */
+.card-list.tags .tag-card-content {
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.card-list.tags .tag-card-title {
+  margin: 0 0 16px;
+  font-size: 21px;
+  line-height: 1.45;
+  font-weight: 300;
+}
+
+.card-list.tags .tag-card-title a {
+  color: #006ba8;
+  text-decoration: none;
+}
+
+.card-list.tags .tag-card-title a:hover {
+  color: #008bbd;
+}
+
+/* ============================================================
+   Meta
+   ============================================================ */
+.card-list.tags .tag-card-meta {
+  margin-bottom: 20px;
+  font-size: 15px;
+  line-height: 1.7;
+  color: #555;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* ============================================================
+   Description
+   ============================================================ */
+.card-list.tags .tag-card-description {
+  margin: 0;
+  color: #444;
+  font-size: 18px;
+  line-height: 1.75;
+  font-weight: 300;
+}
+
+/* ============================================================
+   Sidebar  (matches renderTagsSidebar markup)
+   ============================================================ */
+.card-list.tags .tags-sidebar {
+  background: #eff2f4;
+  padding: 28px;
+}
+
+.card-list.tags .tags-sidebar h2 {
+  margin: 0 0 24px;
+  font-size: 22px;
+  font-weight: 300;
+  color: #333;
+  position: relative;
+}
+
+.card-list.tags .tags-sidebar h2::after {
+  content: "";
+  display: block;
+  width: 140px;
+  height: 4px;
+  margin-top: 16px;
+  background: #00a8b5;
+}
+
+.card-list.tags .tags-sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.card-list.tags .tags-sidebar li {
+  margin-bottom: 16px;
+}
+
+.card-list.tags .tags-sidebar a {
+  color: #006ba8;
+  font-size: 18px;
+  font-weight: 300;
+  text-decoration: none;
+}
+
+.card-list.tags .tags-sidebar a:hover {
+  text-decoration: underline;
+}
+
+.card-list.tags .tags-sidebar a.active {
+  font-weight: 500;
+}
+
+/* ============================================================
+   Empty State
+   ============================================================ */
+.card-list.tags .no-results {
+  text-align: center;
+  padding: 80px 0;
+}
+
+/* ============================================================
+   Tablet
+   ============================================================ */
+@media (max-width: 1024px) {
+  .card-list.tags .tags-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .card-list.tags .tags-sidebar {
+    order: -1;
+  }
+
+  .card-list.tags .tag-card {
+    grid-template-columns: 1fr;
+  }
+
+  .card-list.tags .tag-card-image {
+    min-height: 280px;
+  }
+
+  .card-list.tags .tag-card-content {
+    padding: 32px;
+  }
+}
+
+/* ============================================================
+   Mobile
+   ============================================================ */
+@media (max-width: 767px) {
+  .card-list.tags .tags-header h1 {
+    font-size: 34px;
+  }
+
+  .card-list.tags .tag-card {
+    display: block;
+  }
+
+  .card-list.tags .tag-card-image {
+    min-height: 220px;
+  }
+
+  .card-list.tags .tag-card-content {
+    padding: 24px;
+  }
+
+  .card-list.tags .tag-card-title {
+    font-size: 18px;
+  }
+
+  .card-list.tags .tag-card-meta {
+    font-size: 14px;
+    margin-bottom: 16px;
+  }
+
+  .card-list.tags .tag-card-description {
+    font-size: 16px;
+    line-height: 1.7;
+  }
+
+  .card-list.tags .tags-sidebar h2 {
+    font-size: 20px;
+  }
+
+  .card-list.tags .tags-sidebar a {
+    font-size: 16px;
+  }
+}

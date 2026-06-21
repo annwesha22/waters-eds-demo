@@ -198,6 +198,149 @@ async function renderCategory(block) {
 }
 
 /* ============================================================
+   TAGS variation
+   ============================================================ */
+function getTagSlug() {
+  const parts = window.location.pathname.split('/').filter(Boolean);
+  return parts[parts.length - 1];
+}
+
+function getTagsFromArticle(article) {
+  // metadata sheet stores tags under "article:tag"; fall back to tags/Tags
+  const tags = article['article:tag'] || article.tags || article.Tags || '';
+  return tags
+    .split(',')
+    .map((tag) => tag.trim().replace(/^"|"$/g, ''))
+    .filter(Boolean);
+}
+
+async function loadTagArticles(tagSlug) {
+  const resp = await fetch('/blog/metadata.json');
+  if (!resp.ok) return [];
+
+  const json = await resp.json();
+  const rows = json.data || [];
+
+  return rows
+    .filter((r) => r.URL && !r.URL.includes('*'))
+    .filter((article) => {
+      const tags = getTagsFromArticle(article).map((tag) => slugify(tag));
+      return tags.includes(tagSlug);
+    });
+}
+
+async function loadAllTags() {
+  const resp = await fetch('/blog/metadata.json');
+  if (!resp.ok) return [];
+
+  const json = await resp.json();
+  const rows = json.data || [];
+  const tagMap = new Map();
+
+  rows
+    .filter((r) => r.URL && !r.URL.includes('*'))
+    .forEach((article) => {
+      getTagsFromArticle(article).forEach((tag) => {
+        const slug = slugify(tag);
+        if (!tagMap.has(slug)) {
+          tagMap.set(slug, { name: tag, slug });
+        }
+      });
+    });
+
+  return [...tagMap.values()].sort((a, b) => a.name.localeCompare(b.name));
+}
+
+function renderTagCard(article) {
+  const image = article['og:image'] || article.image || '';
+  const date = article['publication-date'] || article.date || article.published;
+
+  return `
+    <article class="tag-card">
+      <a class="tag-card-image" href="${article.url}">
+        ${
+          image
+            ? `<img
+                src="${image}"
+                alt="${article.title}"
+                width="750"
+                height="500"
+                loading="lazy">`
+            : ''
+        }
+      </a>
+      <div class="tag-card-content">
+        <h2 class="tag-card-title">
+          <a href="${article.url}">${article.title}</a>
+        </h2>
+        <div class="tag-card-meta">
+          ${date ? `<span>${formatDate(date)}</span>` : ''}
+          ${article.author ? `<span>By ${article.author}</span>` : ''}
+        </div>
+        <p class="tag-card-description">${excerpt(article.description, 220, '...')}</p>
+      </div>
+    </article>
+  `;
+}
+
+function renderTagsSidebar(tags, currentTag) {
+  return `
+    <aside class="tags-sidebar">
+      <h2>Topics</h2>
+      <ul>
+        ${tags
+          .map(
+            (tag) => `
+              <li>
+                <a
+                  href="/blog/tags/${tag.slug}"
+                  class="${tag.slug === currentTag ? 'active' : ''}">
+                  ${tag.name}
+                </a>
+              </li>
+            `,
+          )
+          .join('')}
+      </ul>
+    </aside>
+  `;
+}
+
+async function renderTags(block) {
+  block.innerHTML = '';
+
+  const currentTag = getTagSlug();
+
+  const [articles, tags] = await Promise.all([
+    loadTagArticles(currentTag),
+    loadAllTags(),
+  ]);
+
+  articles.sort((a, b) => {
+    const da = new Date(a['publication-date'] || a.date || 0);
+    const db = new Date(b['publication-date'] || b.date || 0);
+    return db - da;
+  });
+
+block.innerHTML = `
+  <div class="tags-layout">
+    ${renderTagsSidebar(tags, currentTag)}
+    <div class="tags-results">
+      <div class="tags-header">
+        <h1>${currentTag.replace(/-/g, ' ')}</h1>
+      </div>
+      ${
+        articles.length
+          ? articles.map(renderTagCard).join('')
+          : '<p class="no-results">No articles found.</p>'
+      }
+    </div>
+  </div>
+`;
+
+}
+
+/* ============================================================
    Entry point — picks variation from the block's class list
    ============================================================ */
 export default async function init(block) {
@@ -205,6 +348,8 @@ export default async function init(block) {
     await renderAuthors(block);
   } else if (block.classList.contains('category')) {
     await renderCategory(block);
+  } else if (block.classList.contains('tags')) {
+    await renderTags(block);
   } else {
     // default fallback
     await renderCategory(block);
