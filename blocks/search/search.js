@@ -62,11 +62,13 @@ async function fetchSearchData() {
 }
 
 function categoriesOf(item) {
-  const fromCategory = item.category
+  return item.category
     ? item.category.split(',').map((c) => c.trim().replace(/^"|"$/g, '')).filter(Boolean)
     : [];
-  const fromTags = parseTags(item.tags);
-  return [...new Set([...fromCategory, ...fromTags])];
+}
+
+function tagsOf(item) {
+  return parseTags(item.tags);
 }
 
 function authorsOf(items) {
@@ -100,6 +102,24 @@ function buildSearchEntities(items, taxonomy) {
     });
   });
 
+  const tags = new Set();
+  items.forEach((item) => {
+    tagsOf(item).forEach((tag) => {
+      tags.add(tag);
+    });
+  });
+  tags.forEach((tag) => {
+    const slug = taxonomy[tag.toLowerCase()]
+      || slugify(tag);
+
+    entities.push({
+      type: 'tag',
+      title: tag,
+      path: `/blog/tags/${slug}`,
+    });
+  });
+
+  // Authors → /blog/author/*
   authorsOf(items).forEach((author) => {
   const slug = taxonomy[author.toLowerCase()]
     || slugify(author);
@@ -213,6 +233,17 @@ function renderResults(resultsEl, items, query, taxonomy) {
           <div class="search-result-content">
             <span class="search-result-title">${item.title}</span>
             <span class="search-result-meta">Category</span>
+          </div>
+        </a>
+      `;
+    }
+
+    if (item.type === 'tag') {
+      return `
+        <a class="search-result" href="${item.path}">
+          <div class="search-result-content">
+            <span class="search-result-title">${item.title}</span>
+            <span class="search-result-meta">Tag</span>
           </div>
         </a>
       `;
