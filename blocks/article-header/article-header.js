@@ -101,7 +101,7 @@
       const src = `${image.split('?')[0]}?width=750&format=webply&optimize=medium`;
       const size = await getImageSize(src);
       const dims = size ? `width="${size.width}" height="${size.height}"` : '';
-      imageHtml = `<div class="article-header-image"><img src="${src}" alt="${title}" ${dims} /></div>`;
+      imageHtml = `<div class="article-header-image"><img src="${src}" alt="${title}" ${dims} fetchpriority="high" loading="eager" /></div>`;
     }
 
     el.innerHTML = `
