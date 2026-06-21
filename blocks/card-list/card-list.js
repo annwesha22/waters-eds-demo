@@ -1,6 +1,3 @@
-/* ============================================================
-   Shared helpers
-   ============================================================ */
 const slugify = (value) => (value || '')
   .toLowerCase()
   .replace(/&/g, 'and')
@@ -29,7 +26,6 @@ function getCurrentSlug() {
   return parts[parts.length - 1];
 }
 
-// Real article rows only (skip wildcard/template rows like /blog/articles/**)
 async function fetchMetadataRows() {
   try {
     const resp = await fetch('/blog/metadata.json');
@@ -50,7 +46,6 @@ function getCategoriesFromArticle(article) {
 }
 
 function getTagsFromArticle(article) {
-  // metadata sheet stores tags under "article:tag"; fall back to tags/Tags
   const tags = article['article:tag'] || article.tags || article.Tags || '';
   return tags
     .split(',')
@@ -58,9 +53,6 @@ function getTagsFromArticle(article) {
     .filter(Boolean);
 }
 
-/* ============================================================
-   AUTHOR variation
-   ============================================================ */
 async function fetchAuthorsTaxonomy() {
   try {
     const resp = await fetch('/blog/taxonomy.json?sheet=authors');
@@ -140,17 +132,17 @@ async function renderAuthors(el) {
   el.innerHTML = `<div class="author-wrapper">${merged.map(renderAuthorCard).join('')}</div>`;
 }
 
-/* ============================================================
-   Shared ARCHIVE renderer (CATEGORY + TAGS)
-   ============================================================ */
 function renderArchiveCard(article) {
   const image = article['og:image'] || article.image || '';
   const date = article['publication-date'] || article.date || article.published;
+  const url = article.URL || article.url || '';
+  const author = (article.author || '').trim();
+  const authorSlug = author ? slugify(author) : '';
 
   return `
     <article class="archive-card">
       <div class="archive-card-image">
-        <a href="${article.url}">
+        <a href="${url}">
           ${
             image
               ? `<img
@@ -165,10 +157,10 @@ function renderArchiveCard(article) {
       </div>
       <div class="archive-card-content">
         <h2 class="archive-card-title">
-          <a href="${article.url}">${article.title}</a>
+          <a href="${url}">${article.title}</a>
         </h2>
         <div class="archive-card-meta">
-          ${article.author ? `<span class="author">By ${article.author}</span>` : ''}
+          ${author ? `<span class="author">By <a href="/blog/author/${authorSlug}">${author}</a></span>` : ''}
           ${date ? `<span class="separator">|</span><span>${formatDate(date)}</span>` : ''}
         </div>
         <p class="archive-card-description">${excerpt(article.description, 220)}</p>
@@ -231,7 +223,6 @@ function filterArticles(rows, type, currentSlug) {
     if (type === 'tags') {
       return getTagsFromArticle(article).map((t) => slugify(t)).includes(currentSlug);
     }
-    // category: match the category column OR tags (preserves prior behaviour)
     const values = [
       ...getCategoriesFromArticle(article),
       ...getTagsFromArticle(article),
@@ -273,9 +264,6 @@ async function renderArchive(block, type) {
   `;
 }
 
-/* ============================================================
-   Entry point — picks variation from the block's class list
-   ============================================================ */
 export default async function init(block) {
   if (block.classList.contains('author')) {
     await renderAuthors(block);
@@ -284,7 +272,6 @@ export default async function init(block) {
   } else if (block.classList.contains('category')) {
     await renderArchive(block, 'category');
   } else {
-    // default fallback
     await renderArchive(block, 'category');
   }
 }
