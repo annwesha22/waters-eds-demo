@@ -16,7 +16,6 @@
     return Math.max(1, Math.ceil(words / 200));
   }
 
-  // Build a map of { categoryName(lowercase): slug } from the taxonomy sheet.
   async function fetchTaxonomy() {
     const map = {};
     try {
@@ -33,7 +32,6 @@
       }
 
       allRows.forEach((r) => {
-        // Taxonomy sheet uses "Category" + "Slug" columns
         const name = r.Category || r.Tag || r.Name;
         const slug = r.Slug;
         if (name && slug) map[name.trim().toLowerCase()] = slug;
@@ -42,7 +40,6 @@
     return map;
   }
 
-  // Fetch the bulk metadata sheet and return the row matching the current page.
   async function fetchBulkMetadata() {
     try {
       const resp = await fetch('/blog/metadata.json');
@@ -51,7 +48,6 @@
       const rows = json.data || [];
       const { pathname } = window.location;
 
-      // Exact URL match first, then wildcard prefix (e.g. /blog/articles/**)
       const exact = rows.find((r) => r.URL && r.URL === pathname);
       if (exact) return exact;
 
@@ -66,7 +62,6 @@
     }
   }
 
-  // Preload an image and resolve its natural dimensions (for correct, crop-free sizing).
   function getImageSize(src) {
     return new Promise((resolve) => {
       const img = new Image();
@@ -91,7 +86,6 @@
     const readTime = estimateReadingTime();
     const authorSlug = author ? author.toLowerCase().replace(/\s+/g, '-') : '';
     const firstCategory = category ? category.split(',')[0].trim().replace(/^"|"$/g, '') : '';
-
     const categorySlug = firstCategory
       ? (taxonomy[firstCategory.toLowerCase()] || slugify(firstCategory))
       : '';

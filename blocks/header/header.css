@@ -1,6 +1,3 @@
-/* ==========================================================================
-   1. BASE SYSTEM & MOBILE LAYOUT (DEFAULT)
-   ========================================================================== */
 header {
   --logo-width: 40px;
   --logo-height: 32px;
@@ -40,7 +37,6 @@ header {
     margin-block: 6px;
   }
 
-  /* Core structural default layout */
   .header-content {
     display: grid;
     grid-template-areas:
@@ -272,17 +268,14 @@ header {
   transform: rotate(-135deg);
 }
 
-/* ==========================================================================
-   2. DROPDOWN SUBMENU PANELS
-   ========================================================================== */
 .single-menu {
   display: none;
   position: absolute !important;
-  top: 100%; 
-  left: 0;   
+  top: 100%;
+  left: 0;
   margin-top: 0;
-  min-width: 200px; 
-  width: max-content; 
+  min-width: 200px;
+  width: max-content;
   background: #ffffff;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   border-radius: 4px;
@@ -291,7 +284,7 @@ header {
 
 .single-menu-inner {
   width: 100%;
-  padding: 12px 16px; 
+  padding: 12px 16px;
   box-sizing: border-box;
 }
 
@@ -304,7 +297,7 @@ header {
 
 .single-menu-link {
   display: block;
-  padding: 8px 12px; 
+  padding: 8px 12px;
   color: #333333;
   text-align: left;
   font-size: 14px;
@@ -315,7 +308,7 @@ header {
 
 .single-menu-link:hover {
   background: #f5f5f5;
-  color: #007799; 
+  color: #007799;
 }
 
 .main-nav-item.is-open .single-menu {
@@ -327,14 +320,9 @@ header {
   z-index: 1001;
 }
 
-
-/* ==========================================================================
-   3. DESKTOP MEDIA QUERY (FLUID ROW)
-   ========================================================================== */
 @media (width >= 900px) {
   main {
-    /* Header (80px) + Utility bar (36px) = 116px total header stack height */
-    padding-top: 116px !important; 
+    padding-top: 116px !important;
     box-sizing: border-box;
   }
   header {
@@ -356,7 +344,6 @@ header {
       grid-template-rows: none !important;
     }
 
-    /* 1. Top Utility Strip Alignment */
     .top-utility-section {
       display: flex !important;
       justify-content: flex-end;
@@ -368,7 +355,7 @@ header {
       border-bottom: 1px solid #e5e5e5;
       font-size: 13px;
       color: #666666;
-      overflow: visible !important; /* Permits dropdown container to reveal over edge boundaries */
+      overflow: visible !important;
 
       .default-content {
         width: 100%;
@@ -386,29 +373,27 @@ header {
         padding: 0;
         list-style: none;
       }
-      
+
       li {
         display: flex;
         align-items: center;
         height: 100%;
         margin: 0;
-        position: relative; /* Fixed reference anchor coordinates for dropdown panel positioning */
+        position: relative;
       }
-      
+
       a {
         color: #555555;
         text-decoration: none;
       }
 
-      /* Base layout utility action item class tracking matching header.js */
       .utility-action-item {
-        position: relative; 
+        position: relative;
         display: flex;
         align-items: center;
         height: 100%;
       }
 
-      /* Target the action container component explicitly */
       .action-wrapper.globe,
       .action-wrapper.language {
         display: flex;
@@ -424,7 +409,7 @@ header {
           border: none !important;
           padding: 0 !important;
           cursor: pointer !important;
-          width: auto !important; /* Resets structural button width limitations */
+          width: auto !important;
           height: 100% !important;
 
           .icon {
@@ -435,7 +420,7 @@ header {
           }
 
           .text {
-            display: inline-block !important; /* Reveals language text inline right next to icon view */
+            display: inline-block !important;
             width: auto !important;
             height: auto !important;
             overflow: visible !important;
@@ -447,7 +432,6 @@ header {
         }
       }
 
-      /* Drop-down menu overlay card styles absolute layout */
       .language.menu {
         position: absolute !important;
         top: 100%;
@@ -459,8 +443,8 @@ header {
         padding: 12px 0;
         z-index: 1010;
         min-width: 160px;
-        display: none; /* Hidden by default */
-        
+        display: none;
+
         .language-menu-list {
           display: flex !important;
           flex-direction: column !important;
@@ -499,7 +483,6 @@ header {
         }
       }
 
-      /* Clear and explicit target selector block matching your script changes */
       .utility-action-item.is-open .language.menu {
         display: block !important;
       }
@@ -581,55 +564,12 @@ header {
       margin-left: auto;
       flex-shrink: 0;
     }
-
-    .search-wrapper {
-      position: relative;
-      display: flex;
-      align-items: center;
-      margin: 0;
-    }
-
-    .search-input {
-      width: 280px;
-      height: 42px;
-      padding: 0 44px 0 16px !important;
-      border-radius: 4px !important;
-      font-size: 14px;
-      color: #333333;
-      background-color: #ffffff;
-      box-sizing: border-box;
-    }
-
-    .search-icon {
-      position: absolute;
-      left: auto !important;
-      right: 14px !important;
-      top: 50%;
-      transform: translateY(-50%);
-      display: block;
-      cursor: pointer;
-      pointer-events: auto !important;
-      transition: transform 0.1s ease;
-      
-      &::before {
-        content: "🔍";
-        font-size: 16px;
-      }
-
-      &:active {
-        transform: translateY(-50%) scale(0.9);
-      }
-    }
   }
 }
 
-/* ==========================================================================
-   4. MOBILE RESPONSIVE OVERRIDES
-   ========================================================================== */
 @media (width < 900px) {
   main {
-    /* Adjust this to match your mobile header height if needed */
-    padding-top: 64px; 
+    padding-top: 64px;
     box-sizing: border-box;
   }
   header .header-content {
@@ -640,16 +580,6 @@ header {
     border: none;
     min-width: 0;
     padding: 0;
-  }
-}
-
-@media (width >= 900px) {
-  header {
-    .actions-section {
-      .search {
-        width: 280px;
-      }
-    }
   }
 }
 
@@ -665,9 +595,9 @@ header .search .search-wrapper {
   width: 100%;
   height: 44px;
   background: #fff;
-  border: 1px rgb(249, 77, 77)d #d5d5d5;
+  border: 1px solid #d5d5d5;
   overflow: hidden;
-  transition: border-color .15s ease;
+  transition: border-color 0.15s ease;
 }
 
 header .search .search-wrapper:focus-within {
@@ -715,24 +645,16 @@ header .search .search-btn:hover {
   color: #00778b;
 }
 
-/* ============================================
-   Results Dropdown
-   ============================================ */
-
 header .search .search-results {
   position: absolute;
   top: calc(100% + 8px);
   left: 0;
   right: 0;
   z-index: 2000;
-
   background: #fff;
   border: 1px solid #e5e5e5;
   border-radius: 8px;
-
-  box-shadow:
-    0 6px 20px rgb(0 0 0 / 10%);
-
+  box-shadow: 0 6px 20px rgb(0 0 0 / 10%);
   max-height: 420px;
   overflow-y: auto;
 }
@@ -747,6 +669,7 @@ header .search .search-result {
   text-decoration: none;
   color: inherit;
   border-bottom: 1px solid #f2f2f2;
+  transition: background-color 0.15s ease;
 }
 
 header .search .search-result:last-child {
@@ -783,28 +706,8 @@ header .search .search-no-results {
   color: #666;
 }
 
-/* Desktop */
-
-@media (width >= 900px) {
-  header .actions-wrapper-right {
-    display: flex;
-    align-items: center;
-  }
-
-  header .search {
-    width: 320px;
-  }
-}
-
-/* Mobile */
-
 @media (width < 900px) {
   header .search {
     width: 100%;
-  }
-
-  header .search .search-results {
-    left: 0;
-    right: 0;
   }
 }

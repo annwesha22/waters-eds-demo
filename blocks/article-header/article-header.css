@@ -91,10 +91,7 @@
       font-size: 24px;
     }
   }
-}
 
-/* Mobile */
-@media (width < 900px) {
   .blog-article-template {
     main > .section,
     main > .section:first-child {
