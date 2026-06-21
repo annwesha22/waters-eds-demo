@@ -42,14 +42,14 @@ function renderMeta(article, authorMap) {
 
   const parts = [];
   if (author) {
-    parts.push(`<span class="posted-by">By <a href="/blog/author/${authorSlug}"><span class="meta-label">${author}</span></a></span>`);
+    parts.push(`<span class="author">By <a href="/blog/author/${authorSlug}">${author}</a></span>`);
   }
   if (date) {
-    parts.push(`<span class="posted-on"><time class="entry-date published">${formatDate(date)}</time></span>`);
+    parts.push(`<span class="separator">|</span><span class="date">${formatDate(date)}</span>`);
   }
-  parts.push(`<span class="kt-reading-time-wrap"><span class="kt-reading-time"><span class="kt-reading-time-label">Reading Time:</span> ${mins} <span class="kt-reading-time-postfix">minutes</span></span></span>`);
+  parts.push(`<span class="separator">|</span><span class="reading-time">Reading Time: ${mins} minutes</span>`);
 
-  return `<div class="entry-meta entry-meta-divider-vline">${parts.join('')}</div>`;
+  return `<div class="archive-card-meta">${parts.join('')}</div>`;
 }
 
 function getCurrentSlug() {
