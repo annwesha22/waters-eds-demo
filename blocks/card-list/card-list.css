@@ -99,9 +99,6 @@
   }
 }
 
-/* ============================================================
-   CATEGORY + TAGS ARCHIVE LAYOUT
-   ============================================================ */
 .section.grid-2:has(.card-list.category),
 .section:has(.card-list.category),
 .section.grid-2:has(.card-list.tags),
@@ -117,9 +114,6 @@
   margin-inline: auto;
 }
 
-/* ============================================================
-   Layout
-   ============================================================ */
 .archive-layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 260px;
@@ -144,9 +138,6 @@
   color: #333;
 }
 
-/* ============================================================
-   Cards
-   ============================================================ */
 .archive-card {
   display: grid;
   grid-template-columns: 45% 55%;
@@ -176,9 +167,6 @@
   padding: 36px;
 }
 
-/* ============================================================
-   Title
-   ============================================================ */
 .archive-card-title {
   margin: 0 0 14px;
   font-size: 21px;
@@ -195,9 +183,6 @@
   color: #008bc2;
 }
 
-/* ============================================================
-   Meta
-   ============================================================ */
 .archive-card-meta {
   margin-bottom: 18px;
   font-size: 14px;
@@ -218,9 +203,6 @@
   display: inline;
 }
 
-/* ============================================================
-   Description
-   ============================================================ */
 .archive-card-description {
   margin: 0;
   font-size: 16px;
@@ -228,9 +210,6 @@
   color: #444;
 }
 
-/* ============================================================
-   Sidebar
-   ============================================================ */
 .archive-sidebar {
   background: #eff2f4;
   padding: 20px;
@@ -256,9 +235,6 @@
   margin-top: 12px;
 }
 
-/* ============================================================
-   Category Links
-   ============================================================ */
 .sidebar-links {
   list-style: none;
   padding: 0;
@@ -283,9 +259,6 @@
   font-weight: 500;
 }
 
-/* ============================================================
-   Topic Links
-   ============================================================ */
 .topic-links {
   display: flex;
   flex-wrap: wrap;
@@ -306,9 +279,6 @@
   font-weight: 500;
 }
 
-/* ============================================================
-   Empty State
-   ============================================================ */
 .card-list.category .no-results,
 .card-list.tags .no-results {
   text-align: center;
@@ -320,9 +290,6 @@
   margin: 0;
 }
 
-/* ============================================================
-   Tablet
-   ============================================================ */
 @media (max-width: 1024px) {
   .archive-layout {
     grid-template-columns: 1fr;
@@ -333,9 +300,6 @@
   }
 }
 
-/* ============================================================
-   Mobile
-   ============================================================ */
 @media (max-width: 767px) {
   .archive-header h1 {
     font-size: 32px;
@@ -360,4 +324,42 @@
   .archive-card-description {
     font-size: 15px;
   }
+}
+
+.card-list .entry-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 16px;
+  font-size: var(--body-font-size-s);
+  color: #666;
+}
+
+.card-list .entry-meta-divider-vline > span + span::before {
+  content: "|";
+  margin-right: 10px;
+  color: #ccc;
+}
+
+.card-list .entry-meta .posted-by a {
+  color: #00a7b5;
+  text-decoration: none;
+}
+
+.card-list .entry-meta .posted-by a:hover {
+  text-decoration: underline;
+}
+
+.card-list .entry-meta .meta-label {
+  color: #00a7b5;
+}
+
+.card-list .entry-meta .posted-on,
+.card-list .entry-meta .kt-reading-time-wrap {
+  color: #666;
+}
+
+.card-list .entry-meta time.updated {
+  display: none;
 }
