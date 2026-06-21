@@ -1,11 +1,3 @@
-function parseTags(raw) {
-  if (!raw) return [];
-  if (Array.isArray(raw)) return raw;
-  if (typeof raw !== 'string') return [String(raw)];
-  try { return JSON.parse(raw); } catch { /* not JSON */ }
-  return raw.replace(/^"|"$/g, '').split(',').map((t) => t.trim()).filter(Boolean);
-}
-
 function formatDate(value) {
   if (!value) return '';
   const date = typeof value === 'number' ? new Date(value * 1000) : new Date(value);
@@ -18,10 +10,11 @@ function slugify(name) {
 }
 
 async function fetchTaxonomy() {
-  const map = {};
+  const categoryMap = {};
+  const authorMap = {};
   try {
     const resp = await fetch('/blog/taxonomy.json');
-    if (!resp.ok) return map;
+    if (!resp.ok) return { categoryMap, authorMap };
     const json = await resp.json();
 
     const sheetNames = json[':names'] || Object.keys(json).filter((k) => json[k] && json[k].data);
@@ -33,13 +26,14 @@ async function fetchTaxonomy() {
     }
 
     allRows.forEach((r) => {
-      // Taxonomy sheet now uses "Category" + "Slug" columns
-      const name = r.Category || r.Tag || r.Name;
       const slug = r.Slug;
-      if (name && slug) map[name.trim().toLowerCase()] = slug;
+      if (!slug) return;
+      if (r.Author) authorMap[r.Author.trim().toLowerCase()] = slug;
+      const category = r.Category || r.Tag || r.Name;
+      if (category) categoryMap[category.trim().toLowerCase()] = slug;
     });
   } catch { /* ignore */ }
-  return map;
+  return { categoryMap, authorMap };
 }
 
 async function fetchFeaturedPosts() {
@@ -69,13 +63,15 @@ export default async function init(el) {
   el.innerHTML = '';
 
   let post = null;
-  let taxonomy = {};
+  let categoryMap = {};
+  let authorMap = {};
   try {
-    const [posts, taxonomyMap] = await Promise.all([
+    const [posts, taxonomy] = await Promise.all([
       fetchFeaturedPosts(),
       fetchTaxonomy(),
     ]);
-    taxonomy = taxonomyMap;
+    categoryMap = taxonomy.categoryMap;
+    authorMap = taxonomy.authorMap;
     posts.sort((a, b) => (new Date(b.date) - new Date(a.date)));
     [post] = posts;
   } catch (e) {
@@ -85,13 +81,16 @@ export default async function init(el) {
   if (!post) return;
 
   const date = formatDate(post.date);
-  const authorSlug = post.author ? post.author.toLowerCase().replace(/\s+/g, '-') : '';
+
+  const authorSlug = post.author
+    ? (authorMap[post.author.trim().toLowerCase()] || slugify(post.author))
+    : '';
+
   const firstCategory = post.category
     ? post.category.split(',')[0].trim().replace(/^"|"$/g, '')
     : '';
-
   const categorySlug = firstCategory
-    ? (taxonomy[firstCategory.toLowerCase()] || slugify(firstCategory))
+    ? (categoryMap[firstCategory.toLowerCase()] || slugify(firstCategory))
     : '';
 
   el.innerHTML = `
@@ -109,7 +108,7 @@ export default async function init(el) {
       <p class="blog-hero-cta"><a href="${post.path}">Read More</a></p>
     </div>
     <div class="blog-hero-image">
-      ${(post.image && !post.image.includes('default-meta-image')) ? `<img src="${post.image.split('?')[0]}?width=750&format=webply&optimize=medium" alt="${post.title}" width="750" height="500" fetchpriority="high" loading="eager"  />` : ''}
+      ${(post.image && !post.image.includes('default-meta-image')) ? `<img src="${post.image.split('?')[0]}?width=750&format=webply&optimize=medium" alt="${post.title}" width="750" height="500" fetchpriority="high" loading="eager" />` : ''}
     </div>
   `;
 }

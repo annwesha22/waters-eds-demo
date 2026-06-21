@@ -17,10 +17,11 @@
   }
 
   async function fetchTaxonomy() {
-    const map = {};
+    const categoryMap = {};
+    const authorMap = {};
     try {
       const resp = await fetch('/blog/taxonomy.json');
-      if (!resp.ok) return map;
+      if (!resp.ok) return { categoryMap, authorMap };
       const json = await resp.json();
 
       const sheetNames = json[':names'] || Object.keys(json).filter((k) => json[k] && json[k].data);
@@ -32,12 +33,17 @@
       }
 
       allRows.forEach((r) => {
-        const name = r.Category || r.Tag || r.Name;
         const slug = r.Slug;
-        if (name && slug) map[name.trim().toLowerCase()] = slug;
+        if (!slug) return;
+
+        const author = r.Author;
+        if (author) authorMap[author.trim().toLowerCase()] = slug;
+
+        const category = r.Category || r.Tag || r.Name;
+        if (category) categoryMap[category.trim().toLowerCase()] = slug;
       });
     } catch { /* ignore */ }
-    return map;
+    return { categoryMap, authorMap };
   }
 
   async function fetchBulkMetadata() {
@@ -72,7 +78,7 @@
   }
 
   export default async function init(el) {
-    const [meta, taxonomy] = await Promise.all([
+    const [meta, { categoryMap, authorMap }] = await Promise.all([
       fetchBulkMetadata(),
       fetchTaxonomy(),
     ]);
@@ -84,10 +90,14 @@
     const category = meta.category || '';
 
     const readTime = estimateReadingTime();
-    const authorSlug = author ? author.toLowerCase().replace(/\s+/g, '-') : '';
+
+    const authorSlug = author
+      ? (authorMap[author.trim().toLowerCase()] || slugify(author))
+      : '';
+
     const firstCategory = category ? category.split(',')[0].trim().replace(/^"|"$/g, '') : '';
     const categorySlug = firstCategory
-      ? (taxonomy[firstCategory.toLowerCase()] || slugify(firstCategory))
+      ? (categoryMap[firstCategory.toLowerCase()] || slugify(firstCategory))
       : '';
 
     let imageHtml = '';

@@ -21,6 +21,37 @@ function formatDate(dateString) {
   });
 }
 
+function readingTime(article) {
+  const explicit = parseInt(article['reading-time'] || article.readingTime || '', 10);
+  if (!Number.isNaN(explicit) && explicit > 0) return explicit;
+  const text = `${article.title || ''} ${article.description || ''}`;
+  const words = text.trim().split(/\s+/).filter(Boolean).length;
+  return Math.max(1, Math.ceil(words / 200));
+}
+
+function authorSlugOf(name, authorMap) {
+  if (!name) return '';
+  return authorMap[name.trim().toLowerCase()] || slugify(name);
+}
+
+function renderMeta(article, authorMap) {
+  const author = (article.author || '').trim();
+  const authorSlug = authorSlugOf(author, authorMap);
+  const date = article['publication-date'] || article.date || article.published;
+  const mins = readingTime(article);
+
+  const parts = [];
+  if (author) {
+    parts.push(`<span class="posted-by">By <a href="/blog/author/${authorSlug}"><span class="meta-label">${author}</span></a></span>`);
+  }
+  if (date) {
+    parts.push(`<span class="posted-on"><time class="entry-date published">${formatDate(date)}</time></span>`);
+  }
+  parts.push(`<span class="kt-reading-time-wrap"><span class="kt-reading-time"><span class="kt-reading-time-label">Reading Time:</span> ${mins} <span class="kt-reading-time-postfix">minutes</span></span></span>`);
+
+  return `<div class="entry-meta entry-meta-divider-vline">${parts.join('')}</div>`;
+}
+
 function getCurrentSlug() {
   const parts = window.location.pathname.split('/').filter(Boolean);
   return parts[parts.length - 1];
@@ -35,6 +66,33 @@ async function fetchMetadataRows() {
   } catch {
     return [];
   }
+}
+
+async function fetchTaxonomy() {
+  const categoryMap = {};
+  const authorMap = {};
+  try {
+    const resp = await fetch('/blog/taxonomy.json');
+    if (!resp.ok) return { categoryMap, authorMap };
+    const json = await resp.json();
+
+    const sheetNames = json[':names'] || Object.keys(json).filter((k) => json[k] && json[k].data);
+    const allRows = [];
+    if (sheetNames.length) {
+      sheetNames.forEach((s) => { if (json[s] && json[s].data) allRows.push(...json[s].data); });
+    } else if (json.data) {
+      allRows.push(...json.data);
+    }
+
+    allRows.forEach((r) => {
+      const slug = r.Slug;
+      if (!slug) return;
+      if (r.Author) authorMap[r.Author.trim().toLowerCase()] = slug;
+      const category = r.Category || r.Tag || r.Name;
+      if (category) categoryMap[category.trim().toLowerCase()] = slug;
+    });
+  } catch { /* ignore */ }
+  return { categoryMap, authorMap };
 }
 
 function getCategoriesFromArticle(article) {
@@ -61,7 +119,7 @@ async function fetchAuthorsTaxonomy() {
     const rows = json.data || (json.authors && json.authors.data) || [];
     const map = {};
     rows.forEach((r) => {
-      const name = r.Name || r.name;
+      const name = r.Author || r.Name || r.name;
       const slug = r.Slug || r.slug || slugify(name);
       if (!name) return;
       map[slug] = {
@@ -77,7 +135,7 @@ async function fetchAuthorsTaxonomy() {
   }
 }
 
-async function fetchAuthorsFromMetadata() {
+async function fetchAuthorsFromMetadata(authorMap) {
   const rows = await fetchMetadataRows();
   const seen = new Map();
   rows.forEach((row) => {
@@ -86,7 +144,7 @@ async function fetchAuthorsFromMetadata() {
     const image = row['og:image'] || row['og-image'] || row.image || '';
     seen.set(name, {
       name,
-      slug: slugify(name),
+      slug: authorSlugOf(name, authorMap),
       image: (image && !image.includes('default-meta-image')) ? image : '',
       bio: row.description || '',
     });
@@ -113,9 +171,10 @@ function renderAuthorCard(a) {
 async function renderAuthors(el) {
   el.innerHTML = '';
 
+  const { authorMap } = await fetchTaxonomy();
   const [taxonomy, metaAuthors] = await Promise.all([
     fetchAuthorsTaxonomy(),
-    fetchAuthorsFromMetadata(),
+    fetchAuthorsFromMetadata(authorMap),
   ]);
 
   const merged = metaAuthors.map((m) => {
@@ -132,12 +191,9 @@ async function renderAuthors(el) {
   el.innerHTML = `<div class="author-wrapper">${merged.map(renderAuthorCard).join('')}</div>`;
 }
 
-function renderArchiveCard(article) {
+function renderArchiveCard(article, authorMap) {
   const image = article['og:image'] || article.image || '';
-  const date = article['publication-date'] || article.date || article.published;
   const url = article.URL || article.url || '';
-  const author = (article.author || '').trim();
-  const authorSlug = author ? slugify(author) : '';
 
   return `
     <article class="archive-card">
@@ -159,10 +215,7 @@ function renderArchiveCard(article) {
         <h2 class="archive-card-title">
           <a href="${url}">${article.title}</a>
         </h2>
-        <div class="archive-card-meta">
-          ${author ? `<span class="author">By <a href="/blog/author/${authorSlug}">${author}</a></span>` : ''}
-          ${date ? `<span class="separator">|</span><span>${formatDate(date)}</span>` : ''}
-        </div>
+        ${renderMeta(article, authorMap)}
         <p class="archive-card-description">${excerpt(article.description, 220)}</p>
       </div>
     </article>
@@ -235,7 +288,10 @@ async function renderArchive(block, type) {
   block.innerHTML = '';
 
   const currentSlug = getCurrentSlug();
-  const rows = await fetchMetadataRows();
+  const [rows, { authorMap }] = await Promise.all([
+    fetchMetadataRows(),
+    fetchTaxonomy(),
+  ]);
 
   const categories = collectCategories(rows);
   const topics = collectTags(rows);
@@ -255,7 +311,7 @@ async function renderArchive(block, type) {
         </div>
         ${
           articles.length
-            ? articles.map(renderArchiveCard).join('')
+            ? articles.map((a) => renderArchiveCard(a, authorMap)).join('')
             : '<p class="no-results">No articles found.</p>'
         }
       </div>
