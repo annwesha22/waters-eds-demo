@@ -24,6 +24,40 @@ function formatDate(dateString) {
   });
 }
 
+function getCurrentSlug() {
+  const parts = window.location.pathname.split('/').filter(Boolean);
+  return parts[parts.length - 1];
+}
+
+// Real article rows only (skip wildcard/template rows like /blog/articles/**)
+async function fetchMetadataRows() {
+  try {
+    const resp = await fetch('/blog/metadata.json');
+    if (!resp.ok) return [];
+    const json = await resp.json();
+    return (json.data || []).filter((r) => r.URL && !r.URL.includes('*'));
+  } catch {
+    return [];
+  }
+}
+
+function getCategoriesFromArticle(article) {
+  const category = article.category || article.Category || '';
+  return category
+    .split(',')
+    .map((c) => c.trim().replace(/^"|"$/g, ''))
+    .filter(Boolean);
+}
+
+function getTagsFromArticle(article) {
+  // metadata sheet stores tags under "article:tag"; fall back to tags/Tags
+  const tags = article['article:tag'] || article.tags || article.Tags || '';
+  return tags
+    .split(',')
+    .map((tag) => tag.trim().replace(/^"|"$/g, ''))
+    .filter(Boolean);
+}
+
 /* ============================================================
    AUTHOR variation
    ============================================================ */
@@ -52,29 +86,20 @@ async function fetchAuthorsTaxonomy() {
 }
 
 async function fetchAuthorsFromMetadata() {
-  try {
-    const resp = await fetch('/blog/metadata.json');
-    if (!resp.ok) return [];
-    const json = await resp.json();
-    const rows = json.data || [];
-    const seen = new Map();
-    rows
-      .filter((r) => r.URL && !r.URL.includes('*'))
-      .forEach((row) => {
-        const name = (row.author || '').trim();
-        if (!name || seen.has(name)) return;
-        const image = row['og:image'] || row['og-image'] || row.image || '';
-        seen.set(name, {
-          name,
-          slug: slugify(name),
-          image: (image && !image.includes('default-meta-image')) ? image : '',
-          bio: row.description || '',
-        });
-      });
-    return [...seen.values()];
-  } catch {
-    return [];
-  }
+  const rows = await fetchMetadataRows();
+  const seen = new Map();
+  rows.forEach((row) => {
+    const name = (row.author || '').trim();
+    if (!name || seen.has(name)) return;
+    const image = row['og:image'] || row['og-image'] || row.image || '';
+    seen.set(name, {
+      name,
+      slug: slugify(name),
+      image: (image && !image.includes('default-meta-image')) ? image : '',
+      bio: row.description || '',
+    });
+  });
+  return [...seen.values()];
 }
 
 function renderAuthorCard(a) {
@@ -116,70 +141,114 @@ async function renderAuthors(el) {
 }
 
 /* ============================================================
-   CATEGORY variation
+   Shared ARCHIVE renderer (CATEGORY + TAGS)
    ============================================================ */
-function renderCategoryCard(article) {
+function renderArchiveCard(article) {
   const image = article['og:image'] || article.image || '';
   const date = article['publication-date'] || article.date || article.published;
 
   return `
-    <article class="category-card">
-      <a class="category-card-image" href="${article.url}">
-      ${
-          image
-            ? `<img
-                src="${image}"
-                alt="${article.title}"
-                width="750"
-                height="500"
-                loading="lazy">`
-            : ''
-        }
-      </a>
-      <div class="category-card-content">
-        <h2 class="category-card-title">
+    <article class="archive-card">
+      <div class="archive-card-image">
+        <a href="${article.url}">
+          ${
+            image
+              ? `<img
+                  src="${image}"
+                  alt="${article.title}"
+                  width="750"
+                  height="500"
+                  loading="lazy">`
+              : ''
+          }
+        </a>
+      </div>
+      <div class="archive-card-content">
+        <h2 class="archive-card-title">
           <a href="${article.url}">${article.title}</a>
         </h2>
-        <div class="category-card-meta">
-          ${article.author ? `<span>By ${article.author}</span>` : ''}
-          ${date ? `<span>${formatDate(date)}</span>` : ''}
+        <div class="archive-card-meta">
+          ${article.author ? `<span class="author">By ${article.author}</span>` : ''}
+          ${date ? `<span class="separator">|</span><span>${formatDate(date)}</span>` : ''}
         </div>
-        <p class="category-card-description">${excerpt(article.description, 220, '...')}</p>
+        <p class="archive-card-description">${excerpt(article.description, 220)}</p>
       </div>
     </article>
   `;
 }
 
-function getCategorySlug() {
-  const parts = window.location.pathname.split('/').filter(Boolean);
-  return parts[parts.length - 1];
+function collectCategories(rows) {
+  const map = new Map();
+  rows.forEach((r) => {
+    getCategoriesFromArticle(r).forEach((name) => {
+      const slug = slugify(name);
+      if (!map.has(slug)) map.set(slug, { name, slug });
+    });
+  });
+  return [...map.values()].sort((a, b) => a.name.localeCompare(b.name));
 }
 
-async function loadArticles(categorySlug) {
-  const resp = await fetch('/blog/metadata.json');
-  if (!resp.ok) return [];
+function collectTags(rows) {
+  const map = new Map();
+  rows.forEach((r) => {
+    getTagsFromArticle(r).forEach((name) => {
+      const slug = slugify(name);
+      if (!map.has(slug)) map.set(slug, { name, slug });
+    });
+  });
+  return [...map.values()].sort((a, b) => a.name.localeCompare(b.name));
+}
 
-  const json = await resp.json();
-  const rows = json.data || [];
+function renderSidebar(categories, topics, currentSlug) {
+  return `
+    <aside class="archive-sidebar">
+      <div class="sidebar-section">
+        <h2>Categories</h2>
+        <ul class="sidebar-links">
+          ${categories
+            .map(
+              (c) => `<li><a href="/blog/categories/${c.slug}" class="${c.slug === currentSlug ? 'active' : ''}">${c.name}</a></li>`,
+            )
+            .join('')}
+        </ul>
+      </div>
+      <div class="sidebar-section">
+        <h2>Popular Topics</h2>
+        <div class="topic-links">
+          ${topics
+            .map(
+              (t) => `<a href="/blog/tags/${t.slug}" class="${t.slug === currentSlug ? 'active' : ''}">${t.name}</a>`,
+            )
+            .join('')}
+        </div>
+      </div>
+    </aside>
+  `;
+}
 
-  return rows.filter((row) => {
-    const category = row.category || row.Category || '';
-    const tags = row.tags || row.Tags || '';
-    const categoryValues = `${category},${tags}`.split(',').map((v) => slugify(v));
-    return categoryValues.includes(categorySlug);
+function filterArticles(rows, type, currentSlug) {
+  return rows.filter((article) => {
+    if (type === 'tags') {
+      return getTagsFromArticle(article).map((t) => slugify(t)).includes(currentSlug);
+    }
+    // category: match the category column OR tags (preserves prior behaviour)
+    const values = [
+      ...getCategoriesFromArticle(article),
+      ...getTagsFromArticle(article),
+    ].map((v) => slugify(v));
+    return values.includes(currentSlug);
   });
 }
 
-async function renderCategory(block) {
+async function renderArchive(block, type) {
   block.innerHTML = '';
 
-  const categorySlug = getCategorySlug();
-  const articles = await loadArticles(categorySlug);
+  const currentSlug = getCurrentSlug();
+  const rows = await fetchMetadataRows();
 
-  if (!articles.length) {
-    block.innerHTML = '<p class="no-results">No articles found.</p>';
-    return;
-  }
+  const categories = collectCategories(rows);
+  const topics = collectTags(rows);
+  const articles = filterArticles(rows, type, currentSlug);
 
   articles.sort((a, b) => {
     const da = new Date(a['publication-date'] || a.date || 0);
@@ -188,156 +257,20 @@ async function renderCategory(block) {
   });
 
   block.innerHTML = `
-    <div class="category-header">
-      <h1>${categorySlug.replace(/-/g, ' ')}</h1>
-    </div>
-    <div class="category-list-wrapper">
-      ${articles.map(renderCategoryCard).join('')}
-    </div>
-  `;
-}
-
-/* ============================================================
-   TAGS variation
-   ============================================================ */
-function getTagSlug() {
-  const parts = window.location.pathname.split('/').filter(Boolean);
-  return parts[parts.length - 1];
-}
-
-function getTagsFromArticle(article) {
-  // metadata sheet stores tags under "article:tag"; fall back to tags/Tags
-  const tags = article['article:tag'] || article.tags || article.Tags || '';
-  return tags
-    .split(',')
-    .map((tag) => tag.trim().replace(/^"|"$/g, ''))
-    .filter(Boolean);
-}
-
-async function loadTagArticles(tagSlug) {
-  const resp = await fetch('/blog/metadata.json');
-  if (!resp.ok) return [];
-
-  const json = await resp.json();
-  const rows = json.data || [];
-
-  return rows
-    .filter((r) => r.URL && !r.URL.includes('*'))
-    .filter((article) => {
-      const tags = getTagsFromArticle(article).map((tag) => slugify(tag));
-      return tags.includes(tagSlug);
-    });
-}
-
-async function loadAllTags() {
-  const resp = await fetch('/blog/metadata.json');
-  if (!resp.ok) return [];
-
-  const json = await resp.json();
-  const rows = json.data || [];
-  const tagMap = new Map();
-
-  rows
-    .filter((r) => r.URL && !r.URL.includes('*'))
-    .forEach((article) => {
-      getTagsFromArticle(article).forEach((tag) => {
-        const slug = slugify(tag);
-        if (!tagMap.has(slug)) {
-          tagMap.set(slug, { name: tag, slug });
-        }
-      });
-    });
-
-  return [...tagMap.values()].sort((a, b) => a.name.localeCompare(b.name));
-}
-
-function renderTagCard(article) {
-  const image = article['og:image'] || article.image || '';
-  const date = article['publication-date'] || article.date || article.published;
-
-  return `
-    <article class="tag-card">
-      <a class="tag-card-image" href="${article.url}">
-        ${
-          image
-            ? `<img
-                src="${image}"
-                alt="${article.title}"
-                width="750"
-                height="500"
-                loading="lazy">`
-            : ''
-        }
-      </a>
-      <div class="tag-card-content">
-        <h2 class="tag-card-title">
-          <a href="${article.url}">${article.title}</a>
-        </h2>
-        <div class="tag-card-meta">
-          ${date ? `<span>${formatDate(date)}</span>` : ''}
-          ${article.author ? `<span>By ${article.author}</span>` : ''}
+    <div class="archive-layout">
+      <div class="archive-results">
+        <div class="archive-header">
+          <h1>${currentSlug.replace(/-/g, ' ')}</h1>
         </div>
-        <p class="tag-card-description">${excerpt(article.description, 220, '...')}</p>
+        ${
+          articles.length
+            ? articles.map(renderArchiveCard).join('')
+            : '<p class="no-results">No articles found.</p>'
+        }
       </div>
-    </article>
-  `;
-}
-
-function renderTagsSidebar(tags, currentTag) {
-  return `
-    <aside class="tags-sidebar">
-      <h2>Topics</h2>
-      <ul>
-        ${tags
-          .map(
-            (tag) => `
-              <li>
-                <a
-                  href="/blog/tags/${tag.slug}"
-                  class="${tag.slug === currentTag ? 'active' : ''}">
-                  ${tag.name}
-                </a>
-              </li>
-            `,
-          )
-          .join('')}
-      </ul>
-    </aside>
-  `;
-}
-
-async function renderTags(block) {
-  block.innerHTML = '';
-
-  const currentTag = getTagSlug();
-
-  const [articles, tags] = await Promise.all([
-    loadTagArticles(currentTag),
-    loadAllTags(),
-  ]);
-
-  articles.sort((a, b) => {
-    const da = new Date(a['publication-date'] || a.date || 0);
-    const db = new Date(b['publication-date'] || b.date || 0);
-    return db - da;
-  });
-
-block.innerHTML = `
-  <div class="tags-layout">
-    ${renderTagsSidebar(tags, currentTag)}
-    <div class="tags-results">
-      <div class="tags-header">
-        <h1>${currentTag.replace(/-/g, ' ')}</h1>
-      </div>
-      ${
-        articles.length
-          ? articles.map(renderTagCard).join('')
-          : '<p class="no-results">No articles found.</p>'
-      }
+      ${renderSidebar(categories, topics, currentSlug)}
     </div>
-  </div>
-`;
-
+  `;
 }
 
 /* ============================================================
@@ -346,12 +279,12 @@ block.innerHTML = `
 export default async function init(block) {
   if (block.classList.contains('author')) {
     await renderAuthors(block);
-  } else if (block.classList.contains('category')) {
-    await renderCategory(block);
   } else if (block.classList.contains('tags')) {
-    await renderTags(block);
+    await renderArchive(block, 'tags');
+  } else if (block.classList.contains('category')) {
+    await renderArchive(block, 'category');
   } else {
     // default fallback
-    await renderCategory(block);
+    await renderArchive(block, 'category');
   }
 }

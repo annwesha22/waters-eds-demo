@@ -1,23 +1,17 @@
 /* ============================================================
-   Section reset (both variations break out of the grid)
+   CARD-LIST BLOCK
+   Variations: author | category | tags
    ============================================================ */
-.section.grid-2:has(.card-list.author),
-.section:has(.card-list.author),
-.section.grid-2:has(.card-list.category),
-.section:has(.card-list.category) {
-  --grid-size: 1;
-
-  display: block;
-}
-
-.card-list-wrapper {
-  display: block;
-  width: 100%;
-}
 
 /* ============================================================
-   AUTHOR variation
+   AUTHOR VARIATION
    ============================================================ */
+.section.grid-2:has(.card-list.author),
+.section:has(.card-list.author) {
+  --grid-size: 1;
+  display: block;
+}
+
 .card-list.author {
   width: 100%;
   max-width: 1100px;
@@ -36,7 +30,7 @@
   max-width: calc((100% - 40px) / 2);
   gap: 20px;
   padding: 20px;
-  box-shadow: 0 6px 12px 0 rgba(0, 0, 0, 0.14);
+  box-shadow: 0 6px 12px 0 rgb(0 0 0 / 14%);
   box-sizing: border-box;
 }
 
@@ -106,399 +100,236 @@
 }
 
 /* ============================================================
-   CATEGORY variation
+   CATEGORY + TAGS ARCHIVE LAYOUT
    ============================================================ */
-.card-list.category {
-  width: 100%;
-  max-width: 1280px;
-  margin-inline: auto;
-}
-
-/* Archive header */
-.card-list.category .category-header {
-  margin-bottom: 40px;
-}
-
-.card-list.category .category-header h1 {
-  margin: 0;
-  font-size: 42px;
-  line-height: 1.2;
-  font-weight: 400;
-  color: #333;
-  text-transform: capitalize;
-}
-
-/* Listing */
-.card-list.category .category-list-wrapper {
-  display: flex;
-  flex-direction: column;
-  gap: 40px;
-  width: 100%;
-}
-
-/* Card */
-.card-list.category .category-card {
-  display: grid;
-  grid-template-columns: 45% 55%;
-  background: #eff2f4;
-  box-shadow: 0 4px 12px rgb(0 0 0 / 10%);
-  overflow: hidden;
-  min-height: 360px;
-}
-
-/* Thumbnail */
-.card-list.category .category-card-image {
-  position: relative;
-  height: 100%;
-}
-
-.card-list.category .category-card-image a {
-  display: block;
-  height: 100%;
-}
-
-.card-list.category .category-card-image img {
-  width: 100%;
-  height: 100%;
-  display: block;
-  object-fit: cover;
-}
-
-/* Content */
-.card-list.category .category-card-content {
-  padding: 40px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-/* Title */
-.card-list.category .category-card-title {
-  margin: 0 0 18px;
-  font-size: 20px;
-  line-height: 1.45;
-  font-weight: 400;
-}
-
-.card-list.category .category-card-title a {
-  color: #006ba8;
-  text-decoration: none;
-}
-
-.card-list.category .category-card-title a:hover {
-  color: #008bbd;
-  text-decoration: none;
-}
-
-/* Meta */
-.card-list.category .category-card-meta {
-  margin-bottom: 24px;
-  font-size: 16px;
-  line-height: 1.6;
-  color: #444;
-}
-
-.card-list.category .category-card-meta .author {
-  color: #006ba8;
-}
-
-.card-list.category .category-card-meta .author a {
-  color: #006ba8;
-  text-decoration: none;
-}
-
-.card-list.category .category-card-meta .author a:hover {
-  text-decoration: underline;
-}
-
-.card-list.category .category-card-meta .date {
-  color: #444;
-}
-
-.card-list.category .category-card-meta .reading-time {
-  display: block;
-  margin-top: 2px;
-  color: #444;
-}
-
-/* Description */
-.card-list.category .category-card-description {
-  margin: 0;
-  color: #444;
-  font-size: 18px;
-  line-height: 1.8;
-  font-weight: 400;
-}
-
-/* Empty state */
-.card-list.category .no-results {
-  text-align: center;
-  padding: 80px 0;
-}
-
-.card-list.category .no-results h2 {
-  margin: 0;
-}
-
-/* Tablet */
-@media (max-width: 1024px) {
-  .card-list.category .category-card {
-    grid-template-columns: 1fr;
-  }
-
-  .card-list.category .category-card-image {
-    min-height: 320px;
-  }
-
-  .card-list.category .category-card-content {
-    padding: 32px;
-  }
-}
-
-/* Mobile */
-@media (max-width: 767px) {
-  .card-list.category .category-header h1 {
-    font-size: 34px;
-  }
-
-  .card-list.category .category-card {
-    display: block;
-    min-height: auto;
-  }
-
-  .card-list.category .category-card-image {
-    min-height: 240px;
-  }
-
-  .card-list.category .category-card-content {
-    padding: 24px;
-  }
-
-  .card-list.category .category-card-title {
-    font-size: 18px;
-    margin-bottom: 12px;
-  }
-
-  .card-list.category .category-card-meta {
-    font-size: 15px;
-    margin-bottom: 16px;
-  }
-
-  .card-list.category .category-card-description {
-    font-size: 16px;
-    line-height: 1.7;
-  }
-}
-
-/* ============================================================
-   TAGS VARIATION
-   ============================================================ */
+.section.grid-2:has(.card-list.category),
+.section:has(.card-list.category),
 .section.grid-2:has(.card-list.tags),
 .section:has(.card-list.tags) {
   --grid-size: 1;
   display: block;
 }
 
+.card-list.category,
 .card-list.tags {
-  max-width: 1440px;
-  margin: 0 auto;
   width: 100%;
+  max-width: 1280px;
+  margin-inline: auto;
 }
 
 /* ============================================================
    Layout
    ============================================================ */
-.card-list.tags .tags-layout {
+.archive-layout {
   display: grid;
-  grid-template-columns: 320px minmax(0, 3fr);
-  gap: 48px;
+  grid-template-columns: minmax(0, 1fr) 260px;
+  gap: 40px;
   align-items: start;
 }
 
-/* ============================================================
-   Page Header
-   ============================================================ */
-.card-list.tags .tags-header {
-  margin-bottom: 48px;
+.archive-results {
+  min-width: 0;
 }
 
-.card-list.tags .tags-header h1 {
+.archive-header {
+  margin-bottom: 32px;
+}
+
+.archive-header h1 {
   margin: 0;
   font-size: 42px;
   line-height: 1.2;
   font-weight: 300;
-  color: #333;
   text-transform: capitalize;
+  color: #333;
 }
 
 /* ============================================================
-   Articles Column
+   Cards
    ============================================================ */
-.card-list.tags .tags-results {
-  display: flex;
-  flex-direction: column;
-  gap: 32px;
-}
-
-/* ============================================================
-   Card
-   ============================================================ */
-.card-list.tags .tag-card {
+.archive-card {
   display: grid;
   grid-template-columns: 45% 55%;
   background: #fff;
-  box-shadow: 0 6px 16px rgb(0 0 0 / 8%);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 10%);
+  margin-bottom: 20px;
   overflow: hidden;
 }
 
-.card-list.tags .tag-card-image {
-  position: relative;
-  min-height: 320px;
+.archive-card-image {
+  min-height: 270px;
 }
 
-.card-list.tags .tag-card-image a {
+.archive-card-image a {
   display: block;
-  width: 100%;
   height: 100%;
 }
 
-.card-list.tags .tag-card-image img {
+.archive-card-image img {
   width: 100%;
   height: 100%;
-  display: block;
   object-fit: cover;
+  display: block;
+}
+
+.archive-card-content {
+  padding: 36px;
 }
 
 /* ============================================================
-   Content
+   Title
    ============================================================ */
-.card-list.tags .tag-card-content {
-  padding: 40px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-.card-list.tags .tag-card-title {
-  margin: 0 0 16px;
+.archive-card-title {
+  margin: 0 0 14px;
   font-size: 21px;
   line-height: 1.45;
   font-weight: 300;
 }
 
-.card-list.tags .tag-card-title a {
+.archive-card-title a {
   color: #006ba8;
   text-decoration: none;
 }
 
-.card-list.tags .tag-card-title a:hover {
-  color: #008bbd;
+.archive-card-title a:hover {
+  color: #008bc2;
 }
 
 /* ============================================================
    Meta
    ============================================================ */
-.card-list.tags .tag-card-meta {
-  margin-bottom: 20px;
-  font-size: 15px;
-  line-height: 1.7;
+.archive-card-meta {
+  margin-bottom: 18px;
+  font-size: 14px;
   color: #555;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+  line-height: 1.7;
+}
+
+.archive-card-meta .author {
+  color: #006ba8;
+}
+
+.archive-card-meta .separator {
+  margin: 0 8px;
+  color: #888;
+}
+
+.archive-card-meta .reading-time {
+  display: inline;
 }
 
 /* ============================================================
    Description
    ============================================================ */
-.card-list.tags .tag-card-description {
+.archive-card-description {
   margin: 0;
+  font-size: 16px;
+  line-height: 1.8;
   color: #444;
-  font-size: 18px;
-  line-height: 1.75;
-  font-weight: 300;
 }
 
 /* ============================================================
-   Sidebar  (matches renderTagsSidebar markup)
+   Sidebar
    ============================================================ */
-.card-list.tags .tags-sidebar {
+.archive-sidebar {
   background: #eff2f4;
-  padding: 28px;
+  padding: 20px;
 }
 
-.card-list.tags .tags-sidebar h2 {
-  margin: 0 0 24px;
+.sidebar-section {
+  margin-bottom: 40px;
+}
+
+.sidebar-section h2 {
+  margin: 0 0 16px;
   font-size: 22px;
   font-weight: 300;
   color: #333;
-  position: relative;
 }
 
-.card-list.tags .tags-sidebar h2::after {
+.sidebar-section h2::after {
   content: "";
   display: block;
   width: 140px;
   height: 4px;
-  margin-top: 16px;
-  background: #00a8b5;
+  background: #18b8c7;
+  margin-top: 12px;
 }
 
-.card-list.tags .tags-sidebar ul {
+/* ============================================================
+   Category Links
+   ============================================================ */
+.sidebar-links {
   list-style: none;
   padding: 0;
   margin: 0;
 }
 
-.card-list.tags .tags-sidebar li {
-  margin-bottom: 16px;
+.sidebar-links li {
+  margin-bottom: 12px;
 }
 
-.card-list.tags .tags-sidebar a {
+.sidebar-links a {
   color: #006ba8;
-  font-size: 18px;
-  font-weight: 300;
   text-decoration: none;
+  font-size: 16px;
 }
 
-.card-list.tags .tags-sidebar a:hover {
+.sidebar-links a:hover {
   text-decoration: underline;
 }
 
-.card-list.tags .tags-sidebar a.active {
+.sidebar-links a.active {
+  font-weight: 500;
+}
+
+/* ============================================================
+   Topic Links
+   ============================================================ */
+.topic-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.topic-links a {
+  color: #006ba8;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.topic-links a:hover {
+  text-decoration: underline;
+}
+
+.topic-links a.active {
   font-weight: 500;
 }
 
 /* ============================================================
    Empty State
    ============================================================ */
+.card-list.category .no-results,
 .card-list.tags .no-results {
   text-align: center;
   padding: 80px 0;
+}
+
+.card-list.category .no-results h2,
+.card-list.tags .no-results h2 {
+  margin: 0;
 }
 
 /* ============================================================
    Tablet
    ============================================================ */
 @media (max-width: 1024px) {
-  .card-list.tags .tags-layout {
+  .archive-layout {
     grid-template-columns: 1fr;
   }
 
-  .card-list.tags .tags-sidebar {
-    order: -1;
-  }
-
-  .card-list.tags .tag-card {
-    grid-template-columns: 1fr;
-  }
-
-  .card-list.tags .tag-card-image {
-    min-height: 280px;
-  }
-
-  .card-list.tags .tag-card-content {
-    padding: 32px;
+  .archive-sidebar {
+    order: 2;
   }
 }
 
@@ -506,41 +337,27 @@
    Mobile
    ============================================================ */
 @media (max-width: 767px) {
-  .card-list.tags .tags-header h1 {
-    font-size: 34px;
+  .archive-header h1 {
+    font-size: 32px;
   }
 
-  .card-list.tags .tag-card {
-    display: block;
+  .archive-card {
+    grid-template-columns: 1fr;
   }
 
-  .card-list.tags .tag-card-image {
-    min-height: 220px;
+  .archive-card-image {
+    min-height: 240px;
   }
 
-  .card-list.tags .tag-card-content {
+  .archive-card-content {
     padding: 24px;
   }
 
-  .card-list.tags .tag-card-title {
+  .archive-card-title {
     font-size: 18px;
   }
 
-  .card-list.tags .tag-card-meta {
-    font-size: 14px;
-    margin-bottom: 16px;
-  }
-
-  .card-list.tags .tag-card-description {
-    font-size: 16px;
-    line-height: 1.7;
-  }
-
-  .card-list.tags .tags-sidebar h2 {
-    font-size: 20px;
-  }
-
-  .card-list.tags .tags-sidebar a {
-    font-size: 16px;
+  .archive-card-description {
+    font-size: 15px;
   }
 }
