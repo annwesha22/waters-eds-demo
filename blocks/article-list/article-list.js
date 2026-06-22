@@ -15,6 +15,72 @@ function formatTag(tag) {
     .join(" ");
 }
 
+function slugifyAuthor(name) {
+  return (name || "")
+    .toLowerCase()
+    .trim()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-");
+}
+
+// Fetch the Author -> Slug mapping from /blog/taxonomy.json (authors sheet)
+async function fetchAuthorSlugMap() {
+  const map = {};
+
+  try {
+    const resp = await fetch("/blog/taxonomy.json?sheet=authors");
+
+    if (!resp.ok) {
+      return map;
+    }
+
+    const json = await resp.json();
+    const rows = json.data || (json.authors && json.authors.data) || [];
+
+    rows.forEach((row) => {
+      const name = row.Author || row.Name || row.name;
+      const slug = row.Slug || row.slug;
+
+      if (name) {
+        map[name.trim().toLowerCase()] = slug || slugifyAuthor(name);
+      }
+    });
+  } catch {
+    // ignore — fall back to slugifying the name
+  }
+
+  return map;
+}
+
+// Build the author page path, using the taxonomy slug when available
+function getAuthorPath(name, authorMap) {
+  if (!name) {
+    return "";
+  }
+
+  const slug = authorMap[name.trim().toLowerCase()] || slugifyAuthor(name);
+
+  return `/blog/author/${slug}`;
+}
+
+// Render the author meta. Uses a real <a> so hovering shows the URL.
+function renderAuthorMeta(author, authorMap) {
+  if (!author) {
+    return "";
+  }
+
+  const href = getAuthorPath(author, authorMap);
+
+  return `
+    <a
+      class="article-author-link"
+      href="${href}"
+    >By ${author}</a>
+  `;
+}
+
 export default async function decorate(block) {
   // eslint-disable-next-line no-console
   console.log(block.className);
@@ -27,7 +93,10 @@ export default async function decorate(block) {
   console.log(`Article List Variant: ${isTagPage ? "tagpage" : "default"}`);
 
   try {
-    const response = await fetch("/tools/tools-query-index.json");
+    const [response, authorMap] = await Promise.all([
+      fetch("/tools/tools-query-index.json"),
+      fetchAuthorSlugMap(),
+    ]);
 
     if (!response.ok) {
       throw new Error(`Failed to load index: ${response.status}`);
@@ -87,9 +156,9 @@ export default async function decorate(block) {
               ${filteredArticles
                 .map(
                   (article) => `
-                    <a
+                    <div
                       class="article-card tagpage-card"
-                      href="${article.path}"
+                      data-href="${article.path}"
                       data-tags="${article.tags || ""}"
                     >
                       <img
@@ -107,7 +176,7 @@ export default async function decorate(block) {
                             article["publication-date"],
                           )}</span>
                           <span>|</span>
-                          <span>${article.author}</span>
+                          ${renderAuthorMeta(article.author, authorMap)}
                         </div>
 
                         <div class="article-reading-time">
@@ -120,7 +189,7 @@ export default async function decorate(block) {
                         </p>
 
                       </div>
-                    </a>
+                    </div>
                   `,
                 )
                 .join("")}
@@ -165,7 +234,7 @@ export default async function decorate(block) {
       `;
     } else {
       block.innerHTML = `
-      <p class="article-list-label">Recent Post</p>
+        <p class="article-list-label">Recent Post</p>
 
         <div class="article-filters">
           <button
@@ -188,15 +257,22 @@ export default async function decorate(block) {
               `,
             )
             .join("")}
+
+          <a
+            href="#"
+            class="article-reset-link"
+          >
+            Reset
+          </a>
         </div>
 
         <div class="article-grid">
           ${articles
             .map(
               (article) => `
-                <a
+                <div
                   class="article-card"
-                  href="${article.path}"
+                  data-href="${article.path}"
                   data-tags="${article.tags || ""}"
                 >
                   <img
@@ -212,7 +288,7 @@ export default async function decorate(block) {
                     <div class="article-meta">
                       <span>${formatDate(article["publication-date"])}</span>
                       <span>|</span>
-                      <span>${article.author}</span>
+                      ${renderAuthorMeta(article.author, authorMap)}
                     </div>
 
                     <div class="article-reading-time">
@@ -225,7 +301,7 @@ export default async function decorate(block) {
                     </p>
 
                   </div>
-                </a>
+                </div>
               `,
             )
             .join("")}
@@ -238,6 +314,28 @@ export default async function decorate(block) {
     const buttons = block.querySelectorAll(".filter-btn");
     const cards = block.querySelectorAll(".article-card");
     const paginationContainer = block.querySelector(".article-pagination");
+
+    // Card click -> navigate to the article, unless an inner link was clicked.
+    cards.forEach((card) => {
+      card.addEventListener("click", (event) => {
+        if (event.target.closest("a")) {
+          return; // let real links (e.g. author) handle their own navigation
+        }
+
+        const href = card.dataset.href;
+
+        if (href) {
+          window.location.href = href;
+        }
+      });
+    });
+
+    // Stop author link clicks from bubbling up to the card handler.
+    block.querySelectorAll(".article-author-link").forEach((authorLink) => {
+      authorLink.addEventListener("click", (event) => {
+        event.stopPropagation();
+      });
+    });
 
     function renderPagination(totalPages) {
       paginationContainer.innerHTML = "";
@@ -314,6 +412,29 @@ export default async function decorate(block) {
           updateVisibility();
         });
       });
+
+      const resetLink = block.querySelector(".article-reset-link");
+
+      if (resetLink) {
+        resetLink.addEventListener("click", (event) => {
+          event.preventDefault();
+
+          buttons.forEach((btn) => {
+            btn.classList.remove("active");
+          });
+
+          const allButton = block.querySelector('.filter-btn[data-tag="all"]');
+
+          if (allButton) {
+            allButton.classList.add("active");
+          }
+
+          activeTag = "all";
+          currentPage = 1;
+
+          updateVisibility();
+        });
+      }
     }
 
     updateVisibility();

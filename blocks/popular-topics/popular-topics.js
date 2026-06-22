@@ -20,11 +20,13 @@ function buildTagCounts(articles) {
   const counts = {};
 
   articles.forEach((article) => {
-    if (!article.tags) {
+    const articleTags = article['article-tags'];
+
+    if (!articleTags) {
       return;
     }
 
-    article.tags
+    articleTags
       .split(',')
       .map(normalizeTag)
       .filter(Boolean)
@@ -36,42 +38,36 @@ function buildTagCounts(articles) {
   return counts;
 }
 
-function buildTagMap(taggingData) {
-  const tagMap = {};
+// Read all tags from the "tags" sheet in /blog/taxonomy.json
+function buildTagsFromTaxonomy(taxonomyData) {
+  const rows = taxonomyData?.data
+    || (taxonomyData?.tags && taxonomyData.tags.data)
+    || [];
 
-  const rows = taggingData?.data || taggingData || [];
+  return rows
+    .map((row) => {
+      const name = row.Tag || row.Name || row.name || row.Value || row.value;
+      const slug = row.Slug || row.slug || row.Key || row.key || name;
 
-  rows.forEach((row) => {
-    const key = normalizeTag(row.key);
-    const value = row.value?.trim();
-
-    if (key && value) {
-      tagMap[key] = value;
-    }
-  });
-
-  return tagMap;
+      return { name, slug };
+    })
+    .filter((tag) => tag.name && tag.slug);
 }
 
 export default async function decorate(block) {
-  const authoredTags = [...block.children]
-    .map((row) => row.textContent.trim())
-    .filter(Boolean)
-    .map(normalizeTag);
-
-  const [articlesJson, taggingJson] = await Promise.all([
+  const [articlesJson, taxonomyJson] = await Promise.all([
     fetchJson('/tools/tools-query-index.json'),
-    fetchJson('/docs/library/tagging.json'),
+    fetchJson('/blog/taxonomy.json?sheet=tags'),
   ]);
 
   const articles = articlesJson?.data || articlesJson || [];
   const tagCounts = buildTagCounts(articles);
-  const tagMap = buildTagMap(taggingJson);
+  const tags = buildTagsFromTaxonomy(taxonomyJson);
 
   block.innerHTML = '';
 
   const wrapper = document.createElement('div');
-  wrapper.className = 'popular-topics-wrapper';
+  wrapper.className = 'popular-topics-inner';
 
   const heading = document.createElement('h2');
   heading.className = 'popular-topics-title';
@@ -83,17 +79,17 @@ export default async function decorate(block) {
   const topicsContainer = document.createElement('div');
   topicsContainer.className = 'popular-topics-links';
 
-  authoredTags.forEach((tagKey) => {
-    const displayName = tagMap[tagKey] || tagKey;
-    const count = tagCounts[tagKey] || 0;
+  tags.forEach(({ name, slug }) => {
+    const key = normalizeTag(slug);
+    const count = tagCounts[key] || 0;
 
     const link = document.createElement('a');
     link.className = 'popular-topics-link';
-    link.href = `/blog/tags/${tagKey}`;
+    link.href = `/blog/tags/${slug}`;
 
     link.textContent = count > 0
-      ? `${displayName} (${count})`
-      : displayName;
+      ? `${name} (${count})`
+      : name;
 
     topicsContainer.append(link);
   });
