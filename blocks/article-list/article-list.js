@@ -165,7 +165,7 @@ export default async function decorate(block) {
       `;
     } else {
       block.innerHTML = `
-      <p class="article-list-label">Recent Post</p>
+        <p class="article-list-label">Recent Post</p>
 
         <div class="article-filters">
           <button
@@ -188,6 +188,13 @@ export default async function decorate(block) {
               `,
             )
             .join("")}
+
+          <a
+            href="#"
+            class="article-reset-link"
+          >
+            Reset
+          </a>
         </div>
 
         <div class="article-grid">
@@ -314,6 +321,29 @@ export default async function decorate(block) {
           updateVisibility();
         });
       });
+
+      const resetLink = block.querySelector(".article-reset-link");
+
+      if (resetLink) {
+        resetLink.addEventListener("click", (event) => {
+          event.preventDefault();
+
+          buttons.forEach((btn) => {
+            btn.classList.remove("active");
+          });
+
+          const allButton = block.querySelector('.filter-btn[data-tag="all"]');
+
+          if (allButton) {
+            allButton.classList.add("active");
+          }
+
+          activeTag = "all";
+          currentPage = 1;
+
+          updateVisibility();
+        });
+      }
     }
 
     updateVisibility();

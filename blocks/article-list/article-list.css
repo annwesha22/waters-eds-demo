@@ -17,6 +17,19 @@
   color: #243746;
 }
 
+.article-reset-link {
+  align-self: center;
+  color: #005eb8;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.article-reset-link:hover,
+.article-reset-link:focus {
+  text-decoration: underline;
+}
 
 .article-filters {
   display: flex;
