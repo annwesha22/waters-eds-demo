@@ -1,3 +1,7 @@
+.article-list {
+  background: #fff;
+}
+
 .article-filters {
   display: flex;
   flex-wrap: wrap;
