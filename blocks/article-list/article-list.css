@@ -5,9 +5,18 @@
   width: 100vw;
   margin-left: calc(50% - 50vw);
   margin-right: calc(50% - 50vw);
+  padding-block: 32px; /* white background extends above and below the content */
   padding-inline: 48px; /* keep content aligned with the rest of the page */
   box-sizing: border-box;
 }
+
+.article-list-label {
+  margin: 0 0 24px;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #243746;
+}
+
 
 .article-filters {
   display: flex;

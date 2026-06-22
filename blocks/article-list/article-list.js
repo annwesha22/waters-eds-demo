@@ -165,6 +165,8 @@ export default async function decorate(block) {
       `;
     } else {
       block.innerHTML = `
+      <p class="article-list-label">Recent Post</p>
+
         <div class="article-filters">
           <button
             class="filter-btn active"
