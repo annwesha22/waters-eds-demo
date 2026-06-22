@@ -65,6 +65,22 @@ function getAuthorPath(name, authorMap) {
   return `/blog/author/${slug}`;
 }
 
+// Render the author meta. Uses a real <a> so hovering shows the URL.
+function renderAuthorMeta(author, authorMap) {
+  if (!author) {
+    return "";
+  }
+
+  const href = getAuthorPath(author, authorMap);
+
+  return `
+    <a
+      class="article-author-link"
+      href="${href}"
+    >By ${author}</a>
+  `;
+}
+
 export default async function decorate(block) {
   // eslint-disable-next-line no-console
   console.log(block.className);
@@ -140,9 +156,9 @@ export default async function decorate(block) {
               ${filteredArticles
                 .map(
                   (article) => `
-                    <a
+                    <div
                       class="article-card tagpage-card"
-                      href="${article.path}"
+                      data-href="${article.path}"
                       data-tags="${article.tags || ""}"
                     >
                       <img
@@ -160,15 +176,7 @@ export default async function decorate(block) {
                             article["publication-date"],
                           )}</span>
                           <span>|</span>
-                          <span
-                            class="article-author-link"
-                            data-author-href="${getAuthorPath(
-                              article.author,
-                              authorMap,
-                            )}"
-                            role="link"
-                            tabindex="0"
-                          >By ${article.author}</span>
+                          ${renderAuthorMeta(article.author, authorMap)}
                         </div>
 
                         <div class="article-reading-time">
@@ -181,7 +189,7 @@ export default async function decorate(block) {
                         </p>
 
                       </div>
-                    </a>
+                    </div>
                   `,
                 )
                 .join("")}
@@ -262,9 +270,9 @@ export default async function decorate(block) {
           ${articles
             .map(
               (article) => `
-                <a
+                <div
                   class="article-card"
-                  href="${article.path}"
+                  data-href="${article.path}"
                   data-tags="${article.tags || ""}"
                 >
                   <img
@@ -280,15 +288,7 @@ export default async function decorate(block) {
                     <div class="article-meta">
                       <span>${formatDate(article["publication-date"])}</span>
                       <span>|</span>
-                      <span
-                        class="article-author-link"
-                        data-author-href="${getAuthorPath(
-                          article.author,
-                          authorMap,
-                        )}"
-                        role="link"
-                        tabindex="0"
-                      >By ${article.author}</span>
+                      ${renderAuthorMeta(article.author, authorMap)}
                     </div>
 
                     <div class="article-reading-time">
@@ -301,7 +301,7 @@ export default async function decorate(block) {
                     </p>
 
                   </div>
-                </a>
+                </div>
               `,
             )
             .join("")}
@@ -315,27 +315,25 @@ export default async function decorate(block) {
     const cards = block.querySelectorAll(".article-card");
     const paginationContainer = block.querySelector(".article-pagination");
 
-    // Make author names navigate to their author page without triggering
-    // the parent card link (avoids invalid nested anchors).
-    block.querySelectorAll(".article-author-link").forEach((authorEl) => {
-      const href = authorEl.dataset.authorHref;
+    // Card click -> navigate to the article, unless an inner link was clicked.
+    cards.forEach((card) => {
+      card.addEventListener("click", (event) => {
+        if (event.target.closest("a")) {
+          return; // let real links (e.g. author) handle their own navigation
+        }
 
-      if (!href) {
-        return;
-      }
+        const href = card.dataset.href;
 
-      authorEl.addEventListener("click", (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        window.location.href = href;
-      });
-
-      authorEl.addEventListener("keydown", (event) => {
-        if (event.key === "Enter" || event.key === " ") {
-          event.preventDefault();
-          event.stopPropagation();
+        if (href) {
           window.location.href = href;
         }
+      });
+    });
+
+    // Stop author link clicks from bubbling up to the card handler.
+    block.querySelectorAll(".article-author-link").forEach((authorLink) => {
+      authorLink.addEventListener("click", (event) => {
+        event.stopPropagation();
       });
     });
 
