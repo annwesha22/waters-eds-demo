@@ -20,11 +20,13 @@ function buildTagCounts(articles) {
   const counts = {};
 
   articles.forEach((article) => {
-    if (!article.tags) {
+    const articleTags = article['article-tags'];
+
+    if (!articleTags) {
       return;
     }
 
-    article.tags
+    articleTags
       .split(',')
       .map(normalizeTag)
       .filter(Boolean)
