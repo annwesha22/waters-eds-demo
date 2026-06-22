@@ -14,16 +14,6 @@
   background: #e9f4fa;
   padding: 32px;
 }
-/* blue only on the JS-created wrapper that is INSIDE the block */
-.popular-topics > .popular-topics-wrapper {
-  background: #e9f4fa;
-  padding: 32px;
-}
-.popular-topics > div {
-  background: #e9f4fa;
-  padding: 32px;
-}
-
 
 .popular-topics-title {
   margin: 0;
