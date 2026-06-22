@@ -71,7 +71,7 @@ export default async function decorate(block) {
   block.innerHTML = '';
 
   const wrapper = document.createElement('div');
-  wrapper.className = 'popular-topics-wrapper';
+  wrapper.className = 'popular-topics-inner';
 
   const heading = document.createElement('h2');
   heading.className = 'popular-topics-title';
