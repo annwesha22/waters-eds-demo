@@ -1,0 +1,50 @@
+.popular-topics {
+  background: #fff;
+
+  /* Full-bleed: white background spans the entire viewport width */
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  padding-block: 48px; /* white space above and below the blue block */
+  padding-inline: 48px; /* keep content aligned with the rest of the page */
+  box-sizing: border-box;
+}
+
+.popular-topics-inner {
+  background: #e9f4fa;
+  padding: 32px;
+}
+
+.popular-topics-title {
+  margin: 0;
+  color: #4a5568;
+  font-size: 2rem;
+  font-weight: 300;
+  line-height: 1.2;
+}
+
+.popular-topics-underline {
+  width: 72px;
+  height: 3px;
+  background: #00b5d9;
+  margin: 16px 0 24px;
+}
+
+.popular-topics-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+  line-height: 1.8;
+}
+
+.popular-topics-link {
+  color: #0072ce;
+  text-decoration: none;
+  font-size: 1rem;
+  font-weight: 400;
+}
+
+.popular-topics-link:hover,
+.popular-topics-link:focus {
+  text-decoration: underline;
+}
