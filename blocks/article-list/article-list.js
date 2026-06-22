@@ -15,6 +15,56 @@ function formatTag(tag) {
     .join(" ");
 }
 
+function slugifyAuthor(name) {
+  return (name || "")
+    .toLowerCase()
+    .trim()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-");
+}
+
+// Fetch the Author -> Slug mapping from /blog/taxonomy.json (authors sheet)
+async function fetchAuthorSlugMap() {
+  const map = {};
+
+  try {
+    const resp = await fetch("/blog/taxonomy.json?sheet=authors");
+
+    if (!resp.ok) {
+      return map;
+    }
+
+    const json = await resp.json();
+    const rows = json.data || (json.authors && json.authors.data) || [];
+
+    rows.forEach((row) => {
+      const name = row.Author || row.Name || row.name;
+      const slug = row.Slug || row.slug;
+
+      if (name) {
+        map[name.trim().toLowerCase()] = slug || slugifyAuthor(name);
+      }
+    });
+  } catch {
+    // ignore — fall back to slugifying the name
+  }
+
+  return map;
+}
+
+// Build the author page path, using the taxonomy slug when available
+function getAuthorPath(name, authorMap) {
+  if (!name) {
+    return "";
+  }
+
+  const slug = authorMap[name.trim().toLowerCase()] || slugifyAuthor(name);
+
+  return `/blog/author/${slug}`;
+}
+
 export default async function decorate(block) {
   // eslint-disable-next-line no-console
   console.log(block.className);
@@ -27,7 +77,10 @@ export default async function decorate(block) {
   console.log(`Article List Variant: ${isTagPage ? "tagpage" : "default"}`);
 
   try {
-    const response = await fetch("/tools/tools-query-index.json");
+    const [response, authorMap] = await Promise.all([
+      fetch("/tools/tools-query-index.json"),
+      fetchAuthorSlugMap(),
+    ]);
 
     if (!response.ok) {
       throw new Error(`Failed to load index: ${response.status}`);
@@ -107,7 +160,15 @@ export default async function decorate(block) {
                             article["publication-date"],
                           )}</span>
                           <span>|</span>
-                          <span>${article.author}</span>
+                          <span
+                            class="article-author-link"
+                            data-author-href="${getAuthorPath(
+                              article.author,
+                              authorMap,
+                            )}"
+                            role="link"
+                            tabindex="0"
+                          >By ${article.author}</span>
                         </div>
 
                         <div class="article-reading-time">
@@ -219,7 +280,15 @@ export default async function decorate(block) {
                     <div class="article-meta">
                       <span>${formatDate(article["publication-date"])}</span>
                       <span>|</span>
-                      <span>${article.author}</span>
+                      <span
+                        class="article-author-link"
+                        data-author-href="${getAuthorPath(
+                          article.author,
+                          authorMap,
+                        )}"
+                        role="link"
+                        tabindex="0"
+                      >By ${article.author}</span>
                     </div>
 
                     <div class="article-reading-time">
@@ -245,6 +314,30 @@ export default async function decorate(block) {
     const buttons = block.querySelectorAll(".filter-btn");
     const cards = block.querySelectorAll(".article-card");
     const paginationContainer = block.querySelector(".article-pagination");
+
+    // Make author names navigate to their author page without triggering
+    // the parent card link (avoids invalid nested anchors).
+    block.querySelectorAll(".article-author-link").forEach((authorEl) => {
+      const href = authorEl.dataset.authorHref;
+
+      if (!href) {
+        return;
+      }
+
+      authorEl.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        window.location.href = href;
+      });
+
+      authorEl.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          event.stopPropagation();
+          window.location.href = href;
+        }
+      });
+    });
 
     function renderPagination(totalPages) {
       paginationContainer.innerHTML = "";

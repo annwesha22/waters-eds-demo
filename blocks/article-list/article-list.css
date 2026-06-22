@@ -26,6 +26,17 @@
   cursor: pointer;
 }
 
+.article-author-link {
+  color: #005eb8;
+  cursor: pointer;
+}
+
+.article-author-link:hover,
+.article-author-link:focus {
+  text-decoration: underline;
+  outline: none;
+}
+
 .article-reset-link:hover,
 .article-reset-link:focus {
   text-decoration: underline;
