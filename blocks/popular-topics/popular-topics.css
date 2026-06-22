@@ -1,5 +1,13 @@
 .popular-topics {
-  margin: 48px 0;
+  background: #fff;
+
+  /* Full-bleed: white background spans the entire viewport width */
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  padding-block: 48px; /* white space above and below the blue block */
+  padding-inline: 48px; /* keep content aligned with the rest of the page */
+  box-sizing: border-box;
 }
 
 .popular-topics-wrapper {
