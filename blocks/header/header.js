@@ -1,7 +1,6 @@
 import { getConfig, getMetadata } from '../../scripts/ak.js';
 import { loadFragment } from '../fragment/fragment.js';
 import { setColorScheme } from '../section-metadata/section-metadata.js';
-
 const { locale } = getConfig();
 
 const HEADER_PATH = '/fragments/nav/header';
@@ -10,6 +9,249 @@ const HEADER_ACTIONS = [
   '/tools/widgets/language',
   '/tools/widgets/toggle',
 ];
+
+function slugify(name) {
+  return name.toLowerCase().trim().replace(/&/g, '').replace(/\s+/g, '-').replace(/-+/g, '-');
+}
+
+function parseTags(raw) {
+  if (!raw) return [];
+  if (Array.isArray(raw)) return raw;
+  if (typeof raw !== 'string') return [String(raw)];
+  try { return JSON.parse(raw); } catch { /* not JSON */ }
+  return raw.replace(/^"|"$/g, '').split(',').map((t) => t.trim()).filter(Boolean);
+}
+
+async function fetchTaxonomy() {
+  const map = {};
+  try {
+    const resp = await fetch('/blog/taxonomy.json');
+    if (!resp.ok) return map;
+    const json = await resp.json();
+
+    const sheetNames = json[':names'] || Object.keys(json).filter((k) => json[k] && json[k].data);
+    const allRows = [];
+    if (sheetNames.length) {
+      sheetNames.forEach((s) => { if (json[s] && json[s].data) allRows.push(...json[s].data); });
+    } else if (json.data) {
+      allRows.push(...json.data);
+    }
+
+    allRows.forEach((r) => {
+      const name = r.Author || r.Tag || r.Category || r.Name || r.Title;
+      const slug = r.Slug;
+      if (name && slug) map[name.trim().toLowerCase()] = slug;
+    });
+  } catch { /* ignore */ }
+  return map;
+}
+
+async function fetchSearchData() {
+  try {
+    const resp = await fetch('/blog/metadata.json');
+    if (!resp.ok) return [];
+    const json = await resp.json();
+    const rows = json.data || [];
+    return rows
+      .filter((r) => r.URL && !r.URL.includes('*'))
+      .map((r) => ({
+        path: r.URL,
+        title: r.title || '',
+        description: r.description || '',
+        author: r.author || '',
+        category: r.category || '',
+        tags: r['article:tag'] || '',
+        image: r['og:image'] || r['og-image'] || r.image || '',
+      }));
+  } catch {
+    return [];
+  }
+}
+
+function categoriesOf(item) {
+  return item.category
+    ? item.category.split(',').map((c) => c.trim().replace(/^"|"$/g, '')).filter(Boolean)
+    : [];
+}
+
+function tagsOf(item) {
+  return parseTags(item.tags);
+}
+
+function authorsOf(items) {
+  return [...new Set(items.map((item) => item.author?.trim()).filter(Boolean))];
+}
+
+function buildSearchEntities(items, taxonomy) {
+  const entities = [];
+
+  const categories = new Set();
+  items.forEach((item) => categoriesOf(item).forEach((c) => categories.add(c)));
+  categories.forEach((category) => {
+    const slug = taxonomy[category.toLowerCase()] || slugify(category);
+    entities.push({ type: 'category', title: category, path: `/blog/categories/${slug}` });
+  });
+
+  const tags = new Set();
+  items.forEach((item) => tagsOf(item).forEach((t) => tags.add(t)));
+  tags.forEach((tag) => {
+    const slug = taxonomy[tag.toLowerCase()] || slugify(tag);
+    entities.push({ type: 'tag', title: tag, path: `/blog/tags/${slug}` });
+  });
+
+  authorsOf(items).forEach((author) => {
+    const slug = taxonomy[author.toLowerCase()] || slugify(author);
+    entities.push({ type: 'author', title: author, path: `/blog/author/${slug}` });
+  });
+
+  return entities;
+}
+
+function matchesQuery(item, query) {
+  const q = query.toLowerCase();
+  return [item.title, item.description, item.author, item.category, ...parseTags(item.tags)]
+    .filter(Boolean)
+    .some((value) => value.toLowerCase().includes(q));
+}
+
+function resolveDestination(query, items, taxonomy) {
+  const q = query.toLowerCase().trim();
+  const entities = buildSearchEntities(items, taxonomy);
+
+  const exactEntity = entities.find((e) => e.title.toLowerCase() === q);
+  if (exactEntity) return exactEntity.path;
+
+  const exactArticle = items.find((item) => item.title.toLowerCase() === q);
+  if (exactArticle) return exactArticle.path;
+
+  const partialEntity = entities.find((e) => e.title.toLowerCase().includes(q));
+  if (partialEntity) return partialEntity.path;
+
+  const article = items.find((item) => matchesQuery(item, q));
+  return article?.path || null;
+}
+
+function renderSearchResults(resultsEl, items, query, taxonomy) {
+  if (!query) {
+    resultsEl.innerHTML = '';
+    resultsEl.hidden = true;
+    return;
+  }
+
+  const entities = buildSearchEntities(items, taxonomy);
+
+  const articleResults = items
+    .filter((item) => matchesQuery(item, query))
+    .slice(0, 5)
+    .map((item) => ({
+      type: 'article',
+      title: item.title,
+      category: categoriesOf(item)[0] || '',
+      author: item.author || '',
+      path: item.path,
+    }));
+
+  const entityResults = entities
+    .filter((entity) => entity.title.toLowerCase().includes(query))
+    .slice(0, 3);
+
+  const results = [...entityResults, ...articleResults].slice(0, 8);
+
+  if (!results.length) {
+    resultsEl.innerHTML = '<p class="search-no-results">No results found</p>';
+    resultsEl.hidden = false;
+    return;
+  }
+
+  const metaLabel = { author: 'Author', category: 'Category', tag: 'Tag' };
+
+  resultsEl.innerHTML = results.map((item) => {
+    const meta = metaLabel[item.type]
+      || `${item.category || ''}${item.author ? ` • ${item.author}` : ''}`;
+    return `
+      <a class="search-result" href="${item.path}">
+        <div class="search-result-content">
+          <span class="search-result-title">${item.title}</span>
+          <span class="search-result-meta">${meta}</span>
+        </div>
+      </a>
+    `;
+  }).join('');
+
+  resultsEl.hidden = false;
+}
+
+function initSearch(el) {
+  const placeholder = el.querySelector('p')?.textContent?.trim() || 'Search topics, titles and authors';
+
+  el.innerHTML = '';
+
+  const wrapper = document.createElement('div');
+  wrapper.className = 'search-wrapper';
+
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.className = 'search-input';
+  input.placeholder = placeholder;
+
+  const btn = document.createElement('button');
+  btn.className = 'search-btn';
+  btn.setAttribute('aria-label', 'Search');
+  btn.innerHTML = '<svg class="icon icon-search"><use href="/img/icons/search.svg#search"></use></svg>';
+
+  const results = document.createElement('div');
+  results.className = 'search-results';
+  results.hidden = true;
+
+  let dataPromise = null;
+  const ensureData = () => {
+    if (!dataPromise) {
+      dataPromise = Promise.all([fetchSearchData(), fetchTaxonomy()])
+        .then(([items, taxonomy]) => ({ items, taxonomy }));
+    }
+    return dataPromise;
+  };
+
+  const runSearch = async () => {
+    const query = input.value.trim().toLowerCase();
+    const { items, taxonomy } = await ensureData();
+    renderSearchResults(results, items, query, taxonomy);
+  };
+
+  const submit = async () => {
+    const query = input.value.trim().toLowerCase();
+    if (!query) {
+      input.focus();
+      return;
+    }
+    const { items, taxonomy } = await ensureData();
+    const dest = resolveDestination(query, items, taxonomy);
+    if (dest) window.location.href = dest;
+  };
+
+  input.addEventListener('focus', ensureData);
+  input.addEventListener('input', runSearch);
+
+  btn.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    submit();
+  });
+
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      submit();
+    }
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!el.contains(e.target)) results.hidden = true;
+  });
+
+  wrapper.append(input, btn);
+  el.append(wrapper, results);
+}
 
 function closeAllMenus() {
   const openMenus = document.body.querySelectorAll('header .is-open');
@@ -30,59 +272,43 @@ function toggleMenu(menu) {
     document.removeEventListener('click', docClose);
     return;
   }
-
-  // Setup the global close event
   document.addEventListener('click', docClose);
   menu.classList.add('is-open');
 }
 
 function decorateLanguage(btn) {
-  // Find the parent list item context wrapping your button natively
   const utilityLi = btn.closest('li') || btn.closest('.utility-action-item');
   if (!utilityLi) return;
-  
+
   btn.removeAttribute('onclick');
 
   btn.addEventListener('click', async (e) => {
     e.preventDefault();
     e.stopPropagation();
 
-    // Check if the dropdown menu already exists inside this list item
     let menu = utilityLi.querySelector('.language.menu');
     if (!menu) {
-      // 1. Fetch the raw layout fragment from your authorized path
       const fragment = await loadFragment(`${locale.prefix}${HEADER_PATH}/languages`);
-      
-      // 2. Create the clean absolute container card
+
       menu = document.createElement('div');
       menu.className = 'language menu';
-      
-      // 3. Extract the inner <ul> list elements from your document payload
+
       const rawUl = fragment.querySelector('ul');
       if (rawUl) {
         rawUl.className = 'language-menu-list';
-        
-        // Loop through each item to apply standard interactive menu classes
         [...rawUl.children].forEach((li) => {
           li.className = 'language-menu-item';
-          
           const a = li.querySelector('a');
-          if (a) {
-            a.className = 'language-menu-link';
-          }
+          if (a) a.className = 'language-menu-link';
         });
-        
         menu.append(rawUl);
       } else {
-        // Fallback if no <ul> is found in the fragment
         menu.append(fragment);
       }
-      
-      // Append right inside the scoped list item wrapper so it inherits absolute tracking coordinates
+
       utilityLi.append(menu);
     }
-    
-    // 4. Fire your baseline state manager to toggle the dropdown visibility card
+
     toggleMenu(utilityLi);
   });
 }
@@ -93,8 +319,7 @@ function decorateScheme(btn) {
 
     let currPref = localStorage.getItem('color-scheme');
     if (!currPref) {
-      currPref = matchMedia('(prefers-color-scheme: dark)')
-        .matches ? 'dark-scheme' : 'light-scheme';
+      currPref = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark-scheme' : 'light-scheme';
     }
 
     const theme = currPref === 'dark-scheme'
@@ -104,11 +329,9 @@ function decorateScheme(btn) {
     body.classList.remove(theme.remove);
     body.classList.add(theme.add);
     localStorage.setItem('color-scheme', theme.add);
-    // Re-calculatie section schemes
+
     const sections = document.querySelectorAll('.section');
-    for (const section of sections) {
-      setColorScheme(section);
-    }
+    for (const section of sections) setColorScheme(section);
   });
 }
 
@@ -143,50 +366,60 @@ async function decorateAction(header, pattern) {
   if (pattern === '/tools/widgets/toggle') decorateNavToggle(btn);
 }
 
-function decorateMenu(li) {
-  const submenu = li.querySelector(':scope > ul');
-  if (!submenu) return null;
-
-  li.classList.add('has-dropdown');
-
+function decorateCategoriesDropdown(li) {
   const wrapper = document.createElement('div');
   wrapper.className = 'single-menu';
   const inner = document.createElement('div');
   inner.className = 'single-menu-inner';
 
-  submenu.classList.add('single-menu-list');
-  inner.append(submenu);
+  const ul = document.createElement('ul');
+  ul.className = 'single-menu-list';
+
+  inner.append(ul);
   wrapper.append(inner);
-
-  [...submenu.children].forEach((item) => {
-    item.classList.add('single-menu-item');
-
-    const link = item.querySelector('a');
-    if (link) {
-      link.classList.add('single-menu-link');
-    }
-  });
-
   li.append(wrapper);
-  return wrapper;
-}
 
-function decorateMegaMenu(li) {
-  const menu = li.querySelector('.fragment-content');
-  if (!menu) return null;
-  const wrapper = document.createElement('div');
-  wrapper.className = 'mega-menu';
-  wrapper.append(menu);
-  li.append(wrapper);
-  return wrapper;
+  fetch('/blog/taxonomy.json')
+    .then((response) => {
+      if (!response.ok) throw new Error('Failed to fetch categories spreadsheet');
+      return response.json();
+    })
+    .then((json) => {
+      const sheetNames = json[':names'] || Object.keys(json).filter((k) => json[k]?.data);
+
+      let rows = [];
+      if (sheetNames.length) {
+        sheetNames.forEach((sheet) => {
+          if (json[sheet]?.data) rows.push(...json[sheet].data);
+        });
+      } else {
+        rows = json.data || [];
+      }
+
+      rows.forEach((row) => {
+        const category = row.Category?.trim() || row.category?.trim();
+        const slug = row.Slug?.trim() || row.slug?.trim();
+        if (!category || !slug) return;
+
+        const item = document.createElement('li');
+        item.className = 'single-menu-item';
+
+        const a = document.createElement('a');
+        a.className = 'single-menu-link';
+        a.href = `/blog/categories/${slug}`;
+        a.textContent = category;
+
+        item.append(a);
+        ul.append(item);
+      });
+    })
+    .catch((err) => console.error('Error loading dynamic categories:', err));
 }
 
 function decorateNavItem(li) {
   li.classList.add('main-nav-item');
 
-  const link =
-    li.querySelector(':scope > p > a')
-    || li.querySelector(':scope > a');
+  const link = li.querySelector(':scope > p > a') || li.querySelector(':scope > a');
 
   if (!link) {
     const text = li.textContent.trim();
@@ -203,48 +436,16 @@ function decorateNavItem(li) {
   }
 
   const currentLink = li.querySelector('.main-nav-link');
-  const linkText = currentLink ? currentLink.textContent.trim().toLowerCase() : li.textContent.trim().toLowerCase();
-  const isCategories = linkText.includes('categories');
+  const linkText = currentLink
+    ? currentLink.textContent.trim().toLowerCase()
+    : li.textContent.trim().toLowerCase();
 
-  if (isCategories) {
-    li.classList.add('has-dropdown');
+  if (!linkText.includes('categories')) return;
 
-    const wrapper = document.createElement('div');
-    wrapper.className = 'single-menu';
-    const inner = document.createElement('div');
-    inner.className = 'single-menu-inner';
+  li.classList.add('has-dropdown');
+  decorateCategoriesDropdown(li);
 
-    const ul = document.createElement('ul');
-    ul.className = 'single-menu-list';
-    
-    inner.append(ul);
-    wrapper.append(inner);
-    li.append(wrapper);
-
-    fetch('/docs/library/metadata/categories.json')
-      .then((response) => {
-        if (!response.ok) throw new Error('Failed to fetch categories spreadsheet');
-        return response.json();
-      })
-      .then((json) => {
-        const categories = json.data || [];
-        categories.forEach((row) => {
-          const item = document.createElement('li');
-          item.className = 'single-menu-item';
-
-          const a = document.createElement('a');
-          a.className = 'single-menu-link';
-          a.href = row.path;      
-          a.textContent = row.label; 
-          
-          item.append(a);
-          ul.append(item);
-        });
-      })
-      .catch((err) => console.error('Error loading dynamic categories:', err));
-  }
-
-  if (isCategories && currentLink) {
+  if (currentLink) {
     currentLink.classList.add('dropdown-trigger');
 
     const arrow = document.createElement('span');
@@ -264,7 +465,8 @@ function decorateBrandSection(section) {
   const brandLink = section.querySelector('a');
   if (!brandLink) return;
 
-  const textNode = [...brandLink.childNodes].find(node => node.nodeType === Node.TEXT_NODE && node.textContent.trim());
+  const textNode = [...brandLink.childNodes]
+    .find((node) => node.nodeType === Node.TEXT_NODE && node.textContent.trim());
   if (textNode) {
     const span = document.createElement('span');
     span.className = 'brand-text-suffix';
@@ -286,125 +488,99 @@ function decorateNavSection(section) {
   navContent.append(nav);
 
   const mainNavItems = section.querySelectorAll('nav > ul > li');
-  for (const navItem of mainNavItems) {
-    decorateNavItem(navItem);
-  }
+  for (const navItem of mainNavItems) decorateNavItem(navItem);
 }
 
-async function decorateActionSection(section) {
+function decorateActionSection(section) {
   section.classList.add('actions-section');
   const items = section.querySelectorAll('li');
 
   items.forEach((item) => {
     const text = item.textContent.trim().toLowerCase();
-
     if (text === 'search') {
       item.textContent = '';
-
-      const wrapper = document.createElement('div');
-      wrapper.className = 'search-wrapper';
-
-      const icon = document.createElement('span');
-      icon.className = 'search-icon';
-
-      const input = document.createElement('input');
-      input.type = 'search';
-      input.placeholder = 'Search';
-      input.className = 'search-input';
-
-      wrapper.append(icon, input);
-      item.append(wrapper);
+      const searchBlock = document.createElement('div');
+      searchBlock.className = 'search';
+      item.append(searchBlock);
+      initSearch(searchBlock);
     }
   });
 }
 
+function buildUtilityBar(utilitySection) {
+  const topUtilityContent = utilitySection.querySelector('.default-content');
+  if (!topUtilityContent) return;
+
+  const langWrapper = utilitySection.querySelector('.action-wrapper.globe')
+    || utilitySection.querySelector('.action-wrapper.language');
+
+  if (langWrapper) {
+    let utilityUl = topUtilityContent.querySelector('ul');
+    if (!utilityUl) {
+      utilityUl = document.createElement('ul');
+      topUtilityContent.append(utilityUl);
+    }
+
+    let utilityLi = langWrapper.closest('li');
+    if (!utilityLi) {
+      utilityLi = document.createElement('li');
+      utilityLi.append(langWrapper);
+    }
+
+    utilityLi.className = 'utility-action-item';
+    utilityUl.append(utilityLi);
+
+    const btn = langWrapper.querySelector('button');
+    if (btn) decorateLanguage(btn);
+  }
+
+  [...topUtilityContent.childNodes]
+    .filter((node) => node.nodeType === Node.TEXT_NODE)
+    .forEach((node) => {
+      if (node.textContent.trim().toLowerCase() === 'language') node.remove();
+    });
+}
+
+function buildMainHeaderRow(brandSection, navSection) {
+  const mainHeaderRow = document.createElement('div');
+  mainHeaderRow.className = 'main-header-row';
+
+  const brandContent = brandSection.querySelector('.default-content');
+  if (brandContent) mainHeaderRow.append(brandContent);
+
+  const navElement = document.createElement('nav');
+  const mainNavList = navSection.querySelector('.main-nav-list');
+  if (mainNavList) navElement.append(mainNavList);
+  mainHeaderRow.append(navElement);
+
+  const searchBlock = navSection.querySelector('.search');
+  if (searchBlock) {
+    const actionsDiv = document.createElement('div');
+    actionsDiv.className = 'actions-wrapper-right';
+    actionsDiv.append(searchBlock);
+    mainHeaderRow.append(actionsDiv);
+  }
+
+  return mainHeaderRow;
+}
+
 async function decorateHeader(fragment) {
   const sections = fragment.querySelectorAll(':scope > .section');
-  
+
   if (sections.length === 3) {
-    // 1. Label the top utility strip wrapper natively
     sections[0].classList.add('top-utility-section');
-    
-    // 2. Run standard baseline action block layout processing elements
-    await decorateActionSection(sections[2]);
-    
-    // 3. Process corporate branding block and main core navigation
+
+    decorateActionSection(sections[2]);
     decorateBrandSection(sections[1]);
     decorateNavSection(sections[2]);
-    
-    // 4. Compile actions completely across all sections (including the utility bar)
+
     for (const pattern of HEADER_ACTIONS) {
       await decorateAction(fragment, pattern);
     }
 
-    // 5. Create the main horizontal flex row wrapper
-    const mainHeaderRow = document.createElement('div');
-    mainHeaderRow.className = 'main-header-row';
-    
-    // Move logo content inside
-    const brandContent = sections[1].querySelector('.default-content');
-    if (brandContent) {
-      mainHeaderRow.append(brandContent);
-    }
-    
-    // Build navigation container
-    const navElement = document.createElement('nav');
-    const mainNavList = sections[2].querySelector('.main-nav-list');
-    if (mainNavList) {
-      navElement.append(mainNavList);
-    }
-    mainHeaderRow.append(navElement);
-    
-    // Extract and pin the search wrapper block to the right
-    const searchWrapper = sections[2].querySelector('.search-wrapper');
-    if (searchWrapper) {
-      const actionsDiv = document.createElement('div');
-      actionsDiv.className = 'actions-wrapper-right';
-      actionsDiv.append(searchWrapper);
-      mainHeaderRow.append(actionsDiv);
-    }
+    const mainHeaderRow = buildMainHeaderRow(sections[1], sections[2]);
+    buildUtilityBar(sections[0]);
 
-    // --- NEW DIRECT UTILITY INTERACTION BINDING ---
-    const topUtilityContent = sections[0].querySelector('.default-content');
-    if (topUtilityContent) {
-      // Find the language wrapper directly inside the utility section where it was generated
-      const langWrapper = sections[0].querySelector('.action-wrapper.globe') || sections[0].querySelector('.action-wrapper.language');
-      
-      if (langWrapper) {
-        // Ensure a clean <ul> container exists inside the utility bar
-        let utilityUl = topUtilityContent.querySelector('ul');
-        if (!utilityUl) {
-          utilityUl = document.createElement('ul');
-          topUtilityContent.append(utilityUl);
-        }
-
-        // Safely check for or create the <li> item wrapper
-        let utilityLi = langWrapper.closest('li');
-        if (!utilityLi) {
-          utilityLi = document.createElement('li');
-          utilityLi.append(langWrapper);
-        }
-        
-        utilityLi.className = 'utility-action-item';
-        utilityUl.append(utilityLi); 
-          
-        // Re-bind the language click event controller to the transformed button element
-        const btn = langWrapper.querySelector('button');
-        if (btn) {
-          decorateLanguage(btn);
-        }
-      }
-
-      // Clean out raw authored static text nodes cleanly
-      const textNodes = [...topUtilityContent.childNodes].filter(node => node.nodeType === Node.TEXT_NODE);
-      textNodes.forEach(node => {
-        if (node.textContent.trim().toLowerCase() === 'language') {
-          node.remove();
-        }
-      });
-    }
-
-    // CRITICAL CORRECTION: Append the assembled rows to the DOM and clear old fragments
     sections[0].after(mainHeaderRow);
     sections[1].remove();
     sections[2].remove();
@@ -412,7 +588,7 @@ async function decorateHeader(fragment) {
     if (sections[0]) decorateBrandSection(sections[0]);
     if (sections[1]) decorateNavSection(sections[1]);
     if (sections[2]) decorateActionSection(sections[2]);
-    
+
     for (const pattern of HEADER_ACTIONS) {
       await decorateAction(fragment, pattern);
     }

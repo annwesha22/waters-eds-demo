@@ -1,0 +1,44 @@
+/* Disclaimer block - full-width background, centered text */
+.disclaimer {
+  --disclaimer-bg: var(--global-palette8, #f7f8fa);
+  --disclaimer-border: var(--global-palette7, #edf2f7);
+  --disclaimer-text: var(--global-palette4, #4a5568);
+
+  box-sizing: border-box;
+  position: relative;
+
+  /* Vertical spacing */
+  padding: 2.5rem 1.5rem;
+}
+
+/* Full-width background painted behind, ignoring container constraints */
+.disclaimer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  background-color: var(--disclaimer-bg);
+  border-top: 3px solid var(--disclaimer-border);
+  z-index: -1;
+}
+
+/* Center the text with equal space on both sides */
+.disclaimer > div {
+  box-sizing: border-box;
+  max-width: 1140px;
+  margin: 0 auto;
+}
+
+.disclaimer p {
+  margin: 0;
+  font-weight: 300;
+  font-size: 13.5px;
+  line-height: 1.5;
+  letter-spacing: 0.02em;
+  color: var(--disclaimer-text);
+  text-align: center;
+}

@@ -1,0 +1,260 @@
+.article-list {
+  background: #fff;
+
+  /* Full-bleed: break out of the constrained section to span the viewport */
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  padding-block: 32px; /* white background extends above and below the content */
+  padding-inline: 48px; /* keep content aligned with the rest of the page */
+  box-sizing: border-box;
+}
+
+.article-list-label {
+  margin: 0 0 24px;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #243746;
+}
+
+.article-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 32px;
+}
+
+.filter-btn {
+  padding: 10px 18px;
+  border: 1px solid #d5dce3;
+  background: #fff;
+  color: #243746;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.filter-btn:hover {
+  border-color: #005eb8;
+}
+
+.filter-btn.active {
+  background: #005eb8;
+  border-color: #005eb8;
+  color: #fff;
+}
+
+.article-reset-link {
+  align-self: center;
+  color: #005eb8;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.article-reset-link:hover,
+.article-reset-link:focus {
+  text-decoration: underline;
+}
+
+.article-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+}
+
+.article-card {
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  color: inherit;
+  text-decoration: none;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 10%);
+  transition: transform 0.2s ease;
+  cursor: pointer;
+}
+
+.article-card:hover {
+  transform: translateY(-4px);
+}
+
+.article-card img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  display: block;
+}
+
+.article-card-content {
+  padding: 20px;
+}
+
+.article-card h3 {
+  margin: 0 0 12px;
+  color: #005eb8;
+  font-size: 1.25rem;
+  line-height: 1.4;
+}
+
+.article-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  color: #66788a;
+  font-size: 0.875rem;
+  margin-bottom: 10px;
+}
+
+.article-author-link {
+  color: #005eb8;
+  text-decoration: none;
+}
+
+.article-author-link:hover,
+.article-author-link:focus {
+  text-decoration: underline;
+}
+
+.article-reading-time {
+  font-size: 0.875rem;
+  color: #66788a;
+  margin-bottom: 12px;
+}
+
+.article-description {
+  margin: 0;
+  color: #243746;
+  line-height: 1.6;
+
+  display: -webkit-box;
+  -webkit-line-clamp: 5;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.article-pagination {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 40px;
+}
+
+.page-btn {
+  min-width: 40px;
+  height: 40px;
+  border: 1px solid #d5dce3;
+  background: #fff;
+  cursor: pointer;
+}
+
+.page-btn.active {
+  background: #005eb8;
+  color: #fff;
+  border-color: #005eb8;
+}
+
+.page-btn:hover {
+  border-color: #005eb8;
+}
+
+.article-list-error {
+  color: #c00;
+  padding: 20px;
+}
+
+@media (max-width: 1024px) {
+  .article-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 767px) {
+  .article-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.article-list.tagpage .tagpage-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) 320px;
+  gap: 40px;
+}
+
+.article-list.tagpage .tagpage-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.article-list.tagpage .tagpage-card {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 24px;
+  align-items: start;
+  text-decoration: none;
+  color: inherit;
+  box-shadow: none;
+  border-bottom: 1px solid #d5dce3;
+  padding-bottom: 24px;
+}
+
+.article-list.tagpage .tagpage-card:hover {
+  transform: none;
+}
+
+.article-list.tagpage .tagpage-card img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+}
+
+.article-list.tagpage .tagpage-card .article-card-content {
+  padding: 0;
+}
+
+.article-list.tagpage .article-description {
+  -webkit-line-clamp: unset;
+}
+
+.article-list.tagpage .tagpage-sidebar {
+  background: #f7f8fa;
+  padding: 24px;
+  height: fit-content;
+}
+
+.article-list.tagpage .sidebar-section {
+  margin-bottom: 40px;
+}
+
+.article-list.tagpage .sidebar-section h3 {
+  margin-top: 0;
+  margin-bottom: 16px;
+}
+
+.article-list.tagpage .sidebar-section ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.article-list.tagpage .sidebar-section li {
+  padding: 8px 0;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+@media (max-width: 1024px) {
+  .article-list.tagpage .tagpage-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .article-list.tagpage .tagpage-sidebar {
+    order: -1;
+  }
+}
+
+@media (max-width: 767px) {
+  .article-list.tagpage .tagpage-card {
+    grid-template-columns: 1fr;
+  }
+}

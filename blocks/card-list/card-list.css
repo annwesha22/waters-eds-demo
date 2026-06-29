@@ -1,0 +1,373 @@
+.section.grid-2:has(.card-list.author),
+.section:has(.card-list.author) {
+  --grid-size: 1;
+  display: block;
+}
+
+.card-list.author {
+  width: 100%;
+  max-width: 1100px;
+  margin-inline: auto;
+}
+
+.card-list.author .author-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 40px;
+}
+
+.card-list.author .author-item {
+  display: flex;
+  flex: 0 0 calc((100% - 40px) / 2);
+  max-width: calc((100% - 40px) / 2);
+  gap: 20px;
+  padding: 20px;
+  box-shadow: 0 6px 12px 0 rgb(0 0 0 / 14%);
+  box-sizing: border-box;
+}
+
+.card-list.author .author-pic {
+  flex: 0 0 160px;
+}
+
+.card-list.author .author-pic img {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+}
+
+.card-list.author .author-info {
+  flex: 1;
+  align-self: center;
+  min-width: 0;
+}
+
+.card-list.author .author-info h2 {
+  font-size: 20px;
+  line-height: 1.5;
+  margin: 0 0 8px;
+}
+
+.card-list.author .author-info h2 a {
+  color: #222;
+  text-decoration: none;
+}
+
+.card-list.author .author-info h2 a:hover {
+  color: #006ba8;
+  text-decoration: underline;
+}
+
+.card-list.author .author-info p {
+  font-size: 16px;
+  line-height: 1.625;
+  color: #333;
+  margin: 0 0 8px;
+}
+
+.card-list.author .author-info .archive-link {
+  font-size: 16px;
+  line-height: 36px;
+  color: #00778b;
+  text-decoration: none;
+}
+
+.card-list.author .author-info .archive-link:hover {
+  text-decoration: underline;
+}
+
+@media (width <= 600px) {
+  .card-list.author .author-item {
+    flex: 0 0 100%;
+    max-width: 400px;
+    margin: 0 auto;
+    display: block;
+  }
+
+  .card-list.author .author-pic {
+    flex: none;
+    padding-bottom: 20px;
+  }
+}
+
+.section.grid-2:has(.card-list.category),
+.section:has(.card-list.category),
+.section.grid-2:has(.card-list.tags),
+.section:has(.card-list.tags) {
+  --grid-size: 1;
+  display: block;
+}
+
+.card-list.category,
+.card-list.tags {
+  width: 100%;
+  max-width: 1280px;
+  margin-inline: auto;
+}
+
+.archive-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 255px;
+  gap: 40px;
+  align-items: start;
+}
+
+.archive-results {
+  min-width: 0;
+}
+
+.archive-header {
+  margin-bottom: 32px;
+}
+
+.archive-header h1 {
+  margin: 0;
+  font-size: 32px;
+  line-height: 1.2;
+  font-weight: 300;
+  text-transform: capitalize;
+  color: #333;
+}
+
+.archive-card {
+  display: grid;
+  grid-template-columns: 44% 56%;
+  background: #f3f5f6;
+  box-shadow: 0 3px 12px rgb(0 0 0 / 8%);
+  margin-bottom: 20px;
+  overflow: hidden;
+  min-height: 270px;
+}
+
+.archive-card-image {
+  height: 100%;
+}
+
+.archive-card-image a {
+  display: block;
+  height: 100%;
+}
+
+.archive-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.archive-card-content {
+  padding: 28px 28px 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.archive-card-title {
+  margin: 0 0 12px;
+  font-size: 21px;
+  line-height: 1.45;
+  font-weight: 300;
+  font-family: acumin-pro, sans-serif;
+}
+
+.archive-card-title a {
+  color: #0071b9;
+  text-decoration: none;
+}
+
+.archive-card-title a:hover {
+  color: #0092d1;
+}
+
+.archive-card-meta {
+  margin-bottom: 18px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #555;
+}
+
+.archive-card-meta .author {
+  color: #0071b9;
+}
+
+.archive-card-meta .author a {
+  color: #0071b9;
+  text-decoration: none;
+}
+
+.archive-card-meta .author a:hover {
+  text-decoration: underline;
+}
+
+.archive-card-meta .separator {
+  margin: 0 6px;
+  color: #999;
+}
+
+.archive-card-meta .reading-time {
+  display: inline;
+}
+
+.archive-card-description {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.7;
+  font-weight: 300;
+  color: #444;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.archive-sidebar {
+  background: #eff2f4;
+  padding: 20px;
+}
+
+.sidebar-section {
+  margin-bottom: 42px;
+}
+
+.sidebar-section h2 {
+  margin: 0 0 18px;
+  font-size: 22px;
+  font-weight: 300;
+  line-height: 1.4;
+  color: #333;
+}
+
+.sidebar-section h2::after {
+  content: "";
+  display: block;
+  width: 145px;
+  height: 4px;
+  margin-top: 12px;
+  background: #1eb7c7;
+}
+
+.sidebar-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar-links li {
+  margin-bottom: 12px;
+}
+
+.sidebar-links a {
+  color: #0071b9;
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: 300;
+}
+
+.sidebar-links a:hover {
+  text-decoration: underline;
+}
+
+.sidebar-links a.active {
+  font-weight: 500;
+}
+
+.topic-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.topic-links a {
+  color: #0071b9;
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.topic-links a:hover {
+  text-decoration: underline;
+}
+
+.topic-links a.active {
+  font-weight: 500;
+}
+
+.card-list.category .no-results,
+.card-list.tags .no-results {
+  text-align: center;
+  padding: 80px 0;
+}
+
+@media (max-width: 1024px) {
+  .archive-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .archive-sidebar {
+    order: 2;
+  }
+}
+
+@media (max-width: 767px) {
+  .archive-header h1 {
+    font-size: 32px;
+  }
+
+  .archive-card {
+    grid-template-columns: 1fr;
+  }
+
+  .archive-card-image {
+    min-height: 240px;
+  }
+
+  .archive-card-content {
+    padding: 24px;
+  }
+
+  .archive-card-title {
+    font-size: 18px;
+  }
+
+  .archive-card-description {
+    font-size: 15px;
+  }
+}
+
+.card-list .entry-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 16px;
+  font-size: var(--body-font-size-s);
+  color: #666;
+}
+
+.card-list .entry-meta-divider-vline > span + span::before {
+  content: "|";
+  margin-right: 10px;
+  color: #ccc;
+}
+
+.card-list .entry-meta .posted-by a {
+  color: #00a7b5;
+  text-decoration: none;
+}
+
+.card-list .entry-meta .posted-by a:hover {
+  text-decoration: underline;
+}
+
+.card-list .entry-meta .meta-label {
+  color: #00a7b5;
+}
+
+.card-list .entry-meta .posted-on,
+.card-list .entry-meta .kt-reading-time-wrap {
+  color: #666;
+}
+
+.card-list .entry-meta time.updated {
+  display: none;
+}
