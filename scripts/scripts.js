@@ -33,6 +33,22 @@ const decorateArea = ({ area = document }) => {
   eagerLoad(area, 'img');
 };
 
+/**
+ * Add the SVG files for the icons, prefixed with `codeBasePath` and an optional prefix.
+ * @param {Element} [element] Container element for the icons
+ * @param {string} [prefix] Optional prefix for the icon path
+ */
+function decorateIcons(element, prefix = '') {
+  const icons = element.querySelectorAll('span.icon');
+  icons.forEach((span) => {
+    decorateIcon(span, prefix);
+  });
+}
+
+export function decorateMain(main) {
+  decorateIcons(main);
+}
+
 export async function loadPage() {
   setConfig({ hostnames, locales, linkBlocks, components, decorateArea });
   await loadArea();
