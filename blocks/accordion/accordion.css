@@ -1,0 +1,116 @@
+.accordion {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  interpolate-size: allow-keywords;
+
+  .accordion-item {
+    padding: var(--space-s);
+    background: var(--color-background-subtle);
+    border-radius: var(--radius-s);
+
+    @media (prefers-reduced-motion: no-preference) {
+      &::details-content {
+        block-size: 0;
+        overflow: hidden;
+        opacity: 0;
+        transition:
+          content-visibility 0.3s allow-discrete,
+          block-size 0.3s ease,
+          opacity 0.2s ease;
+      }
+
+      &[open]::details-content {
+        block-size: auto;
+        opacity: 1;
+      }
+    }
+  }
+
+  .section.highlight & .accordion-item {
+    background: var(--color-surface-light);
+  }
+
+  .accordion-item-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-s);
+    cursor: pointer;
+    list-style: none;
+    font-size: var(--font-size-utility-m);
+    line-height: var(--font-line-height-utility-m);
+    font-weight: var(--font-weight-utility);
+    color: var(--color-font-heading);
+
+    &::-webkit-details-marker {
+      display: none;
+    }
+  }
+
+  .accordion-item-label-text {
+    flex: 1 1 auto;
+    font-weight: var(--font-weight-utility);
+
+    > p {
+      margin: 0;
+      font-weight: inherit;
+    }
+  }
+
+  .accordion-item-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    padding: var(--space-xxs);
+    border-radius: var(--radius-s);
+    transition: background-color 0.2s;
+
+    .icon,
+    .icon img {
+      width: var(--icon-m);
+      height: var(--icon-m);
+    }
+
+    .icon-collapse {
+      display: none;
+    }
+  }
+
+  .accordion-item:hover .accordion-item-icon,
+  .accordion-item-label:focus-visible .accordion-item-icon {
+    background: var(--color-surface-light);
+  }
+
+  .section.highlight & .accordion-item:hover .accordion-item-icon,
+  .section.highlight & .accordion-item-label:focus-visible .accordion-item-icon {
+    background: var(--color-surface-subtle);
+  }
+
+  .accordion-item[open] {
+    .accordion-item-icon .icon-expand {
+      display: none;
+    }
+
+    .accordion-item-icon .icon-collapse {
+      display: inline-flex;
+    }
+  }
+
+  .accordion-item-body {
+    padding-top: var(--space-s);
+    padding-right: var(--space-l);
+    font-size: var(--font-size-copy-s);
+    line-height: var(--font-line-height-copy-s);
+    color: var(--color-font-body);
+
+    > :first-child {
+      margin-top: 0;
+    }
+
+    > :last-child {
+      margin-bottom: 0;
+    }
+  }
+}
